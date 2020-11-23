@@ -1,0 +1,17 @@
+name: 'connector_name'
+version: '0.1.0'
+config-version: 2
+require-dbt-version: [">=0.18.0", "<0.19.0"]
+
+
+vars:
+  connector:
+    table_name: "{{ ref('stg_connector__table_name') }}" # all references to staging models should be vars
+
+  connector_source:
+    table_name: "{{ source('connector', 'table_name') }}" # all sources should be vars
+
+models: 
+  materialized: table # for building the package, switch to views later? 
+
+profile: dev_bigquery_dbt_testing
