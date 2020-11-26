@@ -1,0 +1,11 @@
+# for source packages/pulling from the raw connector data
+
+version: 2
+
+# models:
+#   - name: connector_name 
+
+#     tables:
+#     # tables with table and column- level descriptions
+#     # unique/not_null tests on primary keys
+         

@@ -1,7 +1,2 @@
 packages:
-
-  - package: fishtown-analytics/dbt_utils
-    version: [">=0.6.0","<0.7.0"] 
-
-  - git: https://github.com/fivetran/dbt_fivetran_utils.git
-    warn-unpinned: false  
+  - local: ../dbt_jira_source # todo: switch with hub
