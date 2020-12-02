@@ -41,9 +41,12 @@ board as (
     from {{ var('board') }}
 ),
 
-{# epic as (
+issue_epic as (
 
-) #}
+    select * 
+    from {{ ref('jira__issue_epic') }}
+    
+),
 
 issue_users as (
 
@@ -51,9 +54,15 @@ issue_users as (
     from {{ ref('jira__issue_users') }}
 ),
 
+{# project_board as (
+
+    select * 
+    from {{ var('project_board') }}
+), #}
+
 -- todo: agg issue comments
 -- todo: get issue sprints from last sprint of field history table
--- todo: get epic from issue
+-- todo:: should we do boards? without the feature flag it's 1:1 with projects
 
 join_issue as (
 
@@ -97,7 +106,11 @@ join_issue as (
         issue_type.issue_type_name as issue_type,
 
         issue.work_ratio,
-        issue._fivetran_synced
+        issue._fivetran_synced,
+
+        issue_epic.epic_name,
+        issue_epic.epic_issue_id,
+        issue_epic.epic_key,
     
     from issue
     left join project using(project_id)
@@ -107,4 +120,7 @@ join_issue as (
     left join priority using(priority_id)
 
     left join issue_users on issue_users.issue_id = issue.issue_id
+
+    left join issue_epic on issue_epic.issue_id = issue.issue_id
+
 )
