@@ -94,6 +94,7 @@ join_issue as (
         issue.issue_name,
 
         issue.updated_at,
+        issue_type.issue_type_name as issue_type,
 
         issue.work_ratio,
         issue._fivetran_synced

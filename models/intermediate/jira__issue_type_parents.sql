@@ -26,10 +26,11 @@ grab_parents as (
 
     select
         sub.issue_id,
-        {# sub.issue_type_id, #}
+        sub.issue_type,
         sub.parent_issue_id,
         parent.issue_type as parent_issue_type,
-        lower(coalesce(sub.issue_type, '')) = 'epic' as issue_is_epic,
+        parent.issue_name as parent_issue_name,
+        -- lower(coalesce(sub.issue_type, '')) = 'epic' as issue_is_epic,
         lower(coalesce(parent.issue_type, '')) = 'epic' as parent_is_epic
 
     from
