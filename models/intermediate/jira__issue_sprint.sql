@@ -1,6 +1,7 @@
 with sprint as (
 
     select * 
+    --- ack i forgot to add this to the source package: TODO
     from {{ var('sprint') }}
 
 ),
@@ -29,3 +30,17 @@ last_sprint as (
     from field_history
     join sprint_field using (field_id)
 )
+{# ,
+
+issue_sprint as (
+
+    select 
+        last_sprint.issue_id,
+        last_sprint.sprint_id
+
+    from 
+    last_sprint join sprint using (sprint_id)
+    
+)
+ #}
+select * from last_sprint
