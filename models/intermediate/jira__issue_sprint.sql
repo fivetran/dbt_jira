@@ -36,7 +36,7 @@ sprint_rollovers as (
 
     select 
         issue_id,
-        count(distinct case when field_value is not null then field_value end) as n_sprints
+        count(distinct case when field_value is not null then field_value end) as n_sprint_rollovers
     
     from sprint_field_history
     group by 1
@@ -61,7 +61,8 @@ issue_sprint as (
         last_sprint.board_id,
         last_sprint.started_at as sprint_started_at,
         last_sprint.ended_at as sprint_ended_at,
-        last_sprint.completed_at as sprint_completed_at
+        last_sprint.completed_at as sprint_completed_at,
+        sprint_rollovers.n_sprint_rollovers
 
     from 
     last_sprint 

@@ -1,9 +1,13 @@
 with epic as (
+    -- issues with issue_type = 'epic'
 
     select *
     from {{ ref('jira__epic') }}
 ),
 
+-- issue-epic relationships are either captured via the issue's parent_issue_id,
+-- or through the 'Epic Link' field. todo: figure out the pattern behind this...
+-- note: Fivetran plans to fix this because that's wonky!
 issue_parents as (
 
     select *

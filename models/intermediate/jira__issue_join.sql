@@ -117,6 +117,12 @@ join_issue as (
         issue_epic.epic_name,
         issue_epic.epic_issue_id,
         issue_epic.epic_key,
+
+        issue_sprint.sprint_id,
+        issue_sprint.sprint_name,
+        issue_sprint.n_sprint_rollovers,
+
+        board.board_name
     
     from issue
     left join project using(project_id)
@@ -128,5 +134,9 @@ join_issue as (
     left join issue_users on issue_users.issue_id = issue.issue_id
 
     left join issue_epic on issue_epic.issue_id = issue.issue_id
+
+    left join issue_sprint on issue_sprint.issue_id = issue.issue_id
+
+    left join board on issue_sprint.board_id = board.board_id
 
 )
