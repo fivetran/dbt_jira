@@ -7,7 +7,7 @@ with epic as (
 issue_parents as (
 
     select *
-    from {{ ref('jira_issue_type_parents') }}
+    from {{ ref('jira__issue_type_parents') }}
 
 ),
 

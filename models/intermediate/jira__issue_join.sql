@@ -54,15 +54,21 @@ issue_users as (
     from {{ ref('jira__issue_users') }}
 ),
 
-{# project_board as (
+issue_sprint as (
+
+    select *
+    from {{ ref('jira__issue_sprint') }}
+),
+
+board as (
 
     select * 
-    from {{ var('project_board') }}
-), #}
+    from {{ var('board') }}
+),
 
 -- todo: agg issue comments
 -- todo: get issue sprints from last sprint of field history table
--- todo:: should we do boards? without the feature flag it's 1:1 with projects
+-- todo: add components
 
 join_issue as (
 

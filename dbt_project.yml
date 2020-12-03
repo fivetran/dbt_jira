@@ -20,7 +20,7 @@ vars:
     comment: "{{ ref('stg_jira__comment') }}"
     issue_link: "{{ ref('stg_jira__issue_link') }}"
     component: "{{ ref('stg_jira__component') }}"
-    field: "{{ ref('stg_jira__fieldt') }}"
+    field: "{{ ref('stg_jira__field') }}"
     sprint: "{{ ref('stg_jira__sprint') }}"
 
 models: 

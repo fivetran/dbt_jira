@@ -10,6 +10,7 @@ issue_type as (
     from {{ var('issue_type') }}
 ),
 
+-- epics are stored as issues
 epic_only as (
 
     select
