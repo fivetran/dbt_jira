@@ -66,9 +66,14 @@ board as (
     from {{ var('board') }}
 ),
 
+comments as (
+
+    select * 
+    from {{ ref('jira__issue_comments') }}
+),
+
 -- todo: agg issue comments
--- todo: get issue sprints from last sprint of field history table
--- todo: add components
+-- todo: add components - wiat on that
 
 join_issue as (
 
@@ -122,7 +127,9 @@ join_issue as (
         issue_sprint.sprint_name,
         issue_sprint.n_sprint_rollovers,
 
-        board.board_name
+        board.board_name,
+
+        issue_comments.conversation
     
     from issue
     left join project using(project_id)
@@ -138,5 +145,7 @@ join_issue as (
     left join issue_sprint on issue_sprint.issue_id = issue.issue_id
 
     left join board on issue_sprint.board_id = board.board_id
+
+    left join issue_comments on issue_comments.issue_id = issue.issue_id
 
 )

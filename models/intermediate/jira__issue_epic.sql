@@ -1,5 +1,5 @@
 with epic as (
-    -- issues with issue_type = 'epic'
+    -- just a subset of issues with issue_type = 'epic'
 
     select *
     from {{ ref('jira__epic') }}

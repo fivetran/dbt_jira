@@ -15,11 +15,14 @@ grab_types as (
 
     select 
         issue.issue_id,
+        issue.issue_name,
+        issue.parent_issue_id,
+        issue.issue_key,
         {# issue.issue_type_id, #}
         issue_type.issue_type_name as issue_type,
         issue_type.is_subtask
 
-    on issue 
+    from issue 
     
     join issue_type using (issue_type_id)
 ),
@@ -37,9 +40,8 @@ grab_parents as (
         lower(coalesce(parent.issue_type, '')) = 'epic' as parent_is_epic
 
     from
-    issue sub 
-    left join issue parent 
-        on sub.parent_issue_id parent.issue_id
+    grab_types sub 
+    left join grab_types parent on sub.parent_issue_id = parent.issue_id
 )
 
 select * 

@@ -14,13 +14,11 @@ issue_type as (
 epic_only as (
 
     select
-        issue.*,
-        issue_type.issue_type_name as issue_type,
-
+        issue.*
 
     from issue join issue_type using(issue_type_id)
 
-    where lower(issue_type.name) = 'epic'
+    where lower(issue_type.issue_type_name) = 'epic'
 )
 
 select * 
