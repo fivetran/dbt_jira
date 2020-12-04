@@ -35,7 +35,7 @@ last_epic_link as (
 
     select
         field_history.issue_id,
-        last_value(field_history.value respect nulls) over(partition by issue_id order by updated_at asc) as epic_issue_id
+        cast(last_value(field_history.field_value respect nulls) over(partition by issue_id order by updated_at asc) as {{ dbt_utils.type_int() }} ) as epic_issue_id
 
     from field_history
     join epic_field using (field_id)
@@ -47,11 +47,13 @@ grab_epic_name as (
         last_epic_link.issue_id,
         last_epic_link.epic_issue_id,
 
-        issue_parents.issue_name as parent_issue,
-        issue_parents.parent_issue_key,
+        issue_parents.issue_name as epic_name,
+        issue_parents.issue_key as epic_issue_key,
+
         true as parent_is_epic
         
     from last_epic_link 
+    -- grab epic's issue attributes
         join issue_parents on last_epic_link.epic_issue_id = issue_parents.issue_id
 ),
 
@@ -60,14 +62,16 @@ issue_epics as (
     select 
         issue_parents.issue_id,
         {# issue_parents.issue_type, #}
-        issue_parents.parent_issue_key,
-        coalesce(issue_parents.parent_issue_id, last_epic_link.epic_issue_id) as parent_issue_id,
-        coalesce(issue_parents.parent_issue_name, last_epic_link.epic_name) as parent_issue_name,
-        issue_parents.parent_is_epic or coalesce(last_epic_link.parent_is_epic, false) as parent_is_epic
+        coalesce(issue_parents.parent_issue_key, grab_epic_name.epic_issue_key) as parent_issue_key,
+
+        coalesce(issue_parents.parent_issue_id, grab_epic_name.epic_issue_id) as parent_issue_id,
+        coalesce(issue_parents.parent_issue_name, grab_epic_name.epic_name) as parent_issue_name,
+        issue_parents.parent_is_epic or coalesce(grab_epic_name.parent_is_epic, false) as parent_is_epic
 
     from issue_parents
 
-    left join last_epic_link using(issue_id)
+    left join grab_epic_name 
+        on issue_parents.issue_id = grab_epic_name.issue_id
 
 ),
 

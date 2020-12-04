@@ -32,6 +32,8 @@ grab_parents as (
     select
         sub.issue_id,
         sub.issue_type,
+        sub.issue_name,
+        sub.issue_key,
         sub.parent_issue_id,
         parent.issue_type as parent_issue_type,
         parent.issue_name as parent_issue_name,
