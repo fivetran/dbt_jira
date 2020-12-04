@@ -8,7 +8,7 @@ with issue as (
 project as (
 
     select * 
-    from {{ var('issue') }}
+    from {{ var('project') }}
 ),
 
 issue_type as (
@@ -60,20 +60,13 @@ issue_sprint as (
     from {{ ref('jira__issue_sprint') }}
 ),
 
-board as (
-
-    select * 
-    from {{ var('board') }}
-),
-
-comments as (
+issue_comments as (
 
     select * 
     from {{ ref('jira__issue_comments') }}
 ),
 
--- todo: agg issue comments
--- todo: add components - wiat on that
+-- todo: add components - wait on that
 
 join_issue as (
 
@@ -85,7 +78,7 @@ join_issue as (
 
         issue.assignee_user_id,
         issue_users.assignee_name,
-        issue.reporter as reporter_user_id,
+        issue.reporter_user_id,
         issue_users.reporter_name,
         issue_users.assignee_timezone,
 
@@ -106,7 +99,7 @@ join_issue as (
 
         resolution.resolution_name as resolution_type,
 
-        issue.resolved as resolved_at,
+        issue.resolved_at,
 
         status.status_name as current_status,
         issue.status_changed_at,
@@ -125,18 +118,18 @@ join_issue as (
 
         issue_sprint.sprint_id,
         issue_sprint.sprint_name,
-        issue_sprint.n_sprint_rollovers,
+        issue_sprint.n_sprint_changes,
 
         board.board_name,
 
         issue_comments.conversation
     
     from issue
-    left join project using(project_id)
-    left join issue_type using(issue_type_id)
-    left join status using(status_id)
-    left join resolution using(resolution_id)
-    left join priority using(priority_id)
+    left join project on project.project_id = issue.project_id
+    left join issue_type on issue_type.issue_type_id = issue.issue_type_id
+    left join status on status.status_id = issue.status_id
+    left join resolution on resolution.resolution_id = issue.resolution_id
+    left join priority on priority.priority_id = issue.priority_id
 
     left join issue_users on issue_users.issue_id = issue.issue_id
 
@@ -149,3 +142,5 @@ join_issue as (
     left join issue_comments on issue_comments.issue_id = issue.issue_id
 
 )
+
+select * from join_issue
