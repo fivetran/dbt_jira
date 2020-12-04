@@ -33,7 +33,7 @@ issue_user_join as (
     left join user assignee on issue.assignee_user_id = assignee.user_id 
     left join user reporter on issue.reporter_user_id = reporter.user_id
 
-    group by {{ dbt_utils.group_by(n=9) }}
+    {{ dbt_utils.group_by(n=9) }}
 )
 
 select * from issue_user_join
