@@ -35,12 +35,6 @@ priority as (
     from {{ var('priority') }}
 ),
 
-board as (
-
-    select * 
-    from {{ var('board') }}
-),
-
 issue_epic as (
 
     select * 
@@ -66,7 +60,7 @@ issue_comments as (
     from {{ ref('jira__issue_comments') }}
 ),
 
--- todo: add components - wait on that
+-- todo: add components - use daily history thing
 
 join_issue as (
 
@@ -102,7 +96,7 @@ join_issue as (
         issue.resolved_at,
 
         status.status_name as current_status,
-        issue.status_changed_at,
+        issue.status_changed_at as status_last_changed_at, -- todo: change this in stg model
 
         issue.issue_name,
 
@@ -120,7 +114,6 @@ join_issue as (
         issue_sprint.sprint_name,
         issue_sprint.n_sprint_changes,
 
-        board.board_name,
 
         issue_comments.conversation
     
@@ -136,8 +129,6 @@ join_issue as (
     left join issue_epic on issue_epic.issue_id = issue.issue_id
 
     left join issue_sprint on issue_sprint.issue_id = issue.issue_id
-
-    left join board on issue_sprint.board_id = board.board_id
 
     left join issue_comments on issue_comments.issue_id = issue.issue_id
 
