@@ -42,12 +42,15 @@ sprint_rollovers as (
 
 last_sprint as (
 
-    select
-        sprint_field_history.issue_id,
-        cast( last_value(sprint_field_history.field_value respect nulls) over(partition by issue_id order by updated_at asc) as {{ dbt_utils.type_int() }} ) as sprint_id
+    select issue_id, sprint_id 
+    from (
+        select
+            sprint_field_history.issue_id,
+            cast( first_value(sprint_field_history.field_value respect nulls) over(partition by issue_id order by updated_at desc) as {{ dbt_utils.type_int() }} ) as sprint_id
 
-    from sprint_field_history
-    join sprint_field using (field_id)
+        from sprint_field_history 
+    )
+    group by 1,2
 ),
 
 issue_sprint as (
@@ -66,6 +69,8 @@ issue_sprint as (
     last_sprint 
     join sprint on last_sprint.sprint_id = sprint.sprint_id
     left join sprint_rollovers on sprint_rollovers.issue_id = last_sprint.issue_id
+
+    {# {{ dbt_utils.group_by(8) }} #}
     
 )
 
