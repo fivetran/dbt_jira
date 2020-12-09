@@ -33,12 +33,18 @@ epic_field as (
 
 last_epic_link as (
 
+    select issue_id, epic_issue_id 
+    
+    from (
+
     select
         field_history.issue_id,
         cast(last_value(field_history.field_value respect nulls) over(partition by issue_id order by updated_at asc) as {{ dbt_utils.type_int() }} ) as epic_issue_id
 
     from field_history
-    join epic_field using (field_id)
+    join epic_field using (field_id) )
+
+    group by 1,2
 ),
 
 grab_epic_name as (
