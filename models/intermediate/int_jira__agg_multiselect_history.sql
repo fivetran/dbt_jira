@@ -16,6 +16,13 @@ batch_updates as (
     from issue_multiselect_history 
 ),
 
+{# grab_actual_field_values as (
+-- should i create a field_option table that has it all (field_option does not include components or sprints)
+    select
+        *
+    from batch_updates
+), #}
+
 consolidate_batches as (
 
     select 
@@ -24,7 +31,8 @@ consolidate_batches as (
         updated_at,
         batch_id,
 
-        {{ fivetran_utils.string_agg('batch_updates.field_value', "', '") }} as field_values
+        {{ fivetran_utils.string_agg('batch_updates.field_value', "', '") }} as field_values 
+        -- note: these are the IDs pointing to either the ID of field_option, component, sprint, 
 
     from batch_updates
 
