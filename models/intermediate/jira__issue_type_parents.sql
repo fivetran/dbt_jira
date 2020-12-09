@@ -18,7 +18,6 @@ grab_types as (
         issue.issue_name,
         issue.parent_issue_id,
         issue.issue_key,
-        {# issue.issue_type_id, #}
         issue_type.issue_type_name as issue_type,
         issue_type.is_subtask
 
@@ -38,7 +37,6 @@ grab_parents as (
         parent.issue_type as parent_issue_type,
         parent.issue_name as parent_issue_name,
         parent.issue_key as parent_issue_key,
-        -- lower(coalesce(sub.issue_type, '')) = 'epic' as issue_is_epic,
         lower(coalesce(parent.issue_type, '')) = 'epic' as parent_is_epic
 
     from
