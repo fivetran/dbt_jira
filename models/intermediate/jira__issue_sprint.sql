@@ -50,7 +50,7 @@ last_sprint as (
 
         from sprint_field_history 
     )
-    group by 1,2
+    group by 1,2 -- todo: this should probably draw from the daily model thing... since it will include sprint
 ),
 
 issue_sprint as (
@@ -69,8 +69,6 @@ issue_sprint as (
     last_sprint 
     join sprint on last_sprint.sprint_id = sprint.sprint_id
     left join sprint_rollovers on sprint_rollovers.issue_id = last_sprint.issue_id
-
-    {# {{ dbt_utils.group_by(8) }} #}
     
 )
 
