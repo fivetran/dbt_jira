@@ -22,4 +22,4 @@ pivot_out as (
     group by 1,2
 )
 
-select * from pivot_out 
+select * from pivot_out -- todo: backfill stuff for valid_until

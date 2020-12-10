@@ -59,19 +59,38 @@ get_last_value as (
         issue_id,
         field_name,
         last_value,
-        max(updated_at) as last_updated_at
+        max(updated_at) as last_updated_at, -- might not need this
+        max(valid_until) as valid_until
     from (
         select
             {{ dbt_utils.date_trunc('day', 'updated_at') }} as date_day,
             field_id,
             issue_id,
+
             first_value(field_value respect nulls) over(partition by issue_id, field_id order by updated_at desc) as last_value,
+
             updated_at,
-            field_name
+            field_name,
+
+            lag(updated_at, 1) over(partition by issue_id, field_id order by updated_at desc) as valid_until
 
         from limit_to_relevant_fields
     ) 
     group by date_day, field_id, issue_id, field_name, last_value
+),
+
+final as (
+
+    select
+        date_day,
+        issue_id,
+        field_id,
+        field_name,
+        last_value,
+        last_updated_at,
+        coalesce(valid_until, {{ dbt_utils.current_timestamp() }} ) as valid_until
+
+    from get_last_value
 )
 
 select * from get_last_value
