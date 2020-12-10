@@ -6,18 +6,15 @@ with daily_field_history as (
 
 pivot_out as (
     select 
-        date_day, -- this is the first day it is valid
+        valid_starting_on, 
         issue_id,
 
         {% for col in var('issue_field_history_columns') -%}
-            max(case when lower(field_name) = '{{ col | lower }}' then last_value end) as {{ col }}
+            max(case when lower(field_name) = '{{ col | lower }}' then field_value end) as {{ col }}
             {% if not loop.last %},{% endif %}
         {% endfor -%}
-        {# field_name,
-        last_value,
-        last_updated_at #}
 
-    from daily_field_history
+    from daily_field_history -- do i need valid_ending_at??
 
 )
 

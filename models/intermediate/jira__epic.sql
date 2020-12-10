@@ -1,3 +1,6 @@
+-- we're creating an epic table from ISSUE instead of EPIC due to a bug
+-- excluding next-gen project epics from the EPIC table. these epics are 
+-- still captured in the ISSUE table, as issues with an epic `issue_type`
 with issue as (
 
     select * 

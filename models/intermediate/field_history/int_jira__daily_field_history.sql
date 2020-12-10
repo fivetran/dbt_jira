@@ -12,7 +12,7 @@ field as (
 ),
 
 limit_to_relevant_fields as (
--- to remove unncessary rows and grab field names
+-- to remove unncessary rows moving forward and grab field names
     select 
         combined_field_histories.*, 
         field.field_name
@@ -20,7 +20,7 @@ limit_to_relevant_fields as (
     from combined_field_histories join field using(field_id)
 
     where 
-    lower(field.field_name) in ('sprint', 'status' 
+    lower(field.field_name) in ('sprint', 'status' -- any other default things to include? todo
                                 {%- for col in var('issue_field_history_columns') -%}
                                 , {{ "'" ~ col ~ "'" }}
                                 {%- endfor -%} )

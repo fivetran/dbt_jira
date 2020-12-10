@@ -5,9 +5,8 @@ with epic as (
     from {{ ref('jira__epic') }}
 ),
 
--- issue-epic relationships are either captured via the issue's parent_issue_id,
--- or through the 'Epic Link' field. todo: figure out the pattern behind this...
--- note: Fivetran plans to fix this because that's wonky!
+-- issue-epic relationships are either captured via the issue's parent_issue_id (next-gen projects)
+-- or through the 'Epic Link' field (classic projects)
 issue_parents as (
 
     select *
@@ -39,7 +38,7 @@ last_epic_link as (
 
     select
         field_history.issue_id,
-        cast(last_value(field_history.field_value respect nulls) over(partition by issue_id order by updated_at asc) as {{ dbt_utils.type_int() }} ) as epic_issue_id
+        cast( last_value(field_history.field_value respect nulls) over(partition by issue_id order by updated_at asc) as {{ dbt_utils.type_int() }} ) as epic_issue_id
 
     from field_history
     join epic_field using (field_id) ) 
