@@ -86,9 +86,9 @@ final as (
         issue_id,
         field_id,
         field_name,
-        last_value,
+        last_value as field_value,
         last_updated_at,
-        coalesce(valid_until, {{ dbt_utils.current_timestamp() }} ) as valid_until
+        coalesce(valid_until, {{ dbt_utils.current_timestamp() }} ) as valid_until -- may need to add 1 day to this
 
     from get_last_value
 )

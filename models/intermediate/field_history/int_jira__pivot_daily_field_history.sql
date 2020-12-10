@@ -6,7 +6,7 @@ with daily_field_history as (
 
 pivot_out as (
     select 
-        date_day,
+        date_day, -- this is the first day it is valid
         issue_id,
 
         {% for col in var('issue_field_history_columns') -%}
