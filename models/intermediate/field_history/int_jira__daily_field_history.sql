@@ -1,47 +1,23 @@
-with issue_field_history as (
+with combined_field_histories as (
 
-    select * from {{ var('issue_field_history') }}
-),
+    select * 
+    from {{ ref('int_jira__combine_field_histories') }}
 
-issue_multiselect_batch_history as (
-
-    select * from {{ ref('int_jira__agg_multiselect_history') }}
 ),
 
 field as (
 
-    select * from {{ var('field') }}
-),
-
-combine_field_history as (
-
-    select 
-        field_id,
-        issue_id,
-        updated_at,
-        field_value,
-        false as is_multiselect
-
-    from issue_field_history
-
-    union all
-
-    select 
-        field_id,
-        issue_id,
-        updated_at,
-        field_values as field_value,
-        true as is_multiselect
-
-    from issue_multiselect_batch_history
+    select *
+    from {{ var('field') }}
 ),
 
 limit_to_relevant_fields as (
--- and grab field names
+-- to remove unncessary rows and grab field names
+    select 
+        combined_field_histories.*, 
+        field.field_name
 
-    select combine_field_history.*, field.field_name
-
-    from combine_field_history join field using(field_id)
+    from combined_field_histories join field using(field_id)
 
     where 
     lower(field.field_name) in ('sprint', 'status' 
@@ -51,46 +27,35 @@ limit_to_relevant_fields as (
     
 ),
 
-get_last_value as (
-    
-    select 
-        date_day,
-        field_id,
-        issue_id,
-        field_name,
-        last_value,
-        max(updated_at) as last_updated_at, -- might not need this
-        max(valid_until) as valid_until
+get_latest_daily_value as (
+
+    select * 
     from (
-        select
-            {{ dbt_utils.date_trunc('day', 'updated_at') }} as date_day,
-            field_id,
-            issue_id,
+        select 
+            *,
 
-            first_value(field_value respect nulls) over(partition by issue_id, field_id order by updated_at desc) as last_value,
-
-            updated_at,
-            field_name,
-
-            lag(updated_at, 1) over(partition by issue_id, field_id order by updated_at desc) as valid_until
+            -- want to grab last value for an issue's field for each day
+            row_number() over (
+                partition by valid_starting_on, issue_id, field_id
+                order by valid_starting_at desc
+                ) as row_num
 
         from limit_to_relevant_fields
     ) 
-    group by date_day, field_id, issue_id, field_name, last_value
-),
+    where row_num = 1
+), 
 
 final as (
 
     select
-        date_day,
-        issue_id,
         field_id,
-        field_name,
-        last_value as field_value,
-        last_updated_at,
-        coalesce(valid_until, {{ dbt_utils.current_timestamp() }} ) as valid_until -- may need to add 1 day to this
-
-    from get_last_value
+        issue_id,
+        case when field_value is null then 'is_null' else field_value end as field_value, -- let's see if this indeed comes in handy
+        valid_starting_at,
+        valid_ending_at, 
+        valid_starting_on
+        
+    from get_latest_daily_value
 )
 
-select * from get_last_value
+select * from final

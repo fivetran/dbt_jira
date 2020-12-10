@@ -19,7 +19,6 @@ pivot_out as (
 
     from daily_field_history
 
-    group by 1,2
 )
 
 select * from pivot_out -- todo: backfill stuff for valid_until

@@ -45,7 +45,7 @@ get_valid_dates as (
         field_value,
         updated_at as valid_starting_at,
         lead(updated_at, 1) over(partition by issue_id, field_id order by updated_at asc) as valid_ending_at, -- do i need to flag if this is null....
-        {{ dbt_utils.date_trunc('day', 'updated_at') }} as date_day
+        {{ dbt_utils.date_trunc('day', 'updated_at') }} as valid_starting_on
 
     from combine_field_history
 
