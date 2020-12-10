@@ -1,4 +1,4 @@
--- todo: make this incremental? 
+-- todo: make this incremental prob 
 with issue_multiselect_history as (
 
     select *
@@ -16,13 +16,6 @@ batch_updates as (
     from issue_multiselect_history 
 ),
 
-{# grab_actual_field_values as (
--- should i create a field_option table that has it all (field_option does not include components or sprints)
-    select
-        *
-    from batch_updates
-), #}
-
 consolidate_batches as (
 
     select 
@@ -31,8 +24,9 @@ consolidate_batches as (
         updated_at,
         batch_id,
 
+        -- if the field refers to an object captured in a table elsewhere (ie sprint, users, field_option for custom fields) 
+        -- the value is actually a foreign key to that table
         {{ fivetran_utils.string_agg('batch_updates.field_value', "', '") }} as field_values 
-        -- note: these are the IDs pointing to either the ID of field_option, component, sprint, 
 
     from batch_updates
 
