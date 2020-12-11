@@ -26,6 +26,9 @@ vars:
     issue_field_history_columns: ['assignee', 'summary', 'components']
 
 models: 
-  materialized: table # for building the package, switch to views later? 
+  materialized: table # todo - change this post testing
+  # intermediate:
+  #   materialized: ephemeral
+  #   field_history: incremental
 
 profile: dev_bigquery_dbt_testing
