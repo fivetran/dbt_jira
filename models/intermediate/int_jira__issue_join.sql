@@ -60,8 +60,6 @@ issue_comments as (
     from {{ ref('jira__issue_comments') }}
 ),
 
--- todo: add components - use daily history thing
-
 join_issue as (
 
     select
@@ -77,13 +75,12 @@ join_issue as (
         issue_users.assignee_timezone,
 
         issue.created_at,
-        {# issue.creator_user_id != , #}
         issue.issue_description,
         issue.due_date,
-        {# environment, #}
+        issue.environment,
 
         issue.issue_key,
-        issue.parent_issue_id, -- parent issues can be epic
+        issue.parent_issue_id, -- this may be the same as epic_issue_id
 
         priority.priority_name as current_priority,
 
@@ -96,7 +93,7 @@ join_issue as (
         issue.resolved_at,
 
         status.status_name as current_status,
-        issue.status_changed_at as status_last_changed_at, -- todo: change this in stg model
+        issue.status_changed_at,
 
         issue.issue_name,
 
