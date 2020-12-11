@@ -32,42 +32,19 @@ issue_dates as (
 
 ),
 
-issue_fields as (
--- just want to grab all fields associated with all issues
-    select 
-        issue_id, 
-        field_id
-
-    from {{ ref('int_jira__combine_field_histories') }}
-
-    group by 1,2
-),
-
-combine_issue as (
-
-    select 
-        issue_fields.issue_id,
-        issue_fields.field_id,
-        issue_dates.created_on as issue_created_on,
-        issue_dates.open_until as issue_open_until
-
-    from issue_dates join issue_fields using(issue_id)
-),
-
-issue_field_spine as (
+issue_spine as (
 
     select 
         cast(spine.date_day as date) as date_day,
-        combine_issue.issue_id,
-        combine_issue.field_id
+        issue_dates.issue_id
 
     from spine 
-    join combine_issue on
-        combine_issue.issue_created_on <= spine.date_day
-        combine_issue.issue_open_until >= spine.date_day 
+    join issue_dates on
+        issue_dates.created_on <= spine.date_day
+        and issue_dates.open_until >= spine.date_day 
         -- if we cut off issues, we're going to have to do a full refresh (assuming this is incremental) to catch issues that have been un-resolved
 
-    group by 1,2,3
+    group by 1,2
 )
 
-select * from issue_field_spine 
+select * from issue_spine 
