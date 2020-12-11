@@ -4,7 +4,7 @@ with issue_multiselect_history as (
     select *
     from {{ var('issue_multiselect_history') }}
 
-    where field_value != '' -- todo: should i do this?
+    where field_value != '' -- this seems to never be helpful
 ),
 
 batch_updates as (

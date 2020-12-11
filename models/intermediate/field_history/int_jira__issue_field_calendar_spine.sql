@@ -2,6 +2,7 @@ with spine as (
 
     {% if execute %}
     {% set first_date_query %}
+    -- start at the first created issue
         select  min( created_at ) as min_date from {{ var('issue') }}
     {% endset %}
     {% set first_date = run_query(first_date_query).columns[0][0]|string %}
@@ -23,14 +24,16 @@ issue_dates as (
     select
         issue_id,
         cast({{ dbt_utils.date_trunc('day', 'created_at') }} as date) as created_on,
-        cast({{ dbt_utils.date_trunc('day', 'coalesce(resolved_at, ' ~ dbt_utils.current_timestamp() ~ ')') }} as date) as open_until -- resolved_at = is null if it's been resolved and un-resolved
+
+        -- note: resolved_at will become null if an issue is marked as un-resolved. if this sorta thing happens often, you may want to run full-refreshes of the field_history models often
+        cast({{ dbt_utils.date_trunc('day', 'coalesce(resolved_at, ' ~ dbt_utils.current_timestamp() ~ ')') }} as date) as open_until 
 
     from {{ var('issue') }}
 
 ),
 
 issue_fields as (
-
+-- just want to grab all fields associated with all issues
     select 
         issue_id, 
         field_id
@@ -61,9 +64,8 @@ issue_field_spine as (
     from spine 
     join combine_issue on
         combine_issue.issue_created_on <= spine.date_day
-        -- and combine_issue.issue_open_until <= spine.date_day 
+        combine_issue.issue_open_until >= spine.date_day 
         -- if we cut off issues, we're going to have to do a full refresh (assuming this is incremental) to catch issues that have been un-resolved
-        -- todo: decide what to do here
 
     group by 1,2,3
 )

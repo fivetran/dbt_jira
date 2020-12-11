@@ -20,7 +20,7 @@ limit_to_relevant_fields as (
     from combined_field_histories join field using(field_id)
 
     where 
-    lower(field.field_name) in ('sprint', 'status' -- any other default things to include? todo
+    lower(field.field_name) in ('sprint', 'status' 
                                 {%- for col in var('issue_field_history_columns') -%}
                                 , {{ "'" ~ col ~ "'" }}
                                 {%- endfor -%} )
@@ -50,7 +50,10 @@ final as (
     select
         field_id,
         issue_id,
-        case when field_value is null then 'is_null' else field_value end as field_value, -- let's see if this indeed comes in handy
+        field_name,
+
+        -- doing this to figure out what values are actually null and what needs to be backfilled in jira__daily_issue_field_history
+        case when field_value is null then 'is_null' else field_value end as field_value,
         valid_starting_at,
         valid_ending_at, 
         valid_starting_on
