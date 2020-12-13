@@ -39,7 +39,7 @@ vars:
 ```
 
 ### Daily Issue Field History Columns
-The `jira__daily_issue_field_history` model generates historical data for the columns specified by the `issue_field_history_columns` variable. By default, the columns tracked are `status` and `sprint`. 
+The `jira__daily_issue_field_history` model generates historical data for the columns specified by the `issue_field_history_columns` variable. By default, the only columns tracked are `status` and `sprint`, but all fields found in the Jira `FIELD` table can be included in this model.
 
 If you would like to change these columns, add the following configuration to your dbt_project.yml file. Then, after adding the columns to your `dbt_project.yml` file, run the `dbt run --full-refresh` command to fully refresh any existing models.
 
@@ -54,7 +54,7 @@ vars:
     issue_field_history_columns: ['the', 'list', 'of', 'field', 'names']
 ```
 
-Note: all field names can be found by querying the Jira `FIELD` table.
+Note: `sprint` and `status` will always be tracked, as they are necessary for creating common agile reports. 
 
 ## Contributions
 Additional contributions to this package are very welcome! Please create issues
@@ -64,9 +64,9 @@ on the best workflow for contributing to a package.
 
 ## Resources:
 - Provide [feedback](https://www.surveymonkey.com/r/DQ7K7WW) on our existing dbt packages or what you'd like to see next
-- Have questions or feedback, or need help? Book a time during our office hours [here](https://calendly.com/fivetran-solutions-team/fivetran-solutions-team-office-hours) or shoot us an email at solutions@fivetran.com.
+- Have questions or feedback, or need help? Book a time during our office hours [here](https://calendly.com/fivetran-solutions-team/fivetran-solutions-team-office-hours) or shoot us an email at solutions@fivetran.com
 - Find all of Fivetran's pre-built dbt packages in our [dbt hub](https://hub.getdbt.com/fivetran/)
-- Learn how to orchestrate dbt transformations with Fivetran [here](https://fivetran.com/docs/transformations/dbt).
+- Learn how to orchestrate dbt transformations with Fivetran [here](https://fivetran.com/docs/transformations/dbt)
 - Learn more about Fivetran overall [in our docs](https://fivetran.com/docs)
 - Check out [Fivetran's blog](https://fivetran.com/blog)
 - Learn more about dbt [in the dbt docs](https://docs.getdbt.com/docs/introduction)
