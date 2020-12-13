@@ -34,8 +34,8 @@ By default, this package looks for your Jira data in the `jira` schema of your [
 config-version: 2
 
 vars:
-    connector_database: your_database_name
-    connector_schema: your_schema_name
+    jira_database: your_database_name
+    jira_schema: your_schema_name
 ```
 
 ### Daily Issue Field History Columns
@@ -54,7 +54,7 @@ vars:
     issue_field_history_columns: ['the', 'list', 'of', 'field', 'names']
 ```
 
-Note: all field names can be found by querying `jira.field`.
+Note: all field names can be found by querying the Jira `FIELD` table.
 
 ## Contributions
 Additional contributions to this package are very welcome! Please create issues
