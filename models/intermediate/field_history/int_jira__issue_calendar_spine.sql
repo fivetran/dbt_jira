@@ -1,3 +1,11 @@
+{{
+    config(
+        materialized='incremental',
+        partition_by = {'field': 'date_day', 'data_type': 'date'},
+        unique_key='issue_day_id'
+    )
+}}
+
 with spine as (
 
     {% if execute %}
@@ -10,13 +18,21 @@ with spine as (
     {% else %} {% set first_date = "'2016-01-01'" %}
     {% endif %}
 
-    {{
-        dbt_utils.date_spine(
-            datepart = "day", 
-            start_date =  "'" ~ first_date[0:10] ~ "'", 
-            end_date = dbt_utils.dateadd("week", 1, "current_date")
-        )   
-    }}
+
+    select * 
+    from (
+        {{
+            dbt_utils.date_spine(
+                datepart = "day", 
+                start_date =  "'" ~ first_date[0:10] ~ "'", 
+                end_date = dbt_utils.dateadd("week", 1, "current_date")
+            )   
+        }} 
+    )
+
+    {% if is_incremental() %}
+    where cast( date_day as date) >= (select max(date_day) from {{ this }} )
+    {% endif %}
 ),
 
 issue_dates as (
@@ -41,10 +57,21 @@ issue_spine as (
     from spine 
     join issue_dates on
         issue_dates.created_on <= spine.date_day
-        and issue_dates.open_until >= spine.date_day 
+        and {{ dbt_utils.dateadd('month', 1, 'issue_dates.open_until') }} >= spine.date_day
+        -- and issue_dates.open_until >= spine.date_day 
         -- if we cut off issues, we're going to have to do a full refresh (assuming this is incremental) to catch issues that have been un-resolved
 
     group by 1,2
+),
+
+surrogate_key as (
+
+    select 
+        date_day,
+        issue_id,
+        {{ dbt_utils.surrogate_key(['date_day','issue_id']) }} as issue_day_id
+
+    from issue_spine
 )
 
-select * from issue_spine 
+select * from surrogate_key 

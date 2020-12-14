@@ -29,6 +29,5 @@ models:
   materialized: table # todo - change this post testing
   # intermediate:
   #   materialized: ephemeral
-  #   field_history: incremental
 
 profile: dev_bigquery_dbt_testing

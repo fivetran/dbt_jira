@@ -9,7 +9,7 @@ pivot_out as (
     -- pivot out default columns (status and sprint) and others specified in the issue_field_history_columns var
     -- this will produce a bunch of 
     select 
-        cast(valid_starting_on as date) as valid_starting_on, 
+        valid_starting_on, 
         issue_id,
         max(case when lower(field_name) = 'status' then field_value end) as status,
         max(case when lower(field_name) = 'sprint' then field_value end) as sprint,
