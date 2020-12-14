@@ -6,6 +6,7 @@
     )
 }}
 
+-- grab column names that were pivoted out
 {%- set pivot_data_columns = adapter.get_columns_in_relation(ref('int_jira__pivot_daily_field_history')) -%}
 
 with pivoted_daily_history as (
