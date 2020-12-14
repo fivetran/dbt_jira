@@ -23,7 +23,7 @@ vars:
     field: "{{ ref('stg_jira__field') }}"
     sprint: "{{ ref('stg_jira__sprint') }}"
 
-    issue_field_history_columns: ['assignee', 'summary', 'components', 'story points']
+    issue_field_history_columns: ['summary', 'components', 'story points']
 
 models: 
   materialized: table # todo - change this post testing
