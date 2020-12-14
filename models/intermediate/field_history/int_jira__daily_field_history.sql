@@ -1,8 +1,19 @@
+{{
+    config(
+        materialized='incremental',
+        partition_by = {'field': 'valid_starting_on', 'data_type': 'date'},
+        unique_key='issue_field_day_id'
+    )
+}}
+
 with combined_field_histories as (
 
     select * 
     from {{ ref('int_jira__combine_field_histories') }}
 
+    {% if is_incremental() %}
+    where valid_starting_on >= (select max(valid_starting_on) from {{ this }} )
+    {% endif %}
 ),
 
 field as (
@@ -52,11 +63,13 @@ final as (
         issue_id,
         field_name,
 
-        -- doing this to figure out what values are actually null and what needs to be backfilled in jira__daily_issue_field_history
+        -- doing this to figure out what values are actually null and what needs to be filled in jira__daily_issue_field_history
         case when field_value is null then 'is_null' else field_value end as field_value,
         valid_starting_at,
         valid_ending_at, 
-        valid_starting_on
+        valid_starting_on,
+
+        {{ dbt_utils.surrogate_key(['field_id','issue_id', 'valid_starting_at']) }} as issue_field_day_id
         
     from get_latest_daily_value
 )
