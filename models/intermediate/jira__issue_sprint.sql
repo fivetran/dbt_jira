@@ -8,7 +8,9 @@ with sprint as (
 -- sprint is technically a custom field and therefore has a custom field_id
 sprint_field as (
 
-    select field_id
+    select 
+    -- need to do this for AWS for some reason...
+        cast(field_id as {{ dbt_utils.type_string() }}) as field_id
         
     from {{ var('field') }}
     where lower(field_name) = 'sprint'
@@ -73,7 +75,7 @@ issue_sprint as (
     from 
     last_sprint 
     join sprint on last_sprint.sprint_id = sprint.sprint_id
-    left join sprint_rollovers on cast(sprint_rollovers.issue_id as {{ dbt_utils.type_int() }}) = last_sprint.issue_id
+    left join sprint_rollovers on sprint_rollovers.issue_id = last_sprint.issue_id
     
 )
 
