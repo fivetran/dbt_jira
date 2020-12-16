@@ -1,2 +1,3 @@
 packages:
-  - local: ../dbt_jira_source # todo: switch with hub
+  - git: "https://github.com/fivetran/dbt_jira_source.git" 
+    revision: master # todo: switch with hub
