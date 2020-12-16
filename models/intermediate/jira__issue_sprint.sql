@@ -73,7 +73,7 @@ issue_sprint as (
     from 
     last_sprint 
     join sprint on last_sprint.sprint_id = sprint.sprint_id
-    left join sprint_rollovers on sprint_rollovers.issue_id = last_sprint.issue_id
+    left join sprint_rollovers on cast(sprint_rollovers.issue_id as {{ dbt_utils.type_int() }}) = last_sprint.issue_id
     
 )
 
