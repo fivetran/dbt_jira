@@ -10,7 +10,8 @@ project_metrics as (
     from {{ ref('int_jira__project_metrics') }}
 ),
 
-user as (
+-- user is reserved in AWS
+jira_user as (
 -- to grab the project lead
     select *
     from {{ var('user') }}
@@ -45,8 +46,8 @@ project_join as (
 
     select
         project.*,
-        user.user_display_name as project_lead_user_name,
-        user.email as project_lead_email,
+        jira_user.user_display_name as project_lead_user_name,
+        jira_user.email as project_lead_email,
         agg_epics.epics,
         agg_components.components,
         coalesce(project_metrics.n_closed_issues, 0) as n_closed_issues,
@@ -61,7 +62,7 @@ project_join as (
 
     from project
     left join project_metrics on project.project_id = project_metrics.project_id
-    left join user on project.project_lead_user_id = user.user_id
+    left join jira_user on project.project_lead_user_id = jira_user.user_id
     left join agg_epics on project.project_id = agg_epics.project_id 
     left join agg_components on project.project_id = agg_components.project_id 
 )

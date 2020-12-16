@@ -47,21 +47,21 @@ sprint_rollovers as (
 
 last_sprint as (
 
-    select issue_id, cast(sprint_id as {{ dbt_utils.type_int() }} ) as sprint_id
+    select issue_id, sprint_id
+
     from (
+        
         select
-            sprint_field_history.issue_id,
-            -- respecting nulls in case the issue was most recently returned to the backlog 
-            {# cast( first_value(sprint_field_history.field_value respect nulls) over (
-                partition by issue_id order by updated_at desc) as {{ dbt_utils.type_int() }} ) as sprint_id #}
+            issue_id,
+            cast(field_value as {{ dbt_utils.type_int() }} ) as sprint_id,
 
-            {{ fivetran_utils.first_value(first_value_field="field_value", 
-                partition_field="issue_id", order_by_field="updated_at", order="desc") }} as sprint_id
-
+            row_number() over (
+                    partition by issue_id order by updated_at desc
+                    ) as row_num
 
         from sprint_field_history 
     )
-    group by 1,2
+    where row_num = 1
 ),
 
 issue_sprint as (
