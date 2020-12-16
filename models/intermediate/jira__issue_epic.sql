@@ -25,7 +25,7 @@ field_history as (
 epic_field as (
 
     -- field_id is turning into an int in AWS...
-    select cast(field_id as {{ dbt_utils.type_string() }}) as field_id
+    select field_id
         
     from {{ var('field') }}
     where lower(field_name) like 'epic%link'
