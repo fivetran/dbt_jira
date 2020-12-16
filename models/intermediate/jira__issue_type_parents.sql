@@ -18,9 +18,8 @@ grab_types as (
         issue.issue_name,
         issue.parent_issue_id,
         issue.issue_key,
-        issue_type.issue_type_name as issue_type,
-        issue_type.is_subtask
-
+        issue_type.issue_type_name as issue_type
+        
     from issue 
     
     join issue_type using (issue_type_id)

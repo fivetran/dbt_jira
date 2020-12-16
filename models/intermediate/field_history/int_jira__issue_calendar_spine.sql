@@ -39,9 +39,9 @@ issue_dates as (
 
     select
         issue_id,
-        cast({{ dbt_utils.date_trunc('day', 'created_at') }} as date) as created_on,
+        cast( {{ dbt_utils.date_trunc('day', 'created_at') }} as date) as created_on,
 
-        -- note: resolved_at will become null if an issue is marked as un-resolved. if this sorta thing happens often, you may want to run full-refreshes of the field_history models often
+        -- resolved_at will become null if an issue is marked as un-resolved. if this sorta thing happens often, you may want to run full-refreshes of the field_history models often
         cast({{ dbt_utils.date_trunc('day', 'coalesce(resolved_at, ' ~ dbt_utils.current_timestamp() ~ ')') }} as date) as open_until 
 
     from {{ var('issue') }}
@@ -59,7 +59,7 @@ issue_spine as (
         issue_dates.created_on <= spine.date_day
         and {{ dbt_utils.dateadd('month', 1, 'issue_dates.open_until') }} >= spine.date_day
         -- and issue_dates.open_until >= spine.date_day 
-        -- if we cut off issues, we're going to have to do a full refresh (assuming this is incremental) to catch issues that have been un-resolved
+        -- if we cut off issues, we're going to have to do a full refresh to catch issues that have been un-resolved
 
     group by 1,2
 ),

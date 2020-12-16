@@ -40,7 +40,7 @@ combine_field_history as (
         field_id,
         issue_id,
         updated_at,
-        field_values as field_value
+        field_values as field_value -- this is an aggregated list but we'll just call it field_value
 
     from issue_multiselect_batch_history
 ),
@@ -57,7 +57,7 @@ get_valid_dates as (
         -- this value is valid until the next value is updated
         lead(updated_at, 1) over(partition by issue_id, field_id order by updated_at asc) as valid_ending_at, 
 
-        cast({{ dbt_utils.date_trunc('day', 'updated_at') }} as date) as valid_starting_on
+        cast( {{ dbt_utils.date_trunc('day', 'updated_at') }} as date) as valid_starting_on
 
     from combine_field_history
 

@@ -1,6 +1,6 @@
+-- just a subset of issues with issue_type = 'epic'
 with epic as (
-    -- just a subset of issues with issue_type = 'epic'
-
+    
     select *
     from {{ ref('jira__epic') }}
 ),
@@ -21,7 +21,7 @@ field_history as (
     
 ),
 
--- just grabbing the field id for epics from classic projects
+-- grabbing the field id for epics from classic projects, because epic link is technically a custom field and therefore has a custom field id
 epic_field as (
 
     select field_id
@@ -30,6 +30,7 @@ epic_field as (
     where lower(field_name) like 'epic%link'
 ),
 
+-- only grab history pertaining to epic links
 epic_history as (
 
     select field_history.*
@@ -55,8 +56,6 @@ last_epic_link as (
             from epic_history
         ) 
     where row_num = 1
-
-    group by 1,2
 ),
 
 grab_epic_name as (
@@ -66,12 +65,10 @@ grab_epic_name as (
         last_epic_link.epic_issue_id,
 
         issue_parents.issue_name as epic_name,
-        issue_parents.issue_key as epic_issue_key,
-
-        true as parent_is_epic
+        issue_parents.issue_key as epic_issue_key
         
     from last_epic_link 
-    -- grab epic's issue attributes
+    -- to grab each epic's issue attributes
         join issue_parents on last_epic_link.epic_issue_id = issue_parents.issue_id
 ),
 
@@ -79,12 +76,11 @@ issue_epics as (
 
     select 
         issue_parents.issue_id,
-        {# issue_parents.issue_type, #}
         coalesce(issue_parents.parent_issue_key, grab_epic_name.epic_issue_key) as parent_issue_key,
 
         coalesce(issue_parents.parent_issue_id, grab_epic_name.epic_issue_id) as parent_issue_id,
         coalesce(issue_parents.parent_issue_name, grab_epic_name.epic_name) as parent_issue_name,
-        issue_parents.parent_is_epic or coalesce(grab_epic_name.parent_is_epic, false) as parent_is_epic
+        issue_parents.parent_is_epic or grab_epic_name.issue_id is not null as parent_is_epic
 
     from issue_parents
 

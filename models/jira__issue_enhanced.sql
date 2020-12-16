@@ -20,7 +20,7 @@ issue_dates as (
         issue_id,
         min(case when field_id = 'assignee' then updated_at end) as first_assigned_at,
         max(case when field_id = 'assignee' then updated_at end) as last_assigned_at,
-        min(case when field_id = 'resolutiondate' then updated_at end) as first_resolved_at
+        min(case when field_id = 'resolutiondate' then updated_at end) as first_resolved_at -- in case it's been un-marked
 
     from issue_field_history
     group by 1

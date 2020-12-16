@@ -23,7 +23,8 @@ field as (
 ),
 
 limit_to_relevant_fields as (
--- to remove unncessary rows moving forward and grab field names
+
+-- let's remove unncessary rows moving forward and grab field names 
     select 
         combined_field_histories.*, 
         field.field_name
@@ -38,6 +39,7 @@ limit_to_relevant_fields as (
     
 ),
 
+-- only looking at the latest value for each day
 get_latest_daily_value as (
 
     select * 
@@ -63,7 +65,7 @@ final as (
         issue_id,
         field_name,
 
-        -- doing this to figure out what values are actually null and what needs to be filled in jira__daily_issue_field_history
+        -- doing this to figure out what values are actually null and what needs to be backfilled in jira__daily_issue_field_history
         case when field_value is null then 'is_null' else field_value end as field_value,
         valid_starting_at,
         valid_ending_at, 

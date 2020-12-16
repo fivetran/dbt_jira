@@ -64,44 +64,34 @@ join_issue as (
 
     select
         issue.issue_id,
-        issue.original_estimate_seconds,
-        issue.remaining_estimate_seconds,
-        issue.time_spent_seconds,
+        issue.issue_name,
 
+        issue.updated_at as last_updated_at,
+        issue_type.issue_type_name as issue_type,
+        issue.created_at,
+        issue.issue_description,
+        issue.due_date,
+        issue.environment,
         issue.assignee_user_id,
         issue_users.assignee_name,
         issue.reporter_user_id,
         issue_users.reporter_name,
         issue_users.assignee_timezone,
-
-        issue.created_at,
-        issue.issue_description,
-        issue.due_date,
-        issue.environment,
-
+        issue_users.assignee_email,
+        
         issue.issue_key,
-        issue.parent_issue_id, -- this may be the same as epic_issue_id
+        issue.parent_issue_id, -- this may be the same as epic_issue_id in next-gen projects
 
         priority.priority_name as current_priority,
 
         project.project_id, 
         project.project_name,
         
-
         resolution.resolution_name as resolution_type,
-
         issue.resolved_at,
 
         status.status_name as current_status,
         issue.status_changed_at,
-
-        issue.issue_name,
-
-        issue.updated_at,
-        issue_type.issue_type_name as issue_type,
-
-        issue.work_ratio,
-        issue._fivetran_synced,
 
         issue_epic.epic_name,
         issue_epic.epic_issue_id,
@@ -111,8 +101,15 @@ join_issue as (
         issue_sprint.sprint_name,
         issue_sprint.n_sprint_changes,
 
+        issue.original_estimate_seconds,
+        issue.remaining_estimate_seconds,
+        issue.time_spent_seconds,
+        issue.work_ratio,
 
-        issue_comments.conversation
+        issue_comments.conversation,
+        issue_comments.n_comments,
+
+        issue._fivetran_synced
     
     from issue
     left join project on project.project_id = issue.project_id

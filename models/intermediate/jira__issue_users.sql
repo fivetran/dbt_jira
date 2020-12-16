@@ -22,7 +22,8 @@ issue_user_join as (
         assignee.email as assignee_email,
 
         -- note: reporter is the user who created the issue by default, 
-        -- but this can be changed in-app (making it potentially different from `creator`)
+        -- but this can be changed in-app (making it potentially different from `creator`, which i 
+        -- excluded from this model, but am open to including! 
         issue.reporter_user_id,
         reporter.email as reporter_email,
         reporter.user_display_name as reporter_name,

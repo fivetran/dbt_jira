@@ -5,6 +5,7 @@ with sprint as (
 
 ),
 
+-- sprint is technically a custom field and therefore has a custom field_id
 sprint_field as (
 
     select field_id
@@ -15,11 +16,13 @@ sprint_field as (
 
 field_history as (
 
+     -- sprints don't appear to be capable of multiselect in the UI...
     select *
     from {{ var('issue_multiselect_history') }}
-    -- sprint is for some reason an array...
+
 ),
 
+-- only grab history pertaining to sprints
 sprint_field_history as (
 
     select 
@@ -46,11 +49,13 @@ last_sprint as (
     from (
         select
             sprint_field_history.issue_id,
-            cast( first_value(sprint_field_history.field_value respect nulls) over(partition by issue_id order by updated_at desc) as {{ dbt_utils.type_int() }} ) as sprint_id
+            -- respecting nulls in case the issue was most recently returned to the backlog 
+            cast( first_value(sprint_field_history.field_value respect nulls) over (
+                partition by issue_id order by updated_at desc) as {{ dbt_utils.type_int() }} ) as sprint_id
 
         from sprint_field_history 
     )
-    group by 1,2 -- todo: this should probably draw from the daily model thing... since it will include sprint
+    group by 1,2
 ),
 
 issue_sprint as (
@@ -63,7 +68,7 @@ issue_sprint as (
         sprint.started_at as sprint_started_at,
         sprint.ended_at as sprint_ended_at,
         sprint.completed_at as sprint_completed_at,
-        coalesce(sprint_rollovers.n_sprint_changes, 0) as n_sprint_changes -- todo: this might include first initialized null
+        coalesce(sprint_rollovers.n_sprint_changes, 0) as n_sprint_changes -- todo: check if this includes the initialized null
 
     from 
     last_sprint 

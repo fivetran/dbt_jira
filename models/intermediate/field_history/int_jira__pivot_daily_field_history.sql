@@ -6,6 +6,7 @@
     )
 }}
 
+-- latest value per issue field (already limited included fields to sprint, status, and var(issue_field_history_columns))
 with daily_field_history as (
 
     select * 
@@ -18,9 +19,9 @@ with daily_field_history as (
 
 pivot_out as (
 
-    -- pivot out default columns (status and sprint) and others specified in the issue_field_history_columns var
+    -- pivot out default columns (status and sprint) and others specified in the var(issue_field_history_columns)
     -- only days on which a field value was actively changed will have a non-null value. the nulls will need to 
-    -- be filled in the final daily issue field history model
+    -- be backfilled in the final jira__daily_issue_field_history model
     select 
         valid_starting_on, 
         issue_id,
@@ -28,6 +29,7 @@ pivot_out as (
         max(case when lower(field_name) = 'sprint' then field_value end) as sprint,
 
         {% for col in var('issue_field_history_columns') -%}
+        -- @ kristin, should this be max? in zendesk it's min....
             max(case when lower(field_name) = '{{ col | lower }}' then field_value end) as {{ col | replace(' ', '_') }}
             {% if not loop.last %},{% endif %}
         {% endfor -%}

@@ -6,6 +6,9 @@
     )
 }}
 
+-- issue_multiselect_history splits out an array-type field into multiple rows with unique individual values
+-- to combine with issue_field_history we need to aggregate the multiselect field values.
+
 with issue_multiselect_history as (
 
     select *
@@ -18,6 +21,7 @@ with issue_multiselect_history as (
 
 ),
 
+-- each field value has its own row, but each batch of values for that field has the same timestamp
 batch_updates as (
 
     select 
@@ -36,8 +40,8 @@ consolidate_batches as (
         batch_id,
         cast( {{ dbt_utils.date_trunc('day', 'updated_at') }} as date) as date_day,
 
-        -- if the field refers to an object captured in a table elsewhere (ie sprint, users, field_option for custom fields) 
-        -- the value is actually a foreign key to that table
+        -- if the field refers to an object captured in a table elsewhere (ie sprint, users, field_option for custom fields),
+        -- the value is actually a foreign key to that table. 
         {{ fivetran_utils.string_agg('batch_updates.field_value', "', '") }} as field_values 
 
     from batch_updates

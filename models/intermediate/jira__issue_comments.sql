@@ -17,7 +17,8 @@ agg_comments as (
 
     select 
     comment.issue_id,
-    {{ fivetran_utils.string_agg( "comment.created_at || '  -  ' || user.user_display_name || ':  ' || comment.body", "'\\n'" ) }} as conversation
+    {{ fivetran_utils.string_agg( "comment.created_at || '  -  ' || user.user_display_name || ':  ' || comment.body", "'\\n'" ) }} as conversation,
+    count(distinct comment.comment_id) as n_comments
 
     from
     comment 
