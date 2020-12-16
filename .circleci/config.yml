@@ -24,16 +24,16 @@ jobs:
             pip install -r integration_tests/requirements.txt
             mkdir -p ~/.dbt
             cp integration_tests/ci/sample.profiles.yml ~/.dbt/profiles.yml
-      - run:
-          name: "Run Tests - Redshift"
-          command: |
-            . venv/bin/activate
-            echo `pwd`
-            cd integration_tests
-            dbt deps
-            dbt seed --target redshift --full-refresh
-            dbt run --target redshift --full-refresh
-            dbt test --target redshift
+      # - run:
+      #     name: "Run Tests - Redshift"
+      #     command: |
+      #       . venv/bin/activate
+      #       echo `pwd`
+      #       cd integration_tests
+      #       dbt deps
+      #       dbt seed --target redshift --full-refresh
+      #       dbt run --target redshift --full-refresh
+      #       dbt test --target redshift
       - run:
           name: "Run Tests - Snowflake"
           command: |
