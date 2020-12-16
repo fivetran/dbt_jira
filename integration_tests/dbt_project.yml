@@ -85,4 +85,6 @@ seeds:
       +column_types:
         time: timestamp
         issue_id: "{{ 'int64' if target.name == 'bigquery' else 'bigint' }}"
-
+    sprint: 
+      +column_types:
+        id: "{{ 'int64' if target.name == 'bigquery' else 'bigint' }}"

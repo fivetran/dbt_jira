@@ -6,7 +6,8 @@ with issue as (
 
 ),
 
-user as (
+-- user is a reserved keyword in AWS
+jira_user as (
 
     select *
     from {{ var('user') }}
@@ -31,8 +32,8 @@ issue_user_join as (
         
         
     from issue
-    left join user assignee on issue.assignee_user_id = assignee.user_id 
-    left join user reporter on issue.reporter_user_id = reporter.user_id
+    left join jira_user assignee on issue.assignee_user_id = assignee.user_id 
+    left join jira_user reporter on issue.reporter_user_id = reporter.user_id
 
     {{ dbt_utils.group_by(n=9) }}
 )
