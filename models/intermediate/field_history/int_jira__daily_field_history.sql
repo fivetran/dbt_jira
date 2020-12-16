@@ -18,7 +18,9 @@ with combined_field_histories as (
 
 field as (
 
-    select *
+    select 
+        field_name,
+        cast(field_id as {{ dbt_utils.type_string() }}) as field_id
     from {{ var('field') }}
 ),
 
