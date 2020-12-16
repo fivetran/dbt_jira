@@ -82,10 +82,15 @@ seeds:
       +column_types:
         time: timestamp
         issue_id: "{{ 'int64' if target.name == 'bigquery' else 'bigint' }}"
+        value: "{{ 'string' if target.name == 'bigquery' else 'varchar' }}"
     issue_field_history:
       +column_types:
         time: timestamp
         issue_id: "{{ 'int64' if target.name == 'bigquery' else 'bigint' }}"
+        value: "{{ 'string' if target.name == 'bigquery' else 'varchar' }}"
     sprint: 
       +column_types:
         id: "{{ 'int64' if target.name == 'bigquery' else 'bigint' }}"
+    field: 
+      +column_types:
+        id: "{{ 'string' if target.name == 'bigquery' else 'varchar' }}"

@@ -34,16 +34,16 @@ jobs:
       #       dbt seed --target redshift --full-refresh
       #       dbt run --target redshift --full-refresh
       #       dbt test --target redshift
-      - run:
-          name: "Run Tests - Snowflake"
-          command: |
-            . venv/bin/activate
-            echo `pwd`
-            cd integration_tests
-            dbt deps
-            dbt seed --target snowflake --full-refresh
-            dbt run --target snowflake --full-refresh
-            dbt test --target snowflake
+      # - run:
+      #     name: "Run Tests - Snowflake"
+      #     command: |
+      #       . venv/bin/activate
+      #       echo `pwd`
+      #       cd integration_tests
+      #       dbt deps
+      #       dbt seed --target snowflake --full-refresh
+      #       dbt run --target snowflake --full-refresh
+      #       dbt test --target snowflake
       - run:
           name: "Run Tests - BigQuery"
           environment:
