@@ -24,7 +24,8 @@ field_history as (
 -- grabbing the field id for epics from classic projects, because epic link is technically a custom field and therefore has a custom field id
 epic_field as (
 
-    select field_id
+    -- field_id is turning into an int in AWS...
+    select cast(field_id as {{ dbt_utils.type_string() }}) as field_id
         
     from {{ var('field') }}
     where lower(field_name) like 'epic%link'
