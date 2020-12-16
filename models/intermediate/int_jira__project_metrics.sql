@@ -12,7 +12,6 @@ project_issues as (
         sum(case when resolved_at is null then 1 else 0 end) as n_open_issues,
 
         -- using the below to calculate averages
-        count(1) as n_total_issues,
         sum(case when resolved_at is null and assignee_user_id is not null then 1 else 0 end) as n_open_assigned_issues,
         sum(case when resolved_at is not null and assignee_user_id is not null then 1 else 0 end) as n_closed_assigned_issues,
 

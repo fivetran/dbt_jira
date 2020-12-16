@@ -49,9 +49,9 @@ project_join as (
         user.email as project_lead_email,
         agg_epics.epics,
         agg_components.components,
-        project_metrics.n_closed_issues,
-        project_metrics.n_open_issues,
-        project_metrics.n_open_assigned_issues,
+        coalesce(project_metrics.n_closed_issues, 0) as n_closed_issues,
+        coalesce(project_metrics.n_open_issues, 0) as n_open_issues,
+        coalesce(project_metrics.n_open_assigned_issues, 0) as n_open_assigned_issues,
 
         project_metrics.avg_close_time_seconds,
         project_metrics.avg_assigned_close_time_seconds,
