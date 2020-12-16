@@ -24,10 +24,6 @@ project_issues as (
         sum(case when resolved_at is null then open_duration_seconds else 0 end) as sum_currently_open_duration_seconds,
         sum(case when resolved_at is null then any_assignment_duration_seconds else 0 end) as sum_currently_open_assigned_duration_seconds
 
-        {# sum(unassigned_duration_seconds) as sum_unassigned_duration_seconds, -- to divide by # of all issues
-        sum(open_duration_seconds) as sum_open_duration_seconds, -- to divide by # open issues
-        sum(case when last_assignment_duration_seconds is not null then last_assignment_duration_seconds else 0 end) as sum_last_assignment_duration_seconds #}
-
     from issue
 
     group by 1
@@ -38,7 +34,7 @@ calculate_metrics as (
     select
         project_id,
         n_closed_issues,
-        n_open_issues
+        n_open_issues,
         n_open_assigned_issues,
 
         case when n_closed_issues = 0 then 0 else
