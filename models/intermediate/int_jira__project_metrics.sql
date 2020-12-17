@@ -5,7 +5,35 @@ with issue as (
     where project_id is not null
 ),
 
+median_metrics as (
 
+    select 
+        project_id, 
+        median_close_time_seconds, 
+        median_age_currently_open_seconds,
+        median_assigned_close_time_seconds,
+        median_age_currently_open_assigned_seconds
+
+    from (
+        select 
+            project_id,
+            round( {{ fivetran_utils.percentile(percentile_field='case when resolved_at is not null then open_duration_seconds end', 
+                        partition_field='project_id', percent='0.5') }}, 0) as median_close_time_seconds,
+            round( {{ fivetran_utils.percentile(percentile_field='case when resolved_at is null then open_duration_seconds end', 
+                        partition_field='project_id', percent='0.5') }}, 0) as median_age_currently_open_seconds,
+
+            round( {{ fivetran_utils.percentile(percentile_field='case when resolved_at is not null then any_assignment_duration_seconds end', 
+                        partition_field='project_id', percent='0.5') }}, 0) as median_assigned_close_time_seconds,
+            round( {{ fivetran_utils.percentile(percentile_field='case when resolved_at is null then any_assignment_duration_seconds end', 
+                        partition_field='project_id', percent='0.5') }}, 0) as median_age_currently_open_assigned_seconds
+
+        from issue
+    )
+    group by 1,2,3,4,5
+),
+
+
+-- get appropriate counts + sums to calculate averages
 project_issues as (
     select
         project_id,
@@ -31,7 +59,7 @@ project_issues as (
     group by 1
 ),
 
-calculate_metrics as (
+calculate_avg_metrics as (
 
     select
         project_id,
@@ -52,7 +80,19 @@ calculate_metrics as (
         round( sum_currently_open_assigned_duration_seconds * 1.0 / n_open_assigned_issues, 0) end as avg_age_currently_open_assigned_seconds
 
     from project_issues
+),
+
+join_metrics as (
+
+    select
+        calculate_avg_metrics.*,
+        median_metrics.median_close_time_seconds, 
+        median_metrics.median_age_currently_open_seconds,
+        median_metrics.median_assigned_close_time_seconds,
+        median_metrics.median_age_currently_open_assigned_seconds
+        
+    from calculate_avg_metrics
+    left join median_metrics using(project_id)
 )
 
-select * 
-from calculate_metrics
+select * from join_metrics
