@@ -11,12 +11,6 @@ project as (
     from {{ var('project') }}
 ),
 
-issue_type as (
-
-    select * 
-    from {{ var('issue_type') }}
-),
-
 status as (
 
     select * 
@@ -38,32 +32,33 @@ priority as (
 issue_epic as (
 
     select * 
-    from {{ ref('jira__issue_epic') }}
+    from {{ ref('int_jira__issue_epic') }}
     
 ),
 
 issue_users as (
 
     select *
-    from {{ ref('jira__issue_users') }}
+    from {{ ref('int_jira__issue_users') }}
 ),
 
 issue_sprint as (
 
     select *
-    from {{ ref('jira__issue_sprint') }}
+    from {{ ref('int_jira__issue_sprint') }}
 ),
 
 issue_comments as (
 
     select * 
-    from {{ ref('jira__issue_comments') }}
+    from {{ ref('int_jira__issue_comments') }}
 ),
 
-issue_parent as (
+-- this has issues without parents as well
+issue_type_parent as (
     
     select *
-    from {{ ref('jira__issue_type_parents') }}
+    from {{ ref('int_jira__issue_type_parents') }}
 ),
 
 join_issue as (
@@ -73,7 +68,7 @@ join_issue as (
         issue.issue_name,
 
         issue.updated_at as last_updated_at,
-        issue_type.issue_type_name as issue_type,
+        issue_type_parent.issue_type,
         issue.created_at,
         issue.issue_description,
         issue.due_date,
@@ -87,9 +82,9 @@ join_issue as (
         
         issue.issue_key,
         issue.parent_issue_id, -- this may be the same as epic_issue_id in next-gen projects
-        issue_parent.parent_issue_name,
-        issue_parent.parent_issue_key,
-        issue_parent.parent_issue_type,
+        issue_type_parent.parent_issue_name,
+        issue_type_parent.parent_issue_key,
+        issue_type_parent.parent_issue_type,
         priority.priority_name as current_priority,
 
         project.project_id, 
@@ -121,7 +116,6 @@ join_issue as (
     
     from issue
     left join project on project.project_id = issue.project_id
-    left join issue_type on issue_type.issue_type_id = issue.issue_type_id
     left join status on status.status_id = issue.status_id
     left join resolution on resolution.resolution_id = issue.resolution_id
     left join priority on priority.priority_id = issue.priority_id
@@ -130,7 +124,7 @@ join_issue as (
     left join issue_epic on issue_epic.issue_id = issue.issue_id
     left join issue_sprint on issue_sprint.issue_id = issue.issue_id
     left join issue_comments on issue_comments.issue_id = issue.issue_id
-    left join issue_parent on issue_parent.issue_id = issue.issue_id
+    left join issue_type_parent on issue_type_parent.issue_id = issue.issue_id
 
 )
 

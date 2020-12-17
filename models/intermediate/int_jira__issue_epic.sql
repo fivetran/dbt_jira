@@ -2,7 +2,7 @@
 with epic as (
     
     select *
-    from {{ ref('jira__epic') }}
+    from {{ ref('int_jira__epic') }}
 ),
 
 -- issue-epic relationships are either captured via the issue's parent_issue_id (next-gen projects)
@@ -10,7 +10,7 @@ with epic as (
 issue_parents as (
 
     select *
-    from {{ ref('jira__issue_type_parents') }}
+    from {{ ref('int_jira__issue_type_parents') }}
 
 ),
 

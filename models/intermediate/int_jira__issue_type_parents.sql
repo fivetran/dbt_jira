@@ -40,6 +40,8 @@ grab_parents as (
 
     from
     grab_types sub 
+
+    -- do a left join so we can grab all issue types from this table
     left join grab_types parent on sub.parent_issue_id = parent.issue_id
 )
 
