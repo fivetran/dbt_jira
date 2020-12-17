@@ -1,11 +1,31 @@
-# for source packages/pulling from the raw connector data
-
 version: 2
 
-# models:
-#   - name: connector_name 
+models:
+  - name: jira__daily_issue_field_history 
+    description: >
+      Each record represents a snapshot of an issue's selected fields (as specified in
+      the `issue_history_columns` variable + sprint and status by default) on a given day.
+      Each issue will have a record for every day in which it was open (plus a month afterward,
+      in case issues are reopened -- if they are reopened even later, you'll need to perform a full refresh). 
+      Note: this is an incremental model.
+    columns:
+      - name: date_day
+        description: Date on which the issue had these field values.
+      - name: issue_id
+        description: Foreign key referencing the ID of the `issue` with these values.
+      - name: issue_day_id
+        description: Surrogate key hashed on `date_day` and `issue_id`
+        tests:
+          - unique
+          - not_null
+      - name: sprint
+        description: The ID of the sprint that an issue is slotted into on a given day.
+      - name: status
+        description: The ID of the status that an issue has on a given day.
+        # other fields included in var(issue_history_columns)
 
-#     tables:
-#     # tables with table and column- level descriptions
-#     # unique/not_null tests on primary keys
-         
+  - name: jira__issue_enhanced
+    description: >
+      Enhanced version of the source `issue` table. 
+  - name: jira__project_enhanced
+  - name: jira__user_enhanced
