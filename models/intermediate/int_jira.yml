@@ -307,6 +307,112 @@ models:
         description: Timezone of the user currently who reported this issue.
 
   - name: int_jira__agg_multiselect_history 
+    description: >
+      Table aggregating batches of multiselect field values, which are split out individually in `issue_multiselect_history`.
+      This is necessary to combine the 2 issue field history tables together.
+    columns:
+      - name: field_id
+        description: > 
+          Foreign key referencing the ID of the `field` that was changed.
+      - name: issue_id
+        description: Foreign key referencing the ID of the `issue` whose field was updated.
+      - name: updated_at
+        description: Timestamp of when the issue field was updated to included this value.
+      - name: batch_id
+        description: Unique key hashed on field_id, issue_id, and updated_at.
+        tests:
+          - unique
+          - not_null
+      - name: field_values
+        description: Comma-separated list of the batch's values.
+      - name: date_day
+        description: Calendar date on which the batch of values was applied to the issue field. 
+
   - name: int_jira__combine_field_histories
+    description: Table combining `issue_field_history` with the aggregated `issue_multiselect_history`.
+    columns:
+      - name: field_id
+        description: > 
+          Foreign key referencing the unique ID of the `field` that was changed.
+      - name: issue_id
+        description: Foreign key referencing the ID of the `issue` whose field was updated.
+      - name: field_value 
+        description: >
+          A singular or comma-separated list of field values, depending on if the field is an array type. Note: these values
+          are IDs referencing either `field_option`, `sprint`, `issue` (ie for epics), `user` (ie for assignees), etc. This depends 
+          on what the field is (the value could also be a date, a freeform description, etc).
+      - name: valid_starting_at
+        description: Timestamp of when the field was updated to this value.
+      - name: valid_ending_at
+        description: Timestamp of when the field was updated to a new value.
+      - name: valid_starting_on
+        description: Calendar date of when the field was changed to this value.
+      - name: combined_history_id
+        description: Unique ID hashed on `field_id`, `issue_id`, and `valid_starting_at`.
+        tests:
+          - unique
+          - not_null
+
   - name: int_jira__issue_calendar_spine
+    description: >
+      Table relating every issue to every day it was open (plus a buffer of one month, in case the issue is re-opened, as this model
+      is materialized incrementally).
+    columns:
+      - name: date_day
+        description: Calendar date on which the issue was open.
+      - name: issue_id
+        description: Foreign key referencing the unique ID of the `issue` whose field was updated.
+      - name: issue_day_id
+        description: Unique ID hashed on `date_day` and `issue_id`. 
+        tests:
+          - unique
+          - not_null
+
+  - name: int_jira__daily_field_history
+    description: >
+      Table in which each row represents the latest field value (for `sprint`, `status` and any columns specified by `issue_field_history_columns`)
+      actively changed on a given day for each issue.
+    columns:
+      - name: field_id
+        description: > 
+          Foreign key referencing the unique ID of the `field` that was changed.
+      - name: issue_id
+        description: Foreign key referencing the ID of the `issue` whose field was updated.
+      - name: field_value 
+        description: >
+          A singular or comma-separated list of field values, depending on if the field is an array type. Note: these values
+          are IDs referencing either `field_option`, `sprint`, `issue` (ie for epics), `user` (ie for assignees), etc. This depends 
+          on what the field is (the value could also be a date, a freeform description, etc).
+      - name: field_name
+        description: Name of the field as it appears on issue cards.
+      - name: valid_starting_at
+        description: Timestamp of when the field was updated to this value.
+      - name: valid_ending_at
+        description: Timestamp of when the field was updated to a new value.
+      - name: valid_starting_on
+        description: Calendar date of when the field was changed to this value.
+      - name: issue_field_day_id
+        description: Unique ID hashed on `field_id`, `issue_id`,  and `valid_starting_at`.
+        tests:
+          - unique
+          - not_null
+
   - name: int_jira__pivot_daily_field_history
+    description: >
+      Table pivoting out the fields in `int_jira__daily_field_history` into columns, in which the value of each field column
+      is the latest value updated a given day.
+    columns:
+      - name: valid_starting_on
+        description: Calendar date of when the field was changed to this value.
+      - name: issue_id
+        description: Foreign key referencing the ID of the `issue` whose field was updated.
+      - name: sprint
+        description: The ID of the sprint that an issue is slotted into on a given day.
+      - name: status
+        description: The ID of the status that an issue has on a given day.
+      # plus any fields specified by `var('issue_field_history_columns')`
+      - name: issue_day_id
+        description: Unique ID hashed on `valid_starting_on` and `issue_field_history`.
+        tests:
+          - unique
+          - not_null
