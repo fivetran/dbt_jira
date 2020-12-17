@@ -25,7 +25,7 @@ agg_epics as (
 
     from {{ ref('jira__issue_enhanced') }}
     where lower(issue_type) = 'epic'
-
+    -- should we limit to active epics?
     group by 1
 
 ),

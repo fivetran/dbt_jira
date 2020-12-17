@@ -60,6 +60,12 @@ issue_comments as (
     from {{ ref('jira__issue_comments') }}
 ),
 
+issue_parent as (
+    
+    select *
+    from {{ ref('jira__issue_type_parents') }}
+),
+
 join_issue as (
 
     select
@@ -81,7 +87,9 @@ join_issue as (
         
         issue.issue_key,
         issue.parent_issue_id, -- this may be the same as epic_issue_id in next-gen projects
-
+        issue_parent.parent_issue_name,
+        issue_parent.parent_issue_key,
+        issue_parent.parent_issue_type,
         priority.priority_name as current_priority,
 
         project.project_id, 
@@ -119,12 +127,10 @@ join_issue as (
     left join priority on priority.priority_id = issue.priority_id
 
     left join issue_users on issue_users.issue_id = issue.issue_id
-
     left join issue_epic on issue_epic.issue_id = issue.issue_id
-
     left join issue_sprint on issue_sprint.issue_id = issue.issue_id
-
     left join issue_comments on issue_comments.issue_id = issue.issue_id
+    left join issue_parent on issue_parent.issue_id = issue.issue_id
 
 )
 

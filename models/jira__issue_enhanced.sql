@@ -34,10 +34,11 @@ final as (
         issue_dates.last_assigned_at,
         issue_dates.first_resolved_at,
 
-        {# {{ dbt_utils.datediff('issue.created_at', "coalesce(issue_dates.first_assigned_at, " ~ dbt_utils.current_timestamp() ~ ')', 'second') }} unassigned_duration_seconds, #}
         {{ dbt_utils.datediff('issue.created_at', "coalesce(issue.resolved_at, " ~ dbt_utils.current_timestamp() ~ ')', 'second') }} open_duration_seconds,
         -- this will be null if no one has been assigned
         {{ dbt_utils.datediff('issue_dates.first_assigned_at', "coalesce(issue.resolved_at, " ~ dbt_utils.current_timestamp() ~ ')', 'second') }} any_assignment_duration_seconds,
+
+        -- if an issue is not currently assigned this will not be null
         {{ dbt_utils.datediff('issue_dates.last_assigned_at', "coalesce(issue.resolved_at, " ~ dbt_utils.current_timestamp() ~ ')', 'second') }} last_assignment_duration_seconds 
     
     from issue left join issue_dates using(issue_id)
