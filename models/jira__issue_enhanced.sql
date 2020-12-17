@@ -5,7 +5,7 @@ with issue as (
 ),
 
 issue_field_history as (
-    -- we're only looking at assignments and resolutions
+    -- we're only looking at assignments and resolutions, which are single-field values
     select *
     from {{ var('issue_field_history') }}
 
@@ -20,7 +20,7 @@ issue_dates as (
         issue_id,
         min(case when field_id = 'assignee' then updated_at end) as first_assigned_at,
         max(case when field_id = 'assignee' then updated_at end) as last_assigned_at,
-        min(case when field_id = 'resolutiondate' then updated_at end) as first_resolved_at -- in case it's been un-marked
+        min(case when field_id = 'resolutiondate' then updated_at end) as first_resolved_at -- in case it's been re-opened
 
     from issue_field_history
     group by 1
@@ -35,6 +35,7 @@ final as (
         issue_dates.first_resolved_at,
 
         {{ dbt_utils.datediff('issue.created_at', "coalesce(issue.resolved_at, " ~ dbt_utils.current_timestamp() ~ ')', 'second') }} open_duration_seconds,
+
         -- this will be null if no one has been assigned
         {{ dbt_utils.datediff('issue_dates.first_assigned_at', "coalesce(issue.resolved_at, " ~ dbt_utils.current_timestamp() ~ ')', 'second') }} any_assignment_duration_seconds,
 

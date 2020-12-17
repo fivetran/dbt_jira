@@ -1,7 +1,7 @@
 version: 2
 
 models:
-  - name: int_jira_issue_join
+  - name: int_jira__issue_join
     description: >
       The core issue table, enhanced with current-status attributes from foreign-key-related tables,
       and metrics regarding resolutions and assignments.
