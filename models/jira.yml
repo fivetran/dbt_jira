@@ -66,6 +66,8 @@ models:
         description: UI-facing id of the issue.
       - name: parent_issue_id
         description: Self-referencing ID of the parent `issue`.
+      - name: parent_issue_name
+        description: Title of the parent issue.
       - name: parent_issue_key
         description: Issue key of the sub-issue's parent.
       - name: parent_issue_type
