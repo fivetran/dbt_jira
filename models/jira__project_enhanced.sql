@@ -58,7 +58,12 @@ project_join as (
         project_metrics.avg_assigned_close_time_seconds,
 
         project_metrics.avg_age_currently_open_seconds,
-        project_metrics.avg_age_currently_open_assigned_seconds
+        project_metrics.avg_age_currently_open_assigned_seconds,
+
+        project_metrics.median_close_time_seconds, 
+        project_metrics.median_age_currently_open_seconds,
+        project_metrics.median_assigned_close_time_seconds,
+        project_metrics.median_age_currently_open_assigned_seconds
 
     from project
     left join project_metrics on project.project_id = project_metrics.project_id

@@ -42,7 +42,10 @@ user_join as (
         coalesce(user_metrics.n_closed_issues, 0) as n_closed_issues,
         coalesce(user_metrics.n_open_issues, 0) as n_open_issues,
         user_metrics.avg_close_time_seconds,
-        user_metrics.avg_age_currently_open_seconds
+        user_metrics.avg_age_currently_open_seconds,
+        
+        user_metrics.median_close_time_seconds,
+        user_metrics.median_age_currently_open_seconds
 
     from jira_user 
     left join user_metrics on jira_user.user_id = user_metrics.user_id

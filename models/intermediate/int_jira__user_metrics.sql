@@ -5,6 +5,24 @@ with issue as (
     where assignee_user_id is not null
 ),
 
+median_metrics as (
+
+    select user_id, median_close_time_seconds, median_age_currently_open_seconds
+
+    from (
+        select 
+            assignee_user_id as user_id,
+            round( {{ fivetran_utils.percentile(percentile_field='case when resolved_at is not null then last_assignment_duration_seconds end', 
+                        partition_field='assignee_user_id', percent='0.5') }}, 0) as median_close_time_seconds,
+            round( {{ fivetran_utils.percentile(percentile_field='case when resolved_at is null then last_assignment_duration_seconds end', 
+                        partition_field='assignee_user_id', percent='0.5') }}, 0) as median_age_currently_open_seconds
+
+        from issue
+    )
+    group by 1,2,3
+),
+
+
 user_issues as (
 
     select
@@ -21,7 +39,7 @@ user_issues as (
 
 ),
 
-calculate_metrics as (
+calculate_avg_metrics as (
 
     select 
         user_id,
@@ -35,6 +53,17 @@ calculate_metrics as (
         round( sum_current_open_seconds * 1.0 / n_open_issues, 0) end as avg_age_currently_open_seconds
 
     from user_issues
+),
+
+join_metrics as (
+
+    select
+        calculate_avg_metrics.*,
+        median_metrics.median_close_time_seconds,
+        median_metrics.median_age_currently_open_seconds
+        
+    from calculate_avg_metrics
+    left join median_metrics using(user_id)
 )
 
-select * from calculate_metrics
+select * from join_metrics
