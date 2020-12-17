@@ -2,6 +2,7 @@ with issue as (
 
     select *
     from {{ ref('jira__issue_enhanced') }} 
+    where assignee_user_id is not null
 ),
 
 user_issues as (
@@ -15,8 +16,9 @@ user_issues as (
         sum(case when resolved_at is null then last_assignment_duration_seconds end) as sum_close_time_seconds
 
     from issue
-    
+
     group by 1
+
 ),
 
 calculate_metrics as (

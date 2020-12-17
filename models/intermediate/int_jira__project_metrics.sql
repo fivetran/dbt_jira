@@ -2,6 +2,7 @@ with issue as (
 
     select * 
     from {{ ref('jira__issue_enhanced') }}
+    where project_id is not null
 ),
 
 

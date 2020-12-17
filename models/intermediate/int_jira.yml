@@ -1,7 +1,7 @@
 version: 2
 
 models:
-  - name: int_jira_join
+  - name: int_jira_issue_join
     description: >
       The core issue table, enhanced with current-status attributes from foreign-key-related tables,
       and metrics regarding resolutions and assignments.
@@ -252,7 +252,7 @@ models:
       - name: n_sprint_changes
         description: The total number of sprints that the issue has belonged to.
 
-  - name: int_jira__type_parents
+  - name: int_jira__issue_type_parents
     description: Table relating issues with data regarding their parent issues.
     tests:
       - dbt_utils.unique_combination_of_columns:
@@ -279,7 +279,7 @@ models:
       - name: parent_is_epic
         description: Boolean that is true if the parent is a next-gen epic.
     
-  - name: int_jira__users 
+  - name: int_jira__issue_users 
     description: Table relating issues to attributes about their assignees and reporters.
     columns:
       - name: issue_id
