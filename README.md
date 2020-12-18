@@ -1,8 +1,6 @@
 # Jira (docs once everything is 100% final)
 
-This package models Jira data from [Fivetran's connector](https://fivetran.com/docs/applications/jira). It uses data in the format described by [this ERD](https://fivetran.com/docs/applications/jira/#schemainformation). 
-
-> Note: This schema applies to Jira connections set up or fully re-synced after September 10, 2020.
+This package models Jira data from [Fivetran's connector](https://fivetran.com/docs/applications/jira). It uses data in the format described by [this ERD](https://fivetran.com/docs/applications/jira/#schemainformation).
 
 This package enables you to better understand the workload, performance, and velocity of work done by your team using Jira issues. It achieves this by:
 - Creating a daily issue history table to enable the quick creation of agile reports, such as burndown charts, along any issue field
@@ -12,7 +10,7 @@ This package enables you to better understand the workload, performance, and vel
 ## Compatibility
 > Please be aware the [dbt_jira](https://github.com/fivetran/dbt_jira) and [dbt_jira_source](https://github.com/fivetran/dbt_jira_source) packages will only work with the [Fivetran Jira schema](https://fivetran.com/docs/applications/jira/changelog) released after September 10, 2020. If your Jira connector was set up prior to September 10, 2020, you will need to fully resync or set up a new Jira connector in order for the Fivetran dbt Jira packages to work.
 
-## Models - transformation package version
+## Models
 
 This package contains transformation models, designed to work simultaneously with our [Jira source package](https://github.com/fivetran/dbt_jira_source). A dependency on the source package is declared in this package's `packages.yml` file, so it will automatically download when you run `dbt deps`. The primary outputs of this package are described below. Intermediate models are used to create these output models.
 
@@ -63,7 +61,7 @@ Don't see a model or specific metric you would have liked to be included? Notice
 and running the package? If so, we highly encourage and welcome contributions to this package! 
 Please create issues or open PRs against `master`. Check out [this post](https://discourse.getdbt.com/t/contributing-to-a-dbt-package/657) on the best workflow for contributing to a package.
 
-## Database support
+## Database Support
 This package has been tested on BigQuery, Snowflake and Redshift.
 Coming soon -- compatibility with Spark
 
