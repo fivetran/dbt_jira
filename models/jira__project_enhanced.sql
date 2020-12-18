@@ -50,9 +50,9 @@ project_join as (
         jira_user.email as project_lead_email,
         agg_epics.epics,
         agg_components.components,
-        coalesce(project_metrics.n_closed_issues, 0) as n_closed_issues,
-        coalesce(project_metrics.n_open_issues, 0) as n_open_issues,
-        coalesce(project_metrics.n_open_assigned_issues, 0) as n_open_assigned_issues,
+        coalesce(project_metrics.count_closed_issues, 0) as count_closed_issues,
+        coalesce(project_metrics.count_open_issues, 0) as count_open_issues,
+        coalesce(project_metrics.count_open_assigned_issues, 0) as count_open_assigned_issues,
 
         project_metrics.avg_close_time_seconds,
         project_metrics.avg_assigned_close_time_seconds,

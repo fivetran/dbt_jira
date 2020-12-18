@@ -36,13 +36,13 @@ grab_parents as (
         parent.issue_type as parent_issue_type,
         parent.issue_name as parent_issue_name,
         parent.issue_key as parent_issue_key,
-        lower(coalesce(parent.issue_type, '')) = 'epic' as parent_is_epic
+        lower(coalesce(parent.issue_type, '')) = 'epic' as is_parent_epic
 
     from
-    grab_types sub 
+    grab_types as sub 
 
     -- do a left join so we can grab all issue types from this table in `issue_join`
-    left join grab_types parent on sub.parent_issue_id = parent.issue_id
+    left join grab_types as parent on sub.parent_issue_id = parent.issue_id
 )
 
 select * 

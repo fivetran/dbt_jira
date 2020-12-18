@@ -19,7 +19,7 @@ agg_comments as (
     select 
     comment.issue_id,
     {{ fivetran_utils.string_agg( "comment.created_at || '  -  ' || jira_user.user_display_name || ':  ' || comment.body", "'\\n'" ) }} as conversation,
-    count(comment.comment_id) as n_comments
+    count(comment.comment_id) as count_comments
 
     from
     comment 

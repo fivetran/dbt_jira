@@ -81,10 +81,14 @@ join_issue as (
         issue_users.assignee_email,
         
         issue.issue_key,
-        issue.parent_issue_id, -- this may be the same as epic_issue_id in next-gen projects
-        issue_type_parent.parent_issue_name,
-        issue_type_parent.parent_issue_key,
-        issue_type_parent.parent_issue_type,
+        -- parent automatically = epic in next-gen projects
+        coalesce(issue.parent_issue_id, issue_epic.epic_issue_id) as parent_issue_id,
+        coalesce(issue_type_parent.parent_issue_name, issue_epic.epic_name) as parent_issue_name,
+        coalesce(issue_type_parent.parent_issue_key, issue_epic.epic_key) as parent_issue_key,
+        case 
+            when issue_type_parent.parent_issue_type is not null then issue_type_parent.parent_issue_type
+            when issue_epic.epic_issue_id is not null then 'Epic' 
+            else null end as parent_issue_type,
         priority.priority_name as current_priority,
 
         project.project_id, 
@@ -102,7 +106,7 @@ join_issue as (
 
         issue_sprint.sprint_id,
         issue_sprint.sprint_name,
-        issue_sprint.n_sprint_changes,
+        issue_sprint.count_sprint_changes,
 
         issue.original_estimate_seconds,
         issue.remaining_estimate_seconds,
@@ -110,7 +114,7 @@ join_issue as (
         issue.work_ratio,
 
         issue_comments.conversation,
-        issue_comments.n_comments,
+        issue_comments.count_comments,
 
         issue._fivetran_synced
     
