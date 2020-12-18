@@ -1,6 +1,8 @@
 # Jira
 
-This package models Jira data from [Fivetran's connector](https://fivetran.com/docs/applications/jira). It uses data in the format described by [this ERD](https://docs.google.com/presentation/d/1UPq2CWnqQpbjLxkTrcWvAekaZ0o0OdzXODTVmUXeGvs/edit#slide=id.g5f1e6b049a_8_0). **Note: this schema applies to Jira connections set up or fully resynced after September 10, 2020.**
+This package models Jira data from [Fivetran's connector](https://fivetran.com/docs/applications/jira). It uses data in the format described by [this ERD](https://docs.google.com/presentation/d/1UPq2CWnqQpbjLxkTrcWvAekaZ0o0OdzXODTVmUXeGvs/edit#slide=id.g5f1e6b049a_8_0). 
+
+> Note: this schema applies to Jira connections set up or fully re-synced after September 10, 2020.
 
 This package enables you to better understand the workload, performance, and velocity of work done by your team via Jira issues. It achieves this by:
 - Creating a daily issue history table to enable the quick creation of agile reports, such as burndown charts, along any issue field
