@@ -1,13 +1,6 @@
--- just a subset of issues with issue_type = 'epic'
-with epic as (
-    
-    select *
-    from {{ ref('int_jira__epic') }}
-),
-
 -- issue-epic relationships are either captured via the issue's parent_issue_id (next-gen projects)
 -- or through the 'Epic Link' field (classic projects)
-issue_parents as (
+with issue_parents as (
 
     select *
     from {{ ref('int_jira__issue_type_parents') }}
@@ -40,22 +33,24 @@ epic_history as (
     join epic_field using (field_id) 
 ),
 
+order_epic_links as (
+
+    select
+        issue_id,
+        cast(field_value as {{ dbt_utils.type_int() }} ) as epic_issue_id,
+
+        row_number() over (
+                partition by issue_id order by updated_at desc
+                ) as row_num
+
+    from epic_history
+),
+
 last_epic_link as (
 
     select issue_id, epic_issue_id 
     
-    from (
-
-        select
-            issue_id,
-            cast(field_value as {{ dbt_utils.type_int() }} ) as epic_issue_id,
-
-            row_number() over (
-                    partition by issue_id order by updated_at desc
-                    ) as row_num
-
-            from epic_history
-        ) 
+    from order_epic_links
     where row_num = 1
 ),
 
@@ -81,7 +76,7 @@ issue_epics as (
 
         coalesce(issue_parents.parent_issue_id, grab_epic_name.epic_issue_id) as parent_issue_id,
         coalesce(issue_parents.parent_issue_name, grab_epic_name.epic_name) as parent_issue_name,
-        issue_parents.parent_is_epic or grab_epic_name.issue_id is not null as parent_is_epic
+        issue_parents.is_parent_epic or grab_epic_name.issue_id is not null as is_parent_epic
 
     from issue_parents
 
@@ -100,7 +95,7 @@ final as (
 
     from issue_epics 
 
-    where parent_is_epic
+    where is_parent_epic
 )
 
 select * from final

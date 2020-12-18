@@ -39,8 +39,8 @@ user_join as (
     select
         jira_user.*,
         user_projects.projects, -- projects they've worked on issues for
-        coalesce(user_metrics.n_closed_issues, 0) as n_closed_issues,
-        coalesce(user_metrics.n_open_issues, 0) as n_open_issues,
+        coalesce(user_metrics.count_closed_issues, 0) as count_closed_issues,
+        coalesce(user_metrics.count_open_issues, 0) as count_open_issues,
         user_metrics.avg_close_time_seconds,
         user_metrics.avg_age_currently_open_seconds,
         

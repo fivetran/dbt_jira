@@ -5,6 +5,24 @@ with issue as (
     where project_id is not null
 ),
 
+calculate_medians as (
+
+    select 
+        project_id,
+        round( {{ fivetran_utils.percentile(percentile_field='case when resolved_at is not null then open_duration_seconds end', 
+                    partition_field='project_id', percent='0.5') }}, 0) as median_close_time_seconds,
+        round( {{ fivetran_utils.percentile(percentile_field='case when resolved_at is null then open_duration_seconds end', 
+                    partition_field='project_id', percent='0.5') }}, 0) as median_age_currently_open_seconds,
+
+        round( {{ fivetran_utils.percentile(percentile_field='case when resolved_at is not null then any_assignment_duration_seconds end', 
+                    partition_field='project_id', percent='0.5') }}, 0) as median_assigned_close_time_seconds,
+        round( {{ fivetran_utils.percentile(percentile_field='case when resolved_at is null then any_assignment_duration_seconds end', 
+                    partition_field='project_id', percent='0.5') }}, 0) as median_age_currently_open_assigned_seconds
+
+    from issue
+),
+
+-- grouping because the medians were calculated using window functions
 median_metrics as (
 
     select 
@@ -14,21 +32,7 @@ median_metrics as (
         median_assigned_close_time_seconds,
         median_age_currently_open_assigned_seconds
 
-    from (
-        select 
-            project_id,
-            round( {{ fivetran_utils.percentile(percentile_field='case when resolved_at is not null then open_duration_seconds end', 
-                        partition_field='project_id', percent='0.5') }}, 0) as median_close_time_seconds,
-            round( {{ fivetran_utils.percentile(percentile_field='case when resolved_at is null then open_duration_seconds end', 
-                        partition_field='project_id', percent='0.5') }}, 0) as median_age_currently_open_seconds,
-
-            round( {{ fivetran_utils.percentile(percentile_field='case when resolved_at is not null then any_assignment_duration_seconds end', 
-                        partition_field='project_id', percent='0.5') }}, 0) as median_assigned_close_time_seconds,
-            round( {{ fivetran_utils.percentile(percentile_field='case when resolved_at is null then any_assignment_duration_seconds end', 
-                        partition_field='project_id', percent='0.5') }}, 0) as median_age_currently_open_assigned_seconds
-
-        from issue
-    )
+    from calculate_medians
     group by 1,2,3,4,5
 ),
 
@@ -37,14 +41,14 @@ median_metrics as (
 project_issues as (
     select
         project_id,
-        sum(case when resolved_at is not null then 1 else 0 end) as n_closed_issues,
-        sum(case when resolved_at is null then 1 else 0 end) as n_open_issues,
+        sum(case when resolved_at is not null then 1 else 0 end) as count_closed_issues,
+        sum(case when resolved_at is null then 1 else 0 end) as count_open_issues,
 
         -- using the below to calculate averages
 
         -- assigned issues
-        sum(case when resolved_at is null and assignee_user_id is not null then 1 else 0 end) as n_open_assigned_issues,
-        sum(case when resolved_at is not null and assignee_user_id is not null then 1 else 0 end) as n_closed_assigned_issues,
+        sum(case when resolved_at is null and assignee_user_id is not null then 1 else 0 end) as count_open_assigned_issues,
+        sum(case when resolved_at is not null and assignee_user_id is not null then 1 else 0 end) as count_closed_assigned_issues,
 
         -- close time 
         sum(case when resolved_at is not null then open_duration_seconds else 0 end) as sum_close_time_seconds,
@@ -63,21 +67,21 @@ calculate_avg_metrics as (
 
     select
         project_id,
-        n_closed_issues,
-        n_open_issues,
-        n_open_assigned_issues,
+        count_closed_issues,
+        count_open_issues,
+        count_open_assigned_issues,
 
-        case when n_closed_issues = 0 then 0 else
-        round( sum_close_time_seconds * 1.0 / n_closed_issues, 0) end as avg_close_time_seconds,
+        case when count_closed_issues = 0 then 0 else
+        round( sum_close_time_seconds * 1.0 / count_closed_issues, 0) end as avg_close_time_seconds,
 
-        case when n_closed_assigned_issues = 0 then 0 else
-        round( sum_assigned_close_time_seconds * 1.0 / n_closed_assigned_issues, 0) end as avg_assigned_close_time_seconds,
+        case when count_closed_assigned_issues = 0 then 0 else
+        round( sum_assigned_close_time_seconds * 1.0 / count_closed_assigned_issues, 0) end as avg_assigned_close_time_seconds,
 
-        case when n_open_issues = 0 then 0 else
-        round( sum_currently_open_duration_seconds * 1.0 / n_open_issues, 0) end as avg_age_currently_open_seconds,
+        case when count_open_issues = 0 then 0 else
+        round( sum_currently_open_duration_seconds * 1.0 / count_open_issues, 0) end as avg_age_currently_open_seconds,
 
-        case when n_open_assigned_issues = 0 then 0 else
-        round( sum_currently_open_assigned_duration_seconds * 1.0 / n_open_assigned_issues, 0) end as avg_age_currently_open_assigned_seconds
+        case when count_open_assigned_issues = 0 then 0 else
+        round( sum_currently_open_assigned_duration_seconds * 1.0 / count_open_assigned_issues, 0) end as avg_age_currently_open_assigned_seconds
 
     from project_issues
 ),

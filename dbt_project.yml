@@ -5,12 +5,13 @@ require-dbt-version: [">=0.18.0", "<0.19.0"]
 
 
 vars:
+  jira_schema: jira_3
+
   jira:
     issue: "{{ ref('stg_jira__issue') }}"
     project: "{{ ref('stg_jira__project') }}"
     board: "{{ ref('stg_jira__board') }}"
     user: "{{ ref('stg_jira__user') }}"
-    epic: "{{ ref('stg_jira__epic') }}"
     issue_type: "{{ ref('stg_jira__issue_type') }}"
     status: "{{ ref('stg_jira__status') }}"
     resolution: "{{ ref('stg_jira__resolution') }}"
@@ -23,11 +24,10 @@ vars:
     field: "{{ ref('stg_jira__field') }}"
     sprint: "{{ ref('stg_jira__sprint') }}"
 
-    issue_field_history_columns: ['summary', 'components', 'story points']
+models:
+  jira:
+    materialized: table # field history tables are configured to be incremental
+    intermediate:
+      materialized: ephemeral
 
-models: 
-  materialized: table # todo - change this post testing
-  # intermediate:
-  #   materialized: ephemeral
-
-profile: dev_bigquery_dbt_testing
+profile: dev_bigquery_dbt_testing # final todo: remove this

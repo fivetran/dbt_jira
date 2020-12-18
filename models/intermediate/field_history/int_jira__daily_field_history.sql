@@ -35,7 +35,7 @@ limit_to_relevant_fields as (
 
     where 
     lower(field.field_name) in ('sprint', 'status' 
-                                {%- for col in var('issue_field_history_columns') -%}
+                                {%- for col in var('issue_field_history_columns', []) -%}
                                 , {{ "'" ~ col ~ "'" }}
                                 {%- endfor -%} )
     

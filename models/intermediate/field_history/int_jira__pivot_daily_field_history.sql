@@ -26,12 +26,12 @@ pivot_out as (
         valid_starting_on, 
         issue_id,
         max(case when lower(field_name) = 'status' then field_value end) as status,
-        max(case when lower(field_name) = 'sprint' then field_value end) as sprint,
+        max(case when lower(field_name) = 'sprint' then field_value end) as sprint
 
-        {% for col in var('issue_field_history_columns') -%}
+        {% for col in var('issue_field_history_columns', []) -%}
         -- @ kristin, should this be max? in zendesk it's min....
+        ,
             max(case when lower(field_name) = '{{ col | lower }}' then field_value end) as {{ col | replace(' ', '_') }}
-            {% if not loop.last %},{% endif %}
         {% endfor -%}
 
     from daily_field_history
