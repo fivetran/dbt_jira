@@ -74,7 +74,7 @@ issue_sprint as (
         sprint.started_at as sprint_started_at,
         sprint.ended_at as sprint_ended_at,
         sprint.completed_at as sprint_completed_at,
-        coalesce(sprint_rollovers.count_sprint_changes, 0) as count_sprint_changes -- todo: check if this includes the initialized null
+        coalesce(sprint_rollovers.count_sprint_changes, 0) as count_sprint_changes
 
     from 
     last_sprint 
