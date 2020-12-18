@@ -1,8 +1,10 @@
 # Jira
 
-This package models Jira data from [Fivetran's connector](https://fivetran.com/docs/applications/jira). It uses data in the format described by [this ERD](https://docs.google.com/presentation/d/1UPq2CWnqQpbjLxkTrcWvAekaZ0o0OdzXODTVmUXeGvs/edit#slide=id.g5f1e6b049a_8_0). **Note: this schema applies to Jira connections set up or fully resynced after September 10, 2020.**
+This package models Jira data from [Fivetran's connector](https://fivetran.com/docs/applications/jira). It uses data in the format described by [this ERD](https://docs.google.com/presentation/d/1UPq2CWnqQpbjLxkTrcWvAekaZ0o0OdzXODTVmUXeGvs/edit#slide=id.g5f1e6b049a_8_0). 
 
-This package enables you to better understand the workload, performance, and velocity of work done by your team via Jira issues. It achieves this by:
+> Note: This schema applies to Jira connections set up or fully resynced after September 10, 2020.
+
+This package enables you to better understand the workload, performance, and velocity of work done by your team using Jira issues. It achieves this by:
 - Creating a daily issue history table to enable the quick creation of agile reports, such as burndown charts, along any issue field
 - Enriching the core issue table with relevant data regarding its workflow and current state
 - Aggregating bandwidth and issue velocity metrics along projects and users
@@ -53,7 +55,7 @@ vars:
     issue_field_history_columns: ['the', 'list', 'of', 'field', 'names'] # case-insensitive
 ```
 
-Note: `sprint` and `status` will always be tracked, as they are necessary for creating common agile reports. 
+> Note: `sprint` and `status` will always be tracked, as they are necessary for creating common agile reports. 
 
 ## Contributions
 Additional contributions to this package are very welcome! Please create issues
