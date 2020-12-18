@@ -1,6 +1,6 @@
-# Jira
+# Jira (docs once everything is 100% final)
 
-This package models Jira data from [Fivetran's connector](https://fivetran.com/docs/applications/jira). It uses data in the format described by [this ERD](https://docs.google.com/presentation/d/1UPq2CWnqQpbjLxkTrcWvAekaZ0o0OdzXODTVmUXeGvs/edit#slide=id.g5f1e6b049a_8_0). 
+This package models Jira data from [Fivetran's connector](https://fivetran.com/docs/applications/jira). It uses data in the format described by [this ERD](https://fivetran.com/docs/applications/jira/#schemainformation). 
 
 > Note: This schema applies to Jira connections set up or fully re-synced after September 10, 2020.
 
@@ -9,7 +9,8 @@ This package enables you to better understand the workload, performance, and vel
 - Enriching the core issue table with relevant data regarding its workflow and current state
 - Aggregating bandwidth and issue velocity metrics along projects and users
 
-> The Jira dbt package is compatible with BigQuery, Redshift, and Snowflake destinations.
+## Compatibility
+> Please be aware the [dbt_jira](https://github.com/fivetran/dbt_jira) and [dbt_jira_source](https://github.com/fivetran/dbt_jira_source) packages will only work with the [Fivetran Jira schema](https://fivetran.com/docs/applications/jira/changelog) released after September 10, 2020. If your Jira connector was set up prior to September 10, 2020, you will need to fully resync or set up a new Jira connector in order for the Fivetran dbt Jira packages to work.
 
 ## Models - transformation package version
 
@@ -17,10 +18,10 @@ This package contains transformation models, designed to work simultaneously wit
 
 | **model**                | **description**                                                                                                                                |
 | ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------- |
-| `jira__daily_issue_field_history`             | Each record represents a day in which an issue remained open, complete with the issue's sprint, its status, and the values of any fields specified by the `issue_field_history_columns` variable. |
-| `jira__issue_enhanced`            | Each record represents a Jira issue, enriched with data about its current assignee, reporter, sprint, epic, project, resolution, issue type, priority, and status. Also includes metrics reflecting assignments, sprint rollovers, and re-openings of the issue. Note: all epics are considered `issues` in Jira, and are therefore included in this model (where `issue_type='epic'`). |
-| `jira__project`            | Each record represents a project, enriched with data about the users involved, how many issues have been opened or closed, the velocity of work, and the breadth of the project (ie its components and epics). |
-| `jira__user`            | Each record represents a user, enriched with metrics regarding their open issues, completed issues, the projects they work on, and the velocity of their work. |
+| [jira__daily_issue_field_history](https://github.com/fivetran/dbt_jira/blob/master/models/jira__daily_issue_field_history.sql)             | Each record represents a day in which an issue remained open, complete with the issue's sprint, its status, and the values of any fields specified by the `issue_field_history_columns` variable. |
+| [jira__issue_enhanced](https://github.com/fivetran/dbt_jira/blob/master/models/jira__issue_enhanced.sql)            | Each record represents a Jira issue, enriched with data about its current assignee, reporter, sprint, epic, project, resolution, issue type, priority, and status. Also includes metrics reflecting assignments, sprint rollovers, and re-openings of the issue. Note: all epics are considered `issues` in Jira, and are therefore included in this model (where `issue_type='epic'`). |
+| [jira__project_enhanced](https://github.com/fivetran/dbt_jira/blob/master/models/jira__project_enhanced.sql)            | Each record represents a project, enriched with data about the users involved, how many issues have been opened or closed, the velocity of work, and the breadth of the project (ie its components and epics). |
+| [jira__user_enhanced](https://github.com/fivetran/dbt_jira/blob/master/models/jira__user_enhanced.sql)            | Each record represents a user, enriched with metrics regarding their open issues, completed issues, the projects they work on, and the velocity of their work. |
 
 ## Installation Instructions
 Check [dbt Hub](https://hub.getdbt.com/) for the latest installation instructions, or [read the dbt docs](https://docs.getdbt.com/docs/package-management) for more information on installing packages.
@@ -58,10 +59,13 @@ vars:
 > Note: `sprint` and `status` will always be tracked, as they are necessary for creating common agile reports. 
 
 ## Contributions
-Additional contributions to this package are very welcome! Please create issues
-or open PRs against `master`. Check out 
-[this post](https://discourse.getdbt.com/t/contributing-to-a-dbt-package/657) 
-on the best workflow for contributing to a package.
+Don't see a model or specific metric you would have liked to be included? Notice any bugs when installing 
+and running the package? If so, we highly encourage and welcome contributions to this package! 
+Please create issues or open PRs against `master`. Check out [this post](https://discourse.getdbt.com/t/contributing-to-a-dbt-package/657) on the best workflow for contributing to a package.
+
+## Database support
+This package has been tested on BigQuery, Snowflake and Redshift.
+Coming soon -- compatibility with Spark
 
 ## Resources:
 - Provide [feedback](https://www.surveymonkey.com/r/DQ7K7WW) on our existing dbt packages or what you'd like to see next
