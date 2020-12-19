@@ -53,7 +53,7 @@ join_issue as (
     select
         issue.*, 
 
-        project.project_name,
+        project.project_name as project_name,
 
         status.status_name as current_status,
         
@@ -77,9 +77,9 @@ join_issue as (
     left join status on status.status_id = issue.status_id
     left join resolution on resolution.resolution_id = issue.resolution_id
     left join priority on priority.priority_id = issue.priority_id
-    left join issue_sprint using (issue_id)
-    left join issue_comments using (issue_id)
-    left join issue_assignments_and_resolutions using (issue_id)
+    left join issue_sprint on issue_sprint.issue_id = issue.issue_id
+    left join issue_comments on issue_comments.issue_id = issue.issue_id
+    left join issue_assignments_and_resolutions on issue_assignments_and_resolutions.issue_id = issue.issue_id
 
 )
 
