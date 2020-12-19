@@ -6,12 +6,14 @@ profile: 'integration_tests'
 
 vars:
   jira_source:
+    board: "{{ ref('board') }}"
     comment: "{{ ref('comment') }}"
     component: "{{ ref('component') }}"
     epic: "{{ ref('epic') }}"
     field: "{{ ref('field_option') }}"
     field_option: "{{ ref('field_option') }}"
     issue_field_history: "{{ ref('issue_field_history') }}"
+    issue_link: "{{ ref('issue_link') }}"
     issue_multiselect_history: "{{ ref('issue_multiselect_history') }}"
     issue_type: "{{ ref('issue_type') }}"
     issue: "{{ ref('issue') }}"
@@ -29,6 +31,7 @@ vars:
   jira:
     issue: "{{ ref('stg_jira__issue') }}"
     project: "{{ ref('stg_jira__project') }}"
+    board: "{{ ref('stg_jira__board') }}"
     user: "{{ ref('stg_jira__user') }}"
     epic: "{{ ref('stg_jira__epic') }}"
     issue_type: "{{ ref('stg_jira__issue_type') }}"
@@ -38,6 +41,7 @@ vars:
     issue_multiselect_history: "{{ ref('stg_jira__issue_multiselect_history') }}"
     issue_field_history: "{{ ref('stg_jira__issue_field_history') }}"
     comment: "{{ ref('stg_jira__comment') }}"
+    issue_link: "{{ ref('stg_jira__issue_link') }}"
     component: "{{ ref('stg_jira__component') }}"
     field: "{{ ref('stg_jira__field') }}"
     sprint: "{{ ref('stg_jira__sprint') }}"
@@ -48,6 +52,9 @@ seeds:
   jira_integration_tests:
     +column_types:
       _fivetran_synced: timestamp
+    board:
+      +column_types:
+        id: "{{ 'int64' if target.name == 'bigquery' else 'bigint' }}"
     comment:
       +column_types:
         id: "{{ 'int64' if target.name == 'bigquery' else 'bigint' }}"
