@@ -5,22 +5,11 @@ with sprint as (
 
 ),
 
--- sprint is technically a custom field and therefore has a custom field_id
-sprint_field as (
-
-    select 
-    -- need to do this for AWS for some reason...
-        cast(field_id as {{ dbt_utils.type_string() }}) as field_id
-        
-    from {{ var('field') }}
-    where lower(field_name) = 'sprint'
-),
-
 field_history as (
 
      -- sprints don't appear to be capable of multiselect in the UI...
     select *
-    from {{ var('issue_multiselect_history') }}
+    from {{ ref('int_jira__issue_multiselect_history') }}
 
 ),
 
@@ -28,10 +17,21 @@ field_history as (
 sprint_field_history as (
 
     select 
-        field_history.*
+        field_history.*,
+        row_number() over (
+                    partition by issue_id order by updated_at desc
+                    ) as row_num
 
     from field_history
-    join sprint_field using(field_id)
+    where lower(field_name) = 'sprint'
+
+),
+
+last_sprint as (
+  
+  select *
+  from sprint_field_history
+  where row_num = 1
 
 ),
 
@@ -43,32 +43,14 @@ sprint_rollovers as (
     
     from sprint_field_history
     group by 1
-),
 
-last_sprint as (
-
-    select issue_id, sprint_id
-
-    from (
-        
-        select
-            issue_id,
-            cast(field_value as {{ dbt_utils.type_int() }} ) as sprint_id,
-
-            row_number() over (
-                    partition by issue_id order by updated_at desc
-                    ) as row_num
-
-        from sprint_field_history 
-    )
-    where row_num = 1
 ),
 
 issue_sprint as (
 
     select 
         last_sprint.issue_id,
-        last_sprint.sprint_id,
+        last_sprint.field_value as sprint_id,
         sprint.sprint_name,
         sprint.board_id,
         sprint.started_at as sprint_started_at,
@@ -78,7 +60,7 @@ issue_sprint as (
 
     from 
     last_sprint 
-    join sprint on last_sprint.sprint_id = sprint.sprint_id
+    join sprint on last_sprint.field_value = cast(sprint.sprint_id as {{dbt_utils.type_string()}})
     left join sprint_rollovers on sprint_rollovers.issue_id = last_sprint.issue_id
     
 )

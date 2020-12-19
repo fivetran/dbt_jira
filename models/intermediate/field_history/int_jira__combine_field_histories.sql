@@ -8,7 +8,7 @@
 
 with issue_field_history as (
 
-    select * from {{ var('issue_field_history') }}
+    select * from {{ ref('int_jira__issue_field_history') }}
 
     {% if is_incremental() %}
     where cast( updated_at as date) >= (select max(valid_starting_on) from {{ this }} )
@@ -30,7 +30,8 @@ combine_field_history as (
         field_id,
         issue_id,
         updated_at,
-        field_value
+        field_value,
+        field_name
 
     from issue_field_history
 
@@ -40,7 +41,8 @@ combine_field_history as (
         field_id,
         issue_id,
         updated_at,
-        field_values as field_value -- this is an aggregated list but we'll just call it field_value
+        field_values as field_value, -- this is an aggregated list but we'll just call it field_value
+        field_name
 
     from issue_multiselect_batch_history
 ),
@@ -52,6 +54,7 @@ get_valid_dates as (
         field_id,
         issue_id,
         field_value,
+        field_name,
         updated_at as valid_starting_at,
 
         -- this value is valid until the next value is updated
