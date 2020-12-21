@@ -54,6 +54,19 @@ project_join as (
         coalesce(project_metrics.count_open_issues, 0) as count_open_issues,
         coalesce(project_metrics.count_open_assigned_issues, 0) as count_open_assigned_issues,
 
+        -- days
+        project_metrics.avg_close_time_days,
+        project_metrics.avg_assigned_close_time_days,
+
+        project_metrics.avg_age_currently_open_days,
+        project_metrics.avg_age_currently_open_assigned_days,
+
+        project_metrics.median_close_time_days, 
+        project_metrics.median_age_currently_open_days,
+        project_metrics.median_assigned_close_time_days,
+        project_metrics.median_age_currently_open_assigned_days,
+
+        -- seconds
         project_metrics.avg_close_time_seconds,
         project_metrics.avg_assigned_close_time_seconds,
 

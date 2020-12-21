@@ -41,6 +41,15 @@ user_join as (
         user_projects.projects, -- projects they've worked on issues for
         coalesce(user_metrics.count_closed_issues, 0) as count_closed_issues,
         coalesce(user_metrics.count_open_issues, 0) as count_open_issues,
+
+        -- days
+        user_metrics.avg_close_time_days,
+        user_metrics.avg_age_currently_open_days,
+        
+        user_metrics.median_close_time_days,
+        user_metrics.median_age_currently_open_days,
+
+        -- seconds
         user_metrics.avg_close_time_seconds,
         user_metrics.avg_age_currently_open_seconds,
         
