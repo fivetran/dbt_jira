@@ -86,14 +86,27 @@ calculate_avg_metrics as (
     from project_issues
 ),
 
+-- join medians and averages + convert to days
 join_metrics as (
 
     select
         calculate_avg_metrics.*,
+
+        -- there are 86400 seconds in a day
+        round( calculate_avg_metrics.avg_close_time_seconds / 86400.0, 0) as avg_close_time_days,
+        round( calculate_avg_metrics.avg_assigned_close_time_seconds / 86400.0, 0) as avg_assigned_close_time_days,
+        round( calculate_avg_metrics.avg_age_currently_open_seconds / 86400.0, 0) as avg_age_currently_open_days,
+        round( calculate_avg_metrics.avg_age_currently_open_assigned_seconds / 86400.0, 0) as avg_age_currently_open_assigned_days,
+
         median_metrics.median_close_time_seconds, 
         median_metrics.median_age_currently_open_seconds,
         median_metrics.median_assigned_close_time_seconds,
-        median_metrics.median_age_currently_open_assigned_seconds
+        median_metrics.median_age_currently_open_assigned_seconds,
+
+        round( median_metrics.median_close_time_seconds / 86400.0, 0) as median_close_time_days,
+        round( median_metrics.median_age_currently_open_seconds / 86400.0, 0) as median_age_currently_open_days,
+        round( median_metrics.median_assigned_close_time_seconds / 86400.0, 0) as median_assigned_close_time_days,
+        round( median_metrics.median_age_currently_open_assigned_seconds / 86400.0, 0) as median_age_currently_open_assigned_days,
         
     from calculate_avg_metrics
     left join median_metrics using(project_id)

@@ -123,6 +123,22 @@ models:
         description: The median time taken to close issues from their first assignment, in seconds.
       - name: median_age_currently_open_assigned_seconds
         description: The median age of any currently-open issues, from their first assignment. 
+      - name: avg_close_time_days
+        description: The average time taken to close issues, in days.
+      - name: avg_assigned_close_time_days
+        description: The average time taken to close issues from their first assignment, in days.
+      - name: avg_age_currently_open_days
+        description: The average age of any currently-open issues.
+      - name: avg_age_currently_open_assigned_days
+        description: The average age of any currently-open issues, from their first assignment. 
+      - name: median_close_time_days
+        description: The median time taken to close issues, in days.
+      - name: median_age_currently_open_days
+        description: The median age of any currently-open issues.
+      - name: median_assigned_close_time_days
+        description: The median time taken to close issues from their first assignment, in days.
+      - name: median_age_currently_open_assigned_days
+        description: The median age of any currently-open issues, from their first assignment. 
 
 
   - name: int_jira__user_metrics
@@ -144,6 +160,14 @@ models:
       - name: median_close_time_seconds
         description: The median time taken to close issues since assignment, in seconds.
       - name: median_age_currently_open_seconds
+        description: The median age of a user's currently open issues.
+      - name: avg_close_time_days
+        description: The average time taken to close issues since assignment, in days.
+      - name: avg_age_currently_open_days 
+        description: The average age of a user's currently open issues.
+      - name: median_close_time_days
+        description: The median time taken to close issues since assignment, in days.
+      - name: median_age_currently_open_days
         description: The median age of a user's currently open issues.
 
   - name: int_jira__issue_comments

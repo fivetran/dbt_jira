@@ -66,8 +66,14 @@ join_metrics as (
 
     select
         calculate_avg_metrics.*,
+        round( calculate_avg_metrics.avg_close_time_seconds / 86400.0, 0) as avg_close_time_days,
+        round( calculate_avg_metrics.avg_age_currently_open_seconds / 86400.0, 0) as avg_age_currently_open_days,
+
         median_metrics.median_close_time_seconds,
-        median_metrics.median_age_currently_open_seconds
+        median_metrics.median_age_currently_open_seconds,
+
+        round( median_metrics.median_close_time_seconds / 86400.0, 0) as median_close_time_days,
+        round( median_metrics.median_age_currently_open_seconds / 86400.0, 0) as median_age_currently_open_days
         
     from calculate_avg_metrics
     left join median_metrics using(user_id)
