@@ -106,7 +106,7 @@ join_metrics as (
         round( median_metrics.median_close_time_seconds / 86400.0, 0) as median_close_time_days,
         round( median_metrics.median_age_currently_open_seconds / 86400.0, 0) as median_age_currently_open_days,
         round( median_metrics.median_assigned_close_time_seconds / 86400.0, 0) as median_assigned_close_time_days,
-        round( median_metrics.median_age_currently_open_assigned_seconds / 86400.0, 0) as median_age_currently_open_assigned_days,
+        round( median_metrics.median_age_currently_open_assigned_seconds / 86400.0, 0) as median_age_currently_open_assigned_days
         
     from calculate_avg_metrics
     left join median_metrics using(project_id)
