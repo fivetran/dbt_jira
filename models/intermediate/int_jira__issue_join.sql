@@ -1,7 +1,7 @@
 with issue as (
 
     select *
-    from {{ var('issue') }}
+    from {{ ref('int_jira__issue_users') }}
 
 ),
 
@@ -29,19 +29,6 @@ priority as (
     from {{ var('priority') }}
 ),
 
-issue_epic as (
-
-    select * 
-    from {{ ref('int_jira__issue_epic') }}
-    
-),
-
-issue_users as (
-
-    select *
-    from {{ ref('int_jira__issue_users') }}
-),
-
 issue_sprint as (
 
     select *
@@ -54,82 +41,47 @@ issue_comments as (
     from {{ ref('int_jira__issue_comments') }}
 ),
 
--- this has issues without parents as well
-issue_type_parent as (
-    
-    select *
-    from {{ ref('int_jira__issue_type_parents') }}
+issue_assignments_and_resolutions as (
+  
+  select *
+  from {{ ref('int_jira__issue_assign_resolution')}}
+
 ),
 
 join_issue as (
 
     select
-        issue.issue_id,
-        issue.issue_name,
+        issue.*, 
 
-        issue.updated_at as last_updated_at,
-        issue_type_parent.issue_type,
-        issue.created_at,
-        issue.issue_description,
-        issue.due_date,
-        issue.environment,
-        issue.assignee_user_id,
-        issue_users.assignee_name,
-        issue.reporter_user_id,
-        issue_users.reporter_name,
-        issue_users.assignee_timezone,
-        issue_users.assignee_email,
-        
-        issue.issue_key,
-        -- parent automatically = epic in next-gen projects
-        coalesce(issue.parent_issue_id, issue_epic.epic_issue_id) as parent_issue_id,
-        coalesce(issue_type_parent.parent_issue_name, issue_epic.epic_name) as parent_issue_name,
-        coalesce(issue_type_parent.parent_issue_key, issue_epic.epic_key) as parent_issue_key,
-        case 
-            when issue_type_parent.parent_issue_type is not null then issue_type_parent.parent_issue_type
-            when issue_epic.epic_issue_id is not null then 'Epic' 
-            else null end as parent_issue_type,
-        priority.priority_name as current_priority,
-
-        project.project_id, 
-        project.project_name,
-        
-        resolution.resolution_name as resolution_type,
-        issue.resolved_at,
+        project.project_name as project_name,
 
         status.status_name as current_status,
-        issue.status_changed_at,
+        
+        resolution.resolution_name as resolution_type,
 
-        issue_epic.epic_name,
-        issue_epic.epic_issue_id,
-        issue_epic.epic_key,
+        priority.priority_name as current_priority,
 
         issue_sprint.sprint_id,
         issue_sprint.sprint_name,
         issue_sprint.count_sprint_changes,
 
-        issue.original_estimate_seconds,
-        issue.remaining_estimate_seconds,
-        issue.time_spent_seconds,
-        issue.work_ratio,
-
         issue_comments.conversation,
         issue_comments.count_comments,
-
-        issue._fivetran_synced
+        
+        issue_assignments_and_resolutions.first_assigned_at,
+        issue_assignments_and_resolutions.last_assigned_at,
+        issue_assignments_and_resolutions.first_resolved_at 
     
     from issue
     left join project on project.project_id = issue.project_id
     left join status on status.status_id = issue.status_id
     left join resolution on resolution.resolution_id = issue.resolution_id
     left join priority on priority.priority_id = issue.priority_id
-
-    left join issue_users on issue_users.issue_id = issue.issue_id
-    left join issue_epic on issue_epic.issue_id = issue.issue_id
     left join issue_sprint on issue_sprint.issue_id = issue.issue_id
     left join issue_comments on issue_comments.issue_id = issue.issue_id
-    left join issue_type_parent on issue_type_parent.issue_id = issue.issue_id
+    left join issue_assignments_and_resolutions on issue_assignments_and_resolutions.issue_id = issue.issue_id
 
 )
 
-select * from join_issue
+select * 
+from join_issue

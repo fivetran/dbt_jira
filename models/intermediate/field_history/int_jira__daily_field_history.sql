@@ -16,25 +16,17 @@ with combined_field_histories as (
     {% endif %}
 ),
 
-field as (
-
-    select 
-        field_name,
-        cast(field_id as {{ dbt_utils.type_string() }}) as field_id
-    from {{ var('field') }}
-),
 
 limit_to_relevant_fields as (
 
 -- let's remove unncessary rows moving forward and grab field names 
     select 
-        combined_field_histories.*, 
-        field.field_name
+        combined_field_histories.*
 
-    from combined_field_histories join field using(field_id)
+    from combined_field_histories
 
     where 
-    lower(field.field_name) in ('sprint', 'status' 
+    lower(field_name) in ('sprint', 'status' 
                                 {%- for col in var('issue_field_history_columns', []) -%}
                                 , {{ "'" ~ col ~ "'" }}
                                 {%- endfor -%} )

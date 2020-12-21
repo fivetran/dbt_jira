@@ -1,3 +1,4 @@
 packages:
   - git: "https://github.com/fivetran/dbt_jira_source.git" 
-    revision: master # todo: switch with hub 
+    revision: convert_field_id_early # todo: switch with hub 
+    # THIS WILL NEED TO CHANGE BACK TO MASTER ONCE BRANCH IS MERGED

@@ -12,7 +12,7 @@
 with issue_multiselect_history as (
 
     select *
-    from {{ var('issue_multiselect_history') }}
+    from {{ ref('int_jira__issue_multiselect_history') }}
 
     {% if is_incremental() %}
     -- always refresh the most recent day of data
@@ -35,6 +35,7 @@ consolidate_batches as (
 
     select 
         field_id,
+        field_name,
         issue_id,
         updated_at,
         batch_id,
@@ -46,7 +47,7 @@ consolidate_batches as (
 
     from batch_updates
 
-    group by 1,2,3,4,5
+    group by 1,2,3,4,5,6
 )
 
 select *
