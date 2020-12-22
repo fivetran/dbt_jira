@@ -18,7 +18,7 @@ final as (
         -- if an issue is not currently assigned this will not be null
         {{ dbt_utils.datediff('last_assigned_at', "coalesce(resolved_at, " ~ dbt_utils.current_timestamp() ~ ')', 'second') }} last_assignment_duration_seconds 
     
-    from issue 
+    from issue
         
 )
 
