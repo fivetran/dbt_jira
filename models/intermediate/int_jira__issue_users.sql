@@ -2,13 +2,17 @@
 
 with issue as (
 
-    {% set except_columns = ["revised_parent_issue_id", "parent_issue_id"] %}
+    -- including issue_id in here because snowflake for some reason ignores issue_id,
+    -- so we'll just always pull it out and explicitly select it
+    {% set except_columns = ["revised_parent_issue_id", "parent_issue_id", "issue_id"] %}
 
     select
+        issue_id,
+        coalesce(revised_parent_issue_id, parent_issue_id) as parent_issue_id,
+
         {{ dbt_utils.star(from=ref('int_jira__issue_type_parents'), 
                             except= except_columns | upper if target.type == 'snowflake' else except_columns) }}
 
-        , coalesce(revised_parent_issue_id, parent_issue_id) as parent_issue_id
 
     
     from {{ ref('int_jira__issue_type_parents') }}

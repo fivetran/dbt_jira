@@ -1,6 +1,6 @@
 {{
     config(
-        materialized='view'
+        materialized='table'
     )
 }}
 -- needs to be a view to use the dbt_utils.star macro in int_jira__issue_users
