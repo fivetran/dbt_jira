@@ -29,9 +29,10 @@ sprint_field_history as (
 
 last_sprint as (
   
-  select *
-  from sprint_field_history
-  where row_num = 1
+    select *
+    from sprint_field_history
+    
+    where row_num = 1
 
 ),
 

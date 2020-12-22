@@ -33,22 +33,26 @@ limit_to_relevant_fields as (
     
 ),
 
+order_daily_values as (
+
+    select 
+        *,
+
+        -- want to grab last value for an issue's field for each day
+        row_number() over (
+            partition by valid_starting_on, issue_id, field_id
+            order by valid_starting_at desc
+            ) as row_num
+
+    from limit_to_relevant_fields
+),
+
 -- only looking at the latest value for each day
 get_latest_daily_value as (
 
     select * 
-    from (
-        select 
-            *,
+    from order_daily_values
 
-            -- want to grab last value for an issue's field for each day
-            row_number() over (
-                partition by valid_starting_on, issue_id, field_id
-                order by valid_starting_at desc
-                ) as row_num
-
-        from limit_to_relevant_fields
-    ) 
     where row_num = 1
 ), 
 

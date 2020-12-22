@@ -16,21 +16,24 @@ issue as (
     from {{ ref('jira__issue_enhanced') }} 
 ),
 
-user_projects as (
+user_project as (
+
+    select 
+        assignee_user_id,
+        project_name
+
+    from issue
+    group by 1,2
+
+),
+
+agg_user_projects as (
 
     select 
         assignee_user_id,
         {{ fivetran_utils.string_agg( "project_name", "', '" ) }} as projects
 
-    from (
-        -- get distinct user-project combos
-        select 
-            assignee_user_id,
-            project_name
-
-        from issue
-        group by 1,2
-    )
+    from user_project
     group by 1
 ),
 
@@ -38,7 +41,7 @@ user_join as (
 
     select
         jira_user.*,
-        user_projects.projects, -- projects they've worked on issues for
+        agg_user_projects.projects, -- projects they've worked on issues for
         coalesce(user_metrics.count_closed_issues, 0) as count_closed_issues,
         coalesce(user_metrics.count_open_issues, 0) as count_open_issues,
 
@@ -58,7 +61,7 @@ user_join as (
 
     from jira_user 
     left join user_metrics on jira_user.user_id = user_metrics.user_id
-    left join user_projects on jira_user.user_id = user_projects.assignee_user_id
+    left join agg_user_projects on jira_user.user_id = agg_user_projects.assignee_user_id
 )
 
 select * from user_join

@@ -29,7 +29,6 @@ pivot_out as (
         max(case when lower(field_name) = 'sprint' then field_value end) as sprint
 
         {% for col in var('issue_field_history_columns', []) -%}
-        -- @ kristin, should this be max? in zendesk it's min....
         ,
             max(case when lower(field_name) = '{{ col | lower }}' then field_value end) as {{ col | replace(' ', '_') }}
         {% endfor -%}
