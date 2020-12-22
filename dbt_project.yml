@@ -29,5 +29,3 @@ models:
     materialized: table # field history tables are configured to be incremental
     intermediate:
       materialized: ephemeral
-
-profile: dev_bigquery_dbt_testing # final todo: remove this
