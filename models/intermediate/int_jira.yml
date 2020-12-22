@@ -13,10 +13,12 @@ models:
           - not_null
       - name: issue_name
         description: Title of the issue.
-      - name: last_updated_at
+      - name: updated_at
         description: Timestamp of when the issue was last updated in some way.
       - name: issue_type
         description: Name of the issue type (ie Epic, Task, Subtask, any custom types).
+      - name: issue_type_id
+        description: Foreign key referencing the ID of the `issue_type`. 
       - name: created_at
         description: Timestamp of when the issue was created (in UTC).
       - name: issue_description
@@ -42,7 +44,11 @@ models:
       - name: issue_key
         description: UI-facing id of the issue.
       - name: parent_issue_id
-        description: Self-referencing ID of the parent `issue`.
+        description: Self-referencing ID of the parent `issue`, which may be an epic.
+      - name: revised_parent_issue_id
+        description: >
+          Unique ID of the parent issue, coalesced with the ID of any linked epics (in classic
+          projects).
       - name: parent_issue_name
         description: Title of the parent issue.
       - name: parent_issue_key
@@ -51,6 +57,8 @@ models:
         description: Name of the type of issue that the parent is.
       - name: current_priority
         description: Name of the issue's current priority as it appears in the UI.
+      - name: priority_id
+        description: Foreign key referencing the ID of the issue's current `priority`.
       - name: project_id
         description: Foreign key referencing the `project` that the issue belongs to.
       - name: project_name
@@ -61,16 +69,16 @@ models:
         description: >
           Timestamp of when the issue was resolved (ie completed, marked as duplicate). If an issue
           is un-resolved, this will be null.
+      - name: resolution_id
+        description: Foreign key referencing the ID of the issue's type of `resolution`.
       - name: current_status
         description: Title of the category of status.
+      - name: status_id
+        description: >
+          Foreign key referencing the ID of the issue's `status` (the step that the issue is currently at 
+          in the project's workflow).
       - name: status_changed_at
         description: Timestamp of when the status was last changed.
-      - name: epic_name
-        description: Title of the issue's epic (it's `issue_name`, as all epics are issues).
-      - name: epic_issue_id
-        description: Self-referencing issue ID of the epic that this issue is associated with.
-      - name: epic_key
-        description: Issue key of the epic.
       - name: sprint_id
         description: Foreign key referencing the `sprint` that the issue is currently in.
       - name: sprint_name
@@ -92,6 +100,20 @@ models:
           Line-separated list of comments made on this issue, including the timestamp and author name of each comment.
       - name: count_comments
         description: The number of comments made on this issues. 
+      - name: first_assigned_at
+        description: Timestamp of when the issue was first assigned to a user.
+      - name: last_assigned_at
+        description: Timestamp of when the issue was last assigned to a user. 
+      - name: first_resolved_at
+        description: Timestamp of when the issue was first resolved.  
+      - name: reporter_email
+        description: Email associated with the user who reported this issue.
+      - name: reporter_timezone
+        description: Timezone of the user currently who reported this issue.
+      - name: is_parent_epic
+        description: Boolean that is true if the parent is an epic.
+      - name: creator_user_id
+        description: Foreign key referencing the `user` who first created the issue. Cannot be changed.
   
   - name: int_jira__project_metrics
     description: Table calculating issue-related metrics per project.
@@ -186,10 +208,10 @@ models:
 
   - name: int_jira__issue_epic
     description: >
-      Table associating issues with the epics they are linked to. This is necessary because issue-epic relationships
-      are represented differently in next-gen vs classic projects. 
+      Table associating **classic-project** issues with the epics they are linked to. This is necessary 
+      because issue-epic relationships are represented differently in next-gen vs classic projects. 
       In next-gen projects, epics are stored as an issue's parent issue, whereas in classic projects epics are 
-      captured in the 'epic link' field in `issue_field_history`.
+      captured in the 'epic link' field in `issue_field_history`. Next-gen issues will not appear in this table.
     tests:
       - dbt_utils.unique_combination_of_columns:
           combination_of_columns: 
@@ -200,10 +222,6 @@ models:
         description: Unique ID of the issue. 
       - name: epic_issue_id
         description: Unique ID of the epic associated with this issue.
-      - name: epic_name
-        description: Name of the epic.
-      - name: epic_key
-        description: Issue key of the epic.
 
   - name: int_jira__issue_sprint
     description: Table relating issues to the sprints they currently belong to.
@@ -231,17 +249,21 @@ models:
         description: The total number of sprints that the issue has belonged to.
 
   - name: int_jira__issue_type_parents
-    description: Table relating issues with data regarding their parent issues.
-    tests:
-      - dbt_utils.unique_combination_of_columns:
-          combination_of_columns: 
-            - issue_id  
-            - parent_issue_id
+    description: >
+      Table relating issues with data regarding their parent issues (which may be epics).
+      Contains all columns present in `stg_jira__issue`.
     columns:
       - name: issue_id
         description: Unique ID of the issue.
+        tests:
+          - unique
+          - not_null
       - name: parent_issue_id
         description: Unique ID of the parent issue.
+      - name: revised_parent_issue_id
+        description: >
+          Unique ID of the parent issue, coalesced with the ID of any linked epics (in classic
+          projects).
       - name: issue_type
         description: Name of the issue type (ie Epic, Task, Subtask, any custom types).
       - name: issue_name
@@ -255,24 +277,70 @@ models:
       - name: parent_issue_key
         description: UI-facing id of the parent issue.
       - name: is_parent_epic
-        description: Boolean that is true if the parent is a next-gen epic.
+        description: Boolean that is true if the parent is an epic.
+      - name: assignee_user_id
+        description: Foreign key referencing the ID of the `user` currently assigned to this task.
+      - name: created_at
+        description: Timestamp of when the issue was created (in UTC).
+      - name: creator_user_id
+        description: Foreign key referencing the `user` who first created the issue. Cannot be changed.
+      - name: issue_description
+        description: The issue description, if given.
+      - name: due_date
+        description: Calendar day on which the issue is due, if a due date is provided.
+      - name: environment
+        description: Text field describing the environment in which the issue occurred (ie "IE9 on Windows 7").
+      - name: issue_type_id
+        description: Foreign key referencing the ID of the `issue_type`. 
+      - name: issue_key
+        description: UI-facing id of the issue.
+      - name: original_estimate_seconds
+        description: The original estimate of how long working on this issue would take, in seconds.
+      - name: priority_id
+        description: Foreign key referencing the ID of the issue's current `priority`.
+      - name: project_id
+        description: Foreign key referencing the ID of the `project` that the issue belongs to.
+      - name: remaining_estimate_seconds
+        description: The estimate of how much longer working on this issue will take, in seconds.
+      - name: reporter_user_id
+        description: >
+          Foreign key referencing the ID of the `user` who reported the issue. This differs from the `creator` column 
+          in that the reporter can be changed in-app.
+      - name: resolution_id
+        description: Foreign key referencing the ID of the issue's type of `resolution`.
+      - name: resolved_at
+        description: >
+          Timestamp of when the issue was resolved (ie completed, marked as duplicate). If an issue
+          is un-resolved, this will be null.
+      - name: status_id
+        description: >
+          Foreign key referencing the ID of the issue's `status` (the step that the issue is currently at 
+          in the project's workflow).
+      - name: status_changed_at
+        description: Timestamp of when the status was last changed.
+      - name: issue_name
+        description: Title of the issue.
+      - name: time_spent_seconds
+        description: The time that was spent working on this issue, in seconds.
+      - name: updated_at
+        description: Timestamp of when the issue was last updated in some way.
+      - name: work_ratio
+        description: >
+          The percentage of work that has been logged against the issue (time_spent) vs the original estimate of worktime.
+          Equals -1.0 when the fields required for calculation are not provided.
     
   - name: int_jira__issue_users 
-    description: Table relating issues to attributes about their assignees and reporters.
+    description: >
+      Table relating issues to attributes about their assignees and reporters.
+      Builds off of the `int_jira__issue_type_parents` model.
     columns:
       - name: issue_id
         description: Unique ID of the issue.
         tests:
           - unique
           - not_null
-      - name: assignee_user_id
-        description: Foreign key referencing the ID of the `user` currently assigned to this task.
       - name: assignee_name
         description: User display name of the person currently assigned this issue.
-      - name: reporter_user_id
-        description: >
-          Foreign key referencing the ID of the `user` who reported the issue. This differs from the `issue.creator` column 
-          in that the reporter can be changed in-app, though it is initialized as the creator.
       - name: reporter_name
         description: User display name of the person who reported the issue.
       - name: assignee_timezone
@@ -283,6 +351,76 @@ models:
         description: Email associated with the user who reported this issue.
       - name: reporter_timezone
         description: Timezone of the user currently who reported this issue.
+      - name: parent_issue_id
+        description: Unique ID of the parent issue.
+      - name: revised_parent_issue_id
+        description: >
+          Unique ID of the parent issue, coalesced with the ID of any linked epics (in classic
+          projects).
+      - name: issue_type
+        description: Name of the issue type (ie Epic, Task, Subtask, any custom types).
+      - name: issue_name
+        description: Title of the issue.
+      - name: issue_key
+        description: UI-facing id of the issue.
+      - name: parent_issue_type
+        description: Name of the parent issue type (ie Epic, Task, Subtask, any custom types).
+      - name: parent_issue_name
+        description: Title of the parent issue.
+      - name: parent_issue_key
+        description: UI-facing id of the parent issue.
+      - name: is_parent_epic
+        description: Boolean that is true if the parent is an epic.
+      - name: assignee_user_id
+        description: Foreign key referencing the ID of the `user` currently assigned to this task.
+      - name: created_at
+        description: Timestamp of when the issue was created (in UTC).
+      - name: creator_user_id
+        description: Foreign key referencing the `user` who first created the issue. Cannot be changed.
+      - name: issue_description
+        description: The issue description, if given.
+      - name: due_date
+        description: Calendar day on which the issue is due, if a due date is provided.
+      - name: environment
+        description: Text field describing the environment in which the issue occurred (ie "IE9 on Windows 7").
+      - name: issue_type_id
+        description: Foreign key referencing the ID of the `issue_type`. 
+      - name: issue_key
+        description: UI-facing id of the issue.
+      - name: original_estimate_seconds
+        description: The original estimate of how long working on this issue would take, in seconds.
+      - name: priority_id
+        description: Foreign key referencing the ID of the issue's current `priority`.
+      - name: project_id
+        description: Foreign key referencing the ID of the `project` that the issue belongs to.
+      - name: remaining_estimate_seconds
+        description: The estimate of how much longer working on this issue will take, in seconds.
+      - name: reporter_user_id
+        description: >
+          Foreign key referencing the ID of the `user` who reported the issue. This differs from the `creator` column 
+          in that the reporter can be changed in-app.
+      - name: resolution_id
+        description: Foreign key referencing the ID of the issue's type of `resolution`.
+      - name: resolved_at
+        description: >
+          Timestamp of when the issue was resolved (ie completed, marked as duplicate). If an issue
+          is un-resolved, this will be null.
+      - name: status_id
+        description: >
+          Foreign key referencing the ID of the issue's `status` (the step that the issue is currently at 
+          in the project's workflow).
+      - name: status_changed_at
+        description: Timestamp of when the status was last changed.
+      - name: issue_name
+        description: Title of the issue.
+      - name: time_spent_seconds
+        description: The time that was spent working on this issue, in seconds.
+      - name: updated_at
+        description: Timestamp of when the issue was last updated in some way.
+      - name: work_ratio
+        description: >
+          The percentage of work that has been logged against the issue (time_spent) vs the original estimate of worktime.
+          Equals -1.0 when the fields required for calculation are not provided.
 
   - name: int_jira__agg_multiselect_history 
     description: >
@@ -305,6 +443,8 @@ models:
         description: Comma-separated list of the batch's values.
       - name: date_day
         description: Calendar date on which the batch of values was applied to the issue field. 
+      - name: field_name
+        description: Name of the field as it appears on issue cards.
 
   - name: int_jira__combine_field_histories
     description: Table combining `issue_field_history` with the aggregated `issue_multiselect_history`.
@@ -330,6 +470,8 @@ models:
         tests:
           - unique
           - not_null
+      - name: field_name
+        description: Name of the field as it appears on issue cards.
 
   - name: int_jira__issue_calendar_spine
     description: >
@@ -391,6 +533,67 @@ models:
       # plus any fields specified by `var('issue_field_history_columns')`
       - name: issue_day_id
         description: Unique ID hashed on `valid_starting_on` and `issue_field_history`.
+        tests:
+          - unique
+          - not_null
+
+
+  - name: int_jira__issue_field_history
+    description: >
+      Table of every value that each **custom non-array** (not multiselect) field has been set to.
+      This model serves to append the `field_name` to each record.
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns: 
+            - field_id
+            - issue_id  
+            - updated_at
+    columns:
+      - name: field_id
+        description: Foreign key referencing the ID of the `field` that was changed.
+      - name: issue_id
+        description: Foreign key referencing the ID of the `issue` whose field was updated.
+      - name: updated_at
+        description: Timestamp of when the issue field was set to this value.
+      - name: field_value
+        description: Content of the value of that the field was set to.
+      - name: field_name
+        description: Name of the field as it appears on issue cards.
+
+  - name: int_jira__issue_multiselect_history
+    description: >
+      Table of every value that each array-type (multiselect) field has been set to. Each row will pertain to **one** value.
+      This model serves to append the `field_name` to each record.
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns: 
+            - _fivetran_id
+            - updated_at
+    columns:
+      - name: _fivetran_id 
+        description: Fivetran-generated ID hashed on field, issue, and value.
+      - name: updated_at
+        description: Timestamp of when the issue field was updated to included this value.
+      - name: field_id
+        description: Foreign key referencing the ID of the `field` that was changed.
+      - name: issue_id
+        description: Foreign key referencing the ID of the `issue` whose field was updated.
+      - name: field_value
+        description: Content of the value of that the field was set to. 
+      - name: field_name
+        description: Name of the field as it appears on issue cards.
+
+  - name: int_jira__issue_assign_resolution
+    description: Table grabbing dates related to the assignment and resolution of issues.
+    columns:
+      - name: first_assigned_at
+        description: Timestamp of when the issue was first assigned to a user.
+      - name: last_assigned_at
+        description: Timestamp of when the issue was last assigned to a user. 
+      - name: first_resolved_at
+        description: Timestamp of when the issue was first resolved.  
+      - name: issue_id
+        description: Foreign key referencing the ID of the `issue` that was assigned or resolved.
         tests:
           - unique
           - not_null
