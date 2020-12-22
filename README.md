@@ -1,4 +1,4 @@
-# Jira (docs once everything is 100% final)
+# Jira ([docs](https://fivetran-dbt-jira.netlify.app/#!/overview))
 
 This package models Jira data from [Fivetran's connector](https://fivetran.com/docs/applications/jira). It uses data in the format described by [this ERD](https://fivetran.com/docs/applications/jira/#schemainformation).
 
