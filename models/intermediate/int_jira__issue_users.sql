@@ -1,9 +1,12 @@
 -- just grabs user attributes for issue assignees and reporters 
 
 with issue as (
+
+    {% set except_columns = ["revised_parent_issue_id", "parent_issue_id"] %}
+
     select
         {{ dbt_utils.star(from=ref('int_jira__issue_type_parents'), 
-                            except=["revised_parent_issue_id", "parent_issue_id"]) }}
+                            except= except_columns | upper if target.type == 'snowflake' else except_columns) }}
 
         , coalesce(revised_parent_issue_id, parent_issue_id) as parent_issue_id
 
