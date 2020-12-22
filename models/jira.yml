@@ -66,10 +66,6 @@ models:
         description: UI-facing id of the issue.
       - name: parent_issue_id
         description: Self-referencing ID of the parent `issue`.
-      - name: revised_parent_issue_id
-        description: >
-          Unique ID of the parent issue, coalesced with the ID of any linked epics (in classic
-          projects).
       - name: parent_issue_name
         description: Title of the parent issue/epic.
       - name: parent_issue_key

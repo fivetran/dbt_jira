@@ -45,10 +45,6 @@ models:
         description: UI-facing id of the issue.
       - name: parent_issue_id
         description: Self-referencing ID of the parent `issue`, which may be an epic.
-      - name: revised_parent_issue_id
-        description: >
-          Unique ID of the parent issue, coalesced with the ID of any linked epics (in classic
-          projects).
       - name: parent_issue_name
         description: Title of the parent issue.
       - name: parent_issue_key
@@ -353,10 +349,6 @@ models:
         description: Timezone of the user currently who reported this issue.
       - name: parent_issue_id
         description: Unique ID of the parent issue.
-      - name: revised_parent_issue_id
-        description: >
-          Unique ID of the parent issue, coalesced with the ID of any linked epics (in classic
-          projects).
       - name: issue_type
         description: Name of the issue type (ie Epic, Task, Subtask, any custom types).
       - name: issue_name

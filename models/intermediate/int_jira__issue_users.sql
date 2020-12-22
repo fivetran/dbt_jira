@@ -1,7 +1,13 @@
 -- just grabs user attributes for issue assignees and reporters 
-with issue as (
 
-    select *
+with issue as (
+    select
+        {{ dbt_utils.star(from=ref('int_jira__issue_type_parents'), 
+                            except=["revised_parent_issue_id", "parent_issue_id"]) }}
+
+        , coalesce(revised_parent_issue_id, parent_issue_id) as parent_issue_id
+
+    
     from {{ ref('int_jira__issue_type_parents') }}
 
 ),
