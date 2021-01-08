@@ -69,6 +69,10 @@ join_issue as (
         issue_sprint.sprint_id,
         issue_sprint.sprint_name,
         issue_sprint.count_sprint_changes,
+        issue_sprint.sprint_started_at,
+        issue_sprint.sprint_ended_at,
+        issue_sprint.sprint_completed_at,
+        issue_sprint.count_sprint_changes,
         {% endif %}
 
         {% if var('include_comments', True) %}
