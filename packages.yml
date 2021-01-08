@@ -1,3 +1,4 @@
 packages:
-  - package: fivetran/jira_source
-    version: 0.1.0
+  - git: https://github.com/fivetran/dbt_jira_source.git
+    revision: create_variables
+    warn-unpinned: false  

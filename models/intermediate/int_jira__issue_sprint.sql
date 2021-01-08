@@ -1,3 +1,5 @@
+{{ config(enabled=var('using_sprints', True)) }}
+
 with sprint as (
 
     select * 
