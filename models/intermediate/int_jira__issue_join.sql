@@ -72,6 +72,8 @@ join_issue as (
         issue_sprint.sprint_started_at,
         issue_sprint.sprint_ended_at,
         issue_sprint.sprint_completed_at,
+        issue_sprint.sprint_started_at <= {{ dbt_utils.current_timestamp() }}
+          and issue_sprint.sprint_ended_at >= {{ dbt_utils.current_timestamp() }} as is_active_sprint,
         {% endif %}
 
         {% if var('include_comments', True) %}
