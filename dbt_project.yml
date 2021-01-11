@@ -9,7 +9,6 @@ vars:
   jira:
     issue: "{{ ref('stg_jira__issue') }}"
     project: "{{ ref('stg_jira__project') }}"
-    board: "{{ ref('stg_jira__board') }}"
     user: "{{ ref('stg_jira__user') }}"
     issue_type: "{{ ref('stg_jira__issue_type') }}"
     status: "{{ ref('stg_jira__status') }}"

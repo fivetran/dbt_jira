@@ -6,7 +6,6 @@ profile: 'integration_tests'
 
 vars:
   jira_source:
-    board: "{{ ref('board') }}"
     comment: "{{ ref('comment') }}"
     component: "{{ ref('component') }}"
     epic: "{{ ref('epic') }}"
