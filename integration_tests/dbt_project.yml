@@ -90,6 +90,9 @@ seeds:
     sprint: 
       +column_types:
         id: "{{ 'int64' if target.name == 'bigquery' else 'bigint' }}"
+        complete_date: timestamp
+        end_date: timestamp
+        start_date: timestamp
     field: 
       +column_types:
         id: "{{ 'string' if target.name == 'bigquery' else 'varchar' }}"
