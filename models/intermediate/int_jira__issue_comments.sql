@@ -1,3 +1,5 @@
+{{ config(enabled=var('jira_include_comments', True)) }}
+
 with comment as (
 
     select *

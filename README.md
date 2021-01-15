@@ -56,6 +56,22 @@ vars:
 
 > Note: `sprint` and `status` will always be tracked, as they are necessary for creating common agile reports. 
 
+
+### Disabling models
+
+It's possible that your Jira connector does not sync every table that this package expects. If your syncs exclude certain tables, it is because you either don't use that functionality in Jira or actively excluded some tables from your syncs. To disable the corresponding functionality in the package, you must add the relevant variables. By default, all variables are assumed to be `true`. Add variables for only the tables you would like to disable:  
+
+```yml
+# dbt_project.yml
+
+...
+config-version: 2
+
+vars:
+  jira_using_sprints: false # Disable if you do not have the sprint table, or if you do not want sprint related metrics reported
+  jira_include_comments: false # this package aggregates issue comments so that you have a single view of all your comments in the jira__issue_enhanced table. This can cause limit errors if you have a large dataset. Disable to remove this functionality.
+```
+
 ## Contributions
 Don't see a model or specific metric you would have liked to be included? Notice any bugs when installing 
 and running the package? If so, we highly encourage and welcome contributions to this package! 

@@ -81,6 +81,14 @@ models:
         description: Title of the issue's sprint.
       - name: count_sprint_changes
         description: The total number of sprints that the issue has belonged to.
+      - name: is_active_sprint
+        description: Yes, if the sprint started after the current time and if the sprint ends in the future.
+      - name: sprint_completed_at
+        description: Timestamp of when the sprint was completed.
+      - name: sprint_ended_at
+        description: Timestamp of when the sprint is planned to end.
+      - name: sprint_started_at
+        description: Timestamp of when the sprint began. 
       - name: original_estimate_seconds
         description: The original estimate of how long working on this issue would take, in seconds.
       - name: remaining_estimate_seconds
