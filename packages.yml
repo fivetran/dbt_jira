@@ -1,4 +1,4 @@
 packages:
   - git: https://github.com/fivetran/dbt_jira_source.git
-    revision: create_variables
+    revision: master
     warn-unpinned: false  
