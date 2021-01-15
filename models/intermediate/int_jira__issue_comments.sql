@@ -1,4 +1,4 @@
-{{ config(enabled=var('include_comments', True)) }}
+{{ config(enabled=var('jira_include_comments', True)) }}
 
 with comment as (
 

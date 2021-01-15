@@ -68,11 +68,8 @@ It's possible that your Jira connector does not sync every table that this packa
 config-version: 2
 
 vars:
-  jira_source:
-    using_sprints: false # Disable if you do not have the sprint table, or if you do not want sprint related metrics reported
-  jira:
-    using_sprints: false # Disable if you do not have the sprint table, or if you do not want sprint related metrics reported
-    include_comments: false # this package aggregates issue comments so that you have a single view of all your comments in the jira__issue_enhanced table. This can cause limit errors if you have a large dataset. Disable to remove this functionality.
+  jira_using_sprints: false # Disable if you do not have the sprint table, or if you do not want sprint related metrics reported
+  jira_include_comments: false # this package aggregates issue comments so that you have a single view of all your comments in the jira__issue_enhanced table. This can cause limit errors if you have a large dataset. Disable to remove this functionality.
 ```
 
 ## Contributions

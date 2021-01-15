@@ -29,7 +29,7 @@ priority as (
     from {{ var('priority') }}
 ),
 
-{% if var('using_sprints', True) %}
+{% if var('jira_using_sprints', True) %}
 issue_sprint as (
 
     select *
@@ -37,7 +37,7 @@ issue_sprint as (
 ),
 {% endif %}
 
-{% if var('include_comments', True) %}
+{% if var('jira_include_comments', True) %}
 issue_comments as (
 
     select * 
@@ -65,18 +65,19 @@ join_issue as (
 
         priority.priority_name as current_priority,
 
-        {% if var('using_sprints', True) %}
+        {% if var('jira_using_sprints', True) %}
         issue_sprint.sprint_id,
         issue_sprint.sprint_name,
         issue_sprint.count_sprint_changes,
         issue_sprint.sprint_started_at,
         issue_sprint.sprint_ended_at,
         issue_sprint.sprint_completed_at,
-        issue_sprint.sprint_started_at <= {{ dbt_utils.current_timestamp() }}
-          and issue_sprint.sprint_ended_at >= {{ dbt_utils.current_timestamp() }} as is_active_sprint,
+        coalesce(issue_sprint.sprint_started_at <= {{ dbt_utils.current_timestamp() }}
+          and coalesce(issue_sprint.sprint_completed_at, {{ dbt_utils.current_timestamp() }}) >= {{ dbt_utils.current_timestamp() }}  
+          , false) as is_active_sprint, -- If sprint doesn't have a start date, default to false. If it does have a start date, but no completed date, this means that the sprint is active. The ended_at timestamp is irrelevant here.
         {% endif %}
 
-        {% if var('include_comments', True) %}
+        {% if var('jira_include_comments', True) %}
         issue_comments.conversation,
         issue_comments.count_comments,
         {% endif %}
@@ -92,11 +93,11 @@ join_issue as (
     left join priority on priority.priority_id = issue.priority_id
     left join issue_assignments_and_resolutions on issue_assignments_and_resolutions.issue_id = issue.issue_id
     
-    {% if var('using_sprints', True) %}
+    {% if var('jira_using_sprints', True) %}
     left join issue_sprint on issue_sprint.issue_id = issue.issue_id
     {% endif %}
 
-    {% if var('include_comments', True) %}
+    {% if var('jira_include_comments', True) %}
     left join issue_comments on issue_comments.issue_id = issue.issue_id
     {% endif %}
 )
