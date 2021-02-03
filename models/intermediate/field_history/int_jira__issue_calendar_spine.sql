@@ -71,6 +71,8 @@ surrogate_key as (
         {{ dbt_utils.surrogate_key(['date_day','issue_id']) }} as issue_day_id
 
     from issue_spine
+
+    where date_day <= current_date
 )
 
 select * from surrogate_key 
