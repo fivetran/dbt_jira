@@ -1,3 +1,5 @@
+{{ config(enabled=var('jira_using_sprints', True)) }}
+
 with sprint as (
 
     select * 
