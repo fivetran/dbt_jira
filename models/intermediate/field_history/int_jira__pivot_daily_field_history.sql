@@ -38,13 +38,14 @@ pivot_out as (
     group by 1,2
 ),
 
-surrogate_key as (
+final as (
 
     select 
         *,
-        {{ dbt_utils.surrogate_key(['valid_starting_on','issue_id']) }} as issue_day_id
+        {{ dbt_utils.surrogate_key(['valid_starting_on','issue_id']) }} as issue_day_id,
+        lead(valid_starting_on) over(partition by issue_id order by valid_starting_on asc) as valid_ending_on
 
     from pivot_out
 )
 
-select * from surrogate_key 
+select * from final 

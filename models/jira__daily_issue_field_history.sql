@@ -16,7 +16,7 @@ with pivoted_daily_history as (
     from {{ ref('int_jira__pivot_daily_field_history') }}
 
     {% if is_incremental() %}
-    where valid_starting_on >= (select max(date_day) from {{ this }} )
+    where valid_ending_on is null or valid_ending_on >= (select max(date_day) from {{ this }} )
     {% endif %}
 
 ),
@@ -38,7 +38,7 @@ joined as (
         calendar.date_day,
         calendar.issue_id
 
-        {% for col in pivot_data_columns if col.name|lower not in ['issue_day_id','issue_id','valid_starting_on'] %} 
+        {% for col in pivot_data_columns if col.name|lower not in ['issue_day_id','issue_id','valid_starting_on', 'valid_ending_on'] %} 
         , {{ col.name }}
         {% endfor %}
 
@@ -54,7 +54,7 @@ fill_values as (
         date_day,
         issue_id
 
-        {% for col in pivot_data_columns if col.name|lower not in ['issue_id','issue_day_id','valid_starting_on'] %}
+        {% for col in pivot_data_columns if col.name|lower not in ['issue_id','issue_day_id','valid_starting_on', 'valid_ending_on'] %}
         , last_value({{ col.name }} ignore nulls) over 
           (partition by issue_id order by date_day asc rows between unbounded preceding and current row) as {{ col.name }}
         {% endfor %}
@@ -67,7 +67,7 @@ fix_null_values as (
     select  
         date_day,
         issue_id
-        {% for col in pivot_data_columns if col.name|lower not in ['issue_id','issue_day_id','valid_starting_on'] %} 
+        {% for col in pivot_data_columns if col.name|lower not in ['issue_id','issue_day_id','valid_starting_on', 'valid_ending_on'] %} 
 
         -- we de-nulled the true null values earlier in order to differentiate them from nulls that just needed to be backfilled
         , case when {{ col.name }} = 'is_null' then null else {{ col.name }} end as {{ col.name }}
