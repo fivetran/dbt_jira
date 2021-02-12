@@ -9,6 +9,8 @@ with change_data as (
 
 ), fill_values as (
 
+-- each row of the pivoted table includes field values if that field was updated on that day
+-- we need to backfill to persist values that have been previously updated and are still valid 
     select 
         valid_starting_on, 
         issue_id,
