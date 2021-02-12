@@ -1,20 +1,11 @@
-{{
-    config(
-        materialized='incremental',
-        partition_by = {'field': 'valid_starting_on', 'data_type': 'date'},
-        unique_key='issue_day_id'
-        ) 
-}}
+{{ config( materialized='table') }}
 
 {%- set issue_columns = adapter.get_columns_in_relation(ref('int_jira__pivot_daily_field_history')) -%}
-    
+
 with change_data as (
 
     select *
     from {{ ref('int_jira__pivot_daily_field_history') }}
-    {% if is_incremental() %}
-    where valid_starting_on >= (select max(valid_starting_on) from {{ this }})
-    {% endif %}
 
 ), fill_values as (
 
