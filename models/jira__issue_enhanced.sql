@@ -41,7 +41,9 @@ final as (
         {% endfor %}
 
     from issue
-    left join latest_issue_field_history using (issue_id)
+    
+    left join latest_issue_field_history 
+        on issue.issue_id = latest_issue_field_history.issue_id
         
 )
 
