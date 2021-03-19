@@ -70,6 +70,7 @@ config-version: 2
 vars:
   jira_using_sprints: false # Disable if you do not have the sprint table, or if you do not want sprint related metrics reported
   jira_include_comments: false # this package aggregates issue comments so that you have a single view of all your comments in the jira__issue_enhanced table. This can cause limit errors if you have a large dataset. Disable to remove this functionality.
+  jira_using_components: false # Disable if you do not have the component table, or if you do not want component related metrics reported
 ```
 
 ## Contributions
