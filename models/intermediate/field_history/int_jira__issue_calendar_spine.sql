@@ -15,7 +15,7 @@ with spine as (
     {% endset %}
     {% set first_date = run_query(first_date_query).columns[0][0]|string %}
     
-    {% else %} {% set first_date = "'2016-01-01'" %}
+    {% else %} {% set first_date = "2016-01-01" %}
     {% endif %}
 
 
