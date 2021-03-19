@@ -30,6 +30,8 @@ agg_epics as (
 
 ),
 
+{% if var('jira_using_components', True) %}
+
 agg_components as (
     -- i'm just aggregating the components here, but perhaps pivoting out components (and epics) 
     -- into columns where the values are the number of issues completed and/or open would be more valuable
@@ -42,6 +44,8 @@ agg_components as (
     group by 1
 ),
 
+{% endif %}
+
 project_join as (
 
     select
@@ -49,7 +53,11 @@ project_join as (
         jira_user.user_display_name as project_lead_user_name,
         jira_user.email as project_lead_email,
         agg_epics.epics,
+        
+        {% if var('jira_using_components', True) %}
         agg_components.components,
+        {% endif %}
+
         coalesce(project_metrics.count_closed_issues, 0) as count_closed_issues,
         coalesce(project_metrics.count_open_issues, 0) as count_open_issues,
         coalesce(project_metrics.count_open_assigned_issues, 0) as count_open_assigned_issues,
@@ -82,7 +90,11 @@ project_join as (
     left join project_metrics on project.project_id = project_metrics.project_id
     left join jira_user on project.project_lead_user_id = jira_user.user_id
     left join agg_epics on project.project_id = agg_epics.project_id 
+    
+    {% if var('jira_using_components', True) %}
     left join agg_components on project.project_id = agg_components.project_id 
+    {% endif %}
+
 )
 
 select * from project_join
