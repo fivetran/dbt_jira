@@ -512,7 +512,7 @@ models:
       - name: valid_starting_on
         description: Calendar date of when the field was changed to this value.
       - name: issue_field_day_id
-        description: Unique ID hashed on `field_id`, `issue_id`,  and `valid_starting_at`.
+        description: Unique ID hashed on `field_id`, `issue_id`,  and `valid_starting_on`.
         tests:
           - unique
           - not_null
