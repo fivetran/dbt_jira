@@ -32,8 +32,9 @@ jobs:
             cd integration_tests
             dbt deps
             dbt seed --target snowflake --full-refresh
-            dbt run --target snowflake --full-refresh
             dbt run --vars '{jira_using_sprints: false, jira_using_components: false}' --target snowflake --full-refresh
+            dbt run --target snowflake --full-refresh
+            dbt run --target snowflake
             dbt test --target snowflake
       - run:
           name: "Run Tests - BigQuery"
@@ -46,8 +47,9 @@ jobs:
             cd integration_tests
             dbt deps
             dbt seed --target bigquery --full-refresh
-            dbt run --target bigquery --full-refresh
             dbt run --vars '{jira_using_sprints: false, jira_using_components: false}' --target bigquery --full-refresh
+            dbt run --target bigquery --full-refresh
+            dbt run --target bigquery
             dbt test --target bigquery
       - run:
           name: "Run Tests - Redshift"
@@ -57,8 +59,9 @@ jobs:
             cd integration_tests
             dbt deps
             dbt seed --target redshift --full-refresh
-            dbt run --target redshift --full-refresh
             dbt run --vars '{jira_using_sprints: false, jira_using_components: false}' --target redshift --full-refresh
+            dbt run --target redshift --full-refresh
+            dbt run --target redshift
             dbt test --target redshift
       - save_cache:
           key: deps2-{{ .Branch }}

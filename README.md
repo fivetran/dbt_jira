@@ -24,6 +24,13 @@ This package contains transformation models, designed to work simultaneously wit
 ## Installation Instructions
 Check [dbt Hub](https://hub.getdbt.com/) for the latest installation instructions, or [read the dbt docs](https://docs.getdbt.com/docs/package-management) for more information on installing packages.
 
+```yml
+# packages.yml
+packages:
+  - package: fivetran/jira
+    version: [">=0.2.0", "<0.3.0"]
+```
+
 ## Configuration
 By default, this package looks for your Jira data in the `jira` schema of your [target database](https://docs.getdbt.com/docs/running-a-dbt-project/using-the-command-line-interface/configure-your-profile). If this is not where your Jira data is, add the following configuration to your `dbt_project.yml` file:
 
@@ -39,7 +46,7 @@ vars:
 ```
 
 ### Daily Issue Field History Columns
-The `jira__daily_issue_field_history` model generates historical data for the columns specified by the `issue_field_history_columns` variable. By default, the only columns tracked are `status` and `sprint`, but all fields found in the Jira `FIELD` table can be included in this model.
+The `jira__daily_issue_field_history` model generates historical data for the columns specified by the `issue_field_history_columns` variable. By default, the only columns tracked are `status` and `sprint`, but all fields found in the Jira `FIELD` table can be included in this model. The most recent value of any tracked column is also captured in `jira__issue_enhanced`.
 
 If you would like to change these columns, add the following configuration to your dbt_project.yml file. Then, after adding the columns to your `dbt_project.yml` file, run the `dbt run --full-refresh` command to fully refresh any existing models.
 
@@ -56,7 +63,6 @@ vars:
 
 > Note: `sprint` and `status` will always be tracked, as they are necessary for creating common agile reports. 
 
-
 ### Disabling models
 
 It's possible that your Jira connector does not sync every table that this package expects. If your syncs exclude certain tables, it is because you either don't use that functionality in Jira or actively excluded some tables from your syncs. To disable the corresponding functionality in the package, you must add the relevant variables. By default, all variables are assumed to be `true`. Add variables for only the tables you would like to disable:  
@@ -69,8 +75,22 @@ config-version: 2
 
 vars:
   jira_using_sprints: false # Disable if you do not have the sprint table, or if you do not want sprint related metrics reported
-  jira_include_comments: false # this package aggregates issue comments so that you have a single view of all your comments in the jira__issue_enhanced table. This can cause limit errors if you have a large dataset. Disable to remove this functionality.
   jira_using_components: false # Disable if you do not have the component table, or if you do not want component related metrics reported
+  jira_include_comments: false # this package aggregates issue comments so that you have a single view of all your comments in the jira__issue_enhanced table. This can cause limit errors if you have a large dataset. Disable to remove this functionality.
+```
+
+### Changing the Build Schema
+By default this package will build the Jira staging models within a schema titled (<target_schema> + `_stg_jira`) and Jira final models within a schema titled (<target_schema> + `jira`) in your target database. If this is not where you would like your modeled Jira data to be written to, add the following configuration to your `dbt_project.yml` file:
+
+```yml
+# dbt_project.yml
+
+...
+models:
+    jira:
+      +schema: my_new_schema_name # leave blank for just the target_schema
+    jira_source:
+      +schema: my_new_schema_name # leave blank for just the target_schema
 ```
 
 ## Contributions
@@ -80,7 +100,6 @@ Please create issues or open PRs against `master`. Check out [this post](https:/
 
 ## Database Support
 This package has been tested on BigQuery, Snowflake and Redshift.
-Coming soon -- compatibility with Spark
 
 ## Resources:
 - Provide [feedback](https://www.surveymonkey.com/r/DQ7K7WW) on our existing dbt packages or what you'd like to see next
