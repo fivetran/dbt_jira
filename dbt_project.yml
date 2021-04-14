@@ -1,5 +1,5 @@
 name: 'jira'
-version: '0.1.4'
+version: '0.2.0'
 config-version: 2
 require-dbt-version: [">=0.18.0", "<0.20.0"]
 
@@ -26,6 +26,8 @@ vars:
 
 models:
   jira:
-    materialized: table # field history tables are configured to be incremental, except for int_jira__field_history_scd, which has to be a table
+    +materialized: table # field history tables are configured to be incremental, except for int_jira__field_history_scd, which has to be a table
+    +schema: jira
     intermediate:
-      materialized: ephemeral
+      +materialized: ephemeral 
+      +schema: int_jira # field history models will be written here (and are not ephemeral, so they'll exist in the warehouse)

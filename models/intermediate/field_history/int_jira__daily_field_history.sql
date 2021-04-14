@@ -69,7 +69,7 @@ final as (
         valid_ending_at, 
         valid_starting_on,
 
-        {{ dbt_utils.surrogate_key(['field_id','issue_id', 'valid_starting_at']) }} as issue_field_day_id
+        {{ dbt_utils.surrogate_key(['field_id','issue_id', 'valid_starting_on']) }} as issue_field_day_id
         
     from get_latest_daily_value
 )
