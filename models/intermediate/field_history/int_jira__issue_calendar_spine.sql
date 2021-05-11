@@ -11,7 +11,7 @@ with spine as (
     {% if execute %}
     {% set first_date_query %}
     -- start at the first created issue
-        select  min( created_at ) as min_date from {{ var('issue') }}
+        select  min( created ) as min_date from {{ source('jira','issue') }}
     {% endset %}
     {% set first_date = run_query(first_date_query).columns[0][0]|string %}
     
