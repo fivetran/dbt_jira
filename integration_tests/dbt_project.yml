@@ -5,6 +5,7 @@ profile: 'integration_tests'
 
 
 vars:
+  jira_schema: jira_integration_tests
   jira_source:
     comment: "{{ ref('comment') }}"
     component: "{{ ref('component') }}"
