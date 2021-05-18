@@ -26,7 +26,7 @@ pivot_out as (
         valid_starting_on, 
         issue_id,
         max(case when lower(field_id) = 'status' then field_value end) as status,
-        max(case when lower(field_id) = 'sprint' then field_value end) as sprint
+        max(case when lower(field_name) = 'sprint' then field_value end) as sprint -- As sprint is a custom field, we aggregate on the field_name.
 
         {% for col in var('issue_field_history_columns', []) -%}
         ,
