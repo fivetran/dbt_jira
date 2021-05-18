@@ -58,7 +58,7 @@ config-version: 2
 
 vars:
   jira:
-    issue_field_history_columns: ['the', 'list', 'of', 'field', 'names']
+    issue_field_history_columns: ['the', 'list', 'of', 'field', 'IDs']
 ```
 
 > Note: `sprint` and `status` will always be tracked, as they are necessary for creating common agile reports. 
