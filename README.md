@@ -28,7 +28,7 @@ Check [dbt Hub](https://hub.getdbt.com/) for the latest installation instruction
 # packages.yml
 packages:
   - package: fivetran/jira
-    version: [">=0.2.0", "<0.3.0"]
+    version: [">=0.3.0", "<0.4.0"]
 ```
 
 ## Configuration
