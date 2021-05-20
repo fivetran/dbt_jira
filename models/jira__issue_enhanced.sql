@@ -33,6 +33,7 @@ latest_issue_field_history as (
 final as (
 
     select 
+    
         issue.*,
 
         {{ dbt_utils.datediff('created_at', "coalesce(resolved_at, " ~ dbt_utils.current_timestamp() ~ ')', 'second') }} open_duration_seconds,
