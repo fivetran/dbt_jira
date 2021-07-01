@@ -30,8 +30,9 @@ with spine as (
         }} 
     )
 
+    -- todo: i think for incremental runs i'm going to have to pull ALL days for new issues? 
     {% if is_incremental() %}
-    where cast( date_day as date) >= (select max(date_day) from {{ this }} )
+    where cast( date_day as date) >= (select min(earliest_open_until_date) from {{ this }} )
     {% endif %}
 ),
 
@@ -42,7 +43,9 @@ issue_dates as (
         cast( {{ dbt_utils.date_trunc('day', 'created_at') }} as date) as created_on,
 
         -- resolved_at will become null if an issue is marked as un-resolved. if this sorta thing happens often, you may want to run full-refreshes of the field_history models often
-        cast({{ dbt_utils.date_trunc('day', 'coalesce(resolved_at, ' ~ dbt_utils.current_timestamp() ~ ')') }} as date) as open_until 
+        -- if it's not resolved include everything up to today. if it is, look at the last time it was updated 
+        cast({{ dbt_utils.date_trunc('day', 'case when resolved_at is null then ' ~ dbt_utils.current_timestamp() ~ ' else updated_at end') }} as date) as open_until
+        {# cast({{ dbt_utils.date_trunc('day', 'coalesce(resolved_at , ' ~ dbt_utils.current_timestamp() ~ ' )') }} as date) as open_until  #}
 
     from {{ var('issue') }}
 
@@ -52,7 +55,8 @@ issue_spine as (
 
     select 
         cast(spine.date_day as date) as date_day,
-        issue_dates.issue_id
+        issue_dates.issue_id,
+        min(issue_dates.open_until) as earliest_open_until_date
 
     from spine 
     join issue_dates on
@@ -68,7 +72,8 @@ surrogate_key as (
     select 
         date_day,
         issue_id,
-        {{ dbt_utils.surrogate_key(['date_day','issue_id']) }} as issue_day_id
+        {{ dbt_utils.surrogate_key(['date_day','issue_id']) }} as issue_day_id,
+        earliest_open_until_date
 
     from issue_spine
 
