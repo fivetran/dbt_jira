@@ -31,7 +31,7 @@ with spine as (
                 end_date = dbt_utils.dateadd("week", 1, "current_date")
             )   
         }} 
-    )
+    ) as date_spine
 
     -- todo: i think for incremental runs i'm going to have to pull ALL days for new issues? 
     {% if is_incremental() %}
