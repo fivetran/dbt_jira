@@ -1,8 +1,11 @@
 {{
     config(
         materialized='incremental',
-        partition_by = {'field': 'date_day', 'data_type': 'date'},
-        unique_key='batch_id'
+        partition_by = {'field': 'date_day', 'data_type': 'date'}
+            if target.type != 'spark' else ['date_day'],
+        unique_key='batch_id',
+        incremental_strategy = 'merge',
+        file_format = 'delta'
     )
 }}
 
