@@ -9,15 +9,17 @@ calculate_medians as (
 
     select 
         assignee_user_id as user_id,
-        round( {{ fivetran_utils.percentile(percentile_field='case when resolved_at is not null then last_assignment_duration_seconds end', 
-                    partition_field='assignee_user_id', percent='0.5') }}, 0) as median_close_time_seconds,
-        round( {{ fivetran_utils.percentile(percentile_field='case when resolved_at is null then last_assignment_duration_seconds end', 
-                    partition_field='assignee_user_id', percent='0.5') }}, 0) as median_age_currently_open_seconds
+        round( cast( {{ fivetran_utils.percentile(percentile_field='case when resolved_at is not null then last_assignment_duration_seconds end', 
+                    partition_field='assignee_user_id', percent='0.5') }} as {{ dbt_utils.type_numeric() }}), 0) as median_close_time_seconds,
+        round( cast( {{ fivetran_utils.percentile(percentile_field='case when resolved_at is null then last_assignment_duration_seconds end', 
+                    partition_field='assignee_user_id', percent='0.5') }} as {{ dbt_utils.type_numeric() }}), 0) as median_age_currently_open_seconds
 
     from issue
+
+    {% if target.type == 'postgres' %} group by 1 {% endif %}
 ),
 
--- grouping because the medians were calculated using window functions
+-- grouping because the medians were calculated using window functions (except postgres)
 median_metrics as (
 
     select 
