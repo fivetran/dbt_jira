@@ -4,3 +4,4 @@ packages:
   - git: https://github.com/fivetran/dbt_jira_source.git
     warn-unpinned: false
     revision: jr_working
+  # - local: ../dbt_jira_source

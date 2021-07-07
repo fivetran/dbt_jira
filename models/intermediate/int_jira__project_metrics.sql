@@ -20,9 +20,11 @@ calculate_medians as (
                     partition_field='project_id', percent='0.5') }}, 0) as median_age_currently_open_assigned_seconds
 
     from issue
+
+    {% if target.type == 'postgres' %} group by project_id {% endif %}
 ),
 
--- grouping because the medians were calculated using window functions
+-- grouping because the medians were calculated using window functions (except in postgres)
 median_metrics as (
 
     select 
