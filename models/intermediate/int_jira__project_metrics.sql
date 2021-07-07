@@ -9,15 +9,15 @@ calculate_medians as (
 
     select 
         project_id,
-        round( {{ fivetran_utils.percentile(percentile_field='case when resolved_at is not null then open_duration_seconds end', 
-                    partition_field='project_id', percent='0.5') }}, 0) as median_close_time_seconds,
-        round( {{ fivetran_utils.percentile(percentile_field='case when resolved_at is null then open_duration_seconds end', 
-                    partition_field='project_id', percent='0.5') }}, 0) as median_age_currently_open_seconds,
+        round( cast( {{ fivetran_utils.percentile(percentile_field='case when resolved_at is not null then open_duration_seconds end', 
+                    partition_field='project_id', percent='0.5') }} as {{ dbt_utils.type_numeric() }} ), 0) as median_close_time_seconds,
+        round( cast({{ fivetran_utils.percentile(percentile_field='case when resolved_at is null then open_duration_seconds end', 
+                    partition_field='project_id', percent='0.5') }} as {{ dbt_utils.type_numeric() }} ), 0) as median_age_currently_open_seconds,
 
-        round( {{ fivetran_utils.percentile(percentile_field='case when resolved_at is not null then any_assignment_duration_seconds end', 
-                    partition_field='project_id', percent='0.5') }}, 0) as median_assigned_close_time_seconds,
-        round( {{ fivetran_utils.percentile(percentile_field='case when resolved_at is null then any_assignment_duration_seconds end', 
-                    partition_field='project_id', percent='0.5') }}, 0) as median_age_currently_open_assigned_seconds
+        round( cast({{ fivetran_utils.percentile(percentile_field='case when resolved_at is not null then any_assignment_duration_seconds end', 
+                    partition_field='project_id', percent='0.5') }} as {{ dbt_utils.type_numeric() }} ), 0) as median_assigned_close_time_seconds,
+        round( cast({{ fivetran_utils.percentile(percentile_field='case when resolved_at is null then any_assignment_duration_seconds end', 
+                    partition_field='project_id', percent='0.5') }} as {{ dbt_utils.type_numeric() }} ), 0) as median_age_currently_open_assigned_seconds
 
     from issue
 
@@ -74,16 +74,16 @@ calculate_avg_metrics as (
         count_open_assigned_issues,
 
         case when count_closed_issues = 0 then 0 else
-        round( sum_close_time_seconds * 1.0 / count_closed_issues, 0) end as avg_close_time_seconds,
+        round( cast(sum_close_time_seconds * 1.0 / count_closed_issues  as {{ dbt_utils.type_numeric() }} ), 0) end as avg_close_time_seconds,
 
         case when count_closed_assigned_issues = 0 then 0 else
-        round( sum_assigned_close_time_seconds * 1.0 / count_closed_assigned_issues, 0) end as avg_assigned_close_time_seconds,
+        round( cast(sum_assigned_close_time_seconds * 1.0 / count_closed_assigned_issues  as {{ dbt_utils.type_numeric() }} ), 0) end as avg_assigned_close_time_seconds,
 
         case when count_open_issues = 0 then 0 else
-        round( sum_currently_open_duration_seconds * 1.0 / count_open_issues, 0) end as avg_age_currently_open_seconds,
+        round( cast(sum_currently_open_duration_seconds * 1.0 / count_open_issues as {{ dbt_utils.type_numeric() }} ), 0) end as avg_age_currently_open_seconds,
 
         case when count_open_assigned_issues = 0 then 0 else
-        round( sum_currently_open_assigned_duration_seconds * 1.0 / count_open_assigned_issues, 0) end as avg_age_currently_open_assigned_seconds
+        round( cast(sum_currently_open_assigned_duration_seconds * 1.0 / count_open_assigned_issues as {{ dbt_utils.type_numeric() }} ), 0) end as avg_age_currently_open_assigned_seconds
 
     from project_issues
 ),
@@ -95,20 +95,20 @@ join_metrics as (
         calculate_avg_metrics.*,
 
         -- there are 86400 seconds in a day
-        round( calculate_avg_metrics.avg_close_time_seconds / 86400.0, 0) as avg_close_time_days,
-        round( calculate_avg_metrics.avg_assigned_close_time_seconds / 86400.0, 0) as avg_assigned_close_time_days,
-        round( calculate_avg_metrics.avg_age_currently_open_seconds / 86400.0, 0) as avg_age_currently_open_days,
-        round( calculate_avg_metrics.avg_age_currently_open_assigned_seconds / 86400.0, 0) as avg_age_currently_open_assigned_days,
+        round( cast(calculate_avg_metrics.avg_close_time_seconds / 86400.0 as {{ dbt_utils.type_numeric() }} ), 0) as avg_close_time_days,
+        round( cast(calculate_avg_metrics.avg_assigned_close_time_seconds / 86400.0 as {{ dbt_utils.type_numeric() }} ), 0) as avg_assigned_close_time_days,
+        round( cast(calculate_avg_metrics.avg_age_currently_open_seconds / 86400.0 as {{ dbt_utils.type_numeric() }} ), 0) as avg_age_currently_open_days,
+        round( cast(calculate_avg_metrics.avg_age_currently_open_assigned_seconds / 86400.0 as {{ dbt_utils.type_numeric() }} ), 0) as avg_age_currently_open_assigned_days,
 
         median_metrics.median_close_time_seconds, 
         median_metrics.median_age_currently_open_seconds,
         median_metrics.median_assigned_close_time_seconds,
         median_metrics.median_age_currently_open_assigned_seconds,
 
-        round( median_metrics.median_close_time_seconds / 86400.0, 0) as median_close_time_days,
-        round( median_metrics.median_age_currently_open_seconds / 86400.0, 0) as median_age_currently_open_days,
-        round( median_metrics.median_assigned_close_time_seconds / 86400.0, 0) as median_assigned_close_time_days,
-        round( median_metrics.median_age_currently_open_assigned_seconds / 86400.0, 0) as median_age_currently_open_assigned_days
+        round( cast(median_metrics.median_close_time_seconds / 86400.0 as {{ dbt_utils.type_numeric() }} ), 0) as median_close_time_days,
+        round( cast(median_metrics.median_age_currently_open_seconds / 86400.0 as {{ dbt_utils.type_numeric() }} ), 0) as median_age_currently_open_days,
+        round( cast(median_metrics.median_assigned_close_time_seconds / 86400.0 as {{ dbt_utils.type_numeric() }} ), 0) as median_assigned_close_time_days,
+        round( cast(median_metrics.median_age_currently_open_assigned_seconds / 86400.0 as {{ dbt_utils.type_numeric() }} ), 0) as median_age_currently_open_assigned_days
         
     from calculate_avg_metrics
     left join median_metrics using(project_id)
