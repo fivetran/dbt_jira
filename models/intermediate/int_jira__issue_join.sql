@@ -23,6 +23,12 @@ status as (
     from {{ var('status') }}
 ),
 
+status_category as (
+
+    select * 
+    from {{ var('status_category') }}
+),
+
 resolution as (
 
     select * 
@@ -66,6 +72,7 @@ join_issue as (
         project.project_name as project_name,
 
         status.status_name as current_status,
+        status_category.status_category_name as current_status_category,
         
         resolution.resolution_name as resolution_type,
 
@@ -95,6 +102,7 @@ join_issue as (
     from issue
     left join project on project.project_id = issue.project_id
     left join status on status.status_id = issue.status_id
+    left join status_category on status.status_category_id = status_category.status_category_id
     left join resolution on resolution.resolution_id = issue.resolution_id
     left join priority on priority.priority_id = issue.priority_id
     left join issue_assignments_and_resolutions on issue_assignments_and_resolutions.issue_id = issue.issue_id
