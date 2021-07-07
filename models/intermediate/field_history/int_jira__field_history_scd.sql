@@ -38,7 +38,7 @@ with change_data as (
 
         {% endfor %}
 
-    from change_data
+    from set_values
 
 )
 
