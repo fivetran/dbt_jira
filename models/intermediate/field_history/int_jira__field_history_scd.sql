@@ -16,9 +16,8 @@ with change_data as (
 
         {% for col in issue_columns if col.name|lower not in ['valid_starting_on','issue_id','issue_day_id'] %} 
         
-        , sum(case when {{ col.name }} is null then 0 else 1 end) over (
+        , sum( case when {{ col.name }} is null then 0 else 1 end) over (
             order by issue_id, valid_starting_on rows unbounded preceding) as {{ col.name }}_field_partition
-        )
 
         {% endfor %}
 
