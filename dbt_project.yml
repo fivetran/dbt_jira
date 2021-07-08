@@ -32,5 +32,5 @@ models:
     +materialized: table # field history tables are configured to be incremental, except for int_jira__field_history_scd, which has to be a table
     +schema: jira
     intermediate:
-      +materialized: ephemeral 
+      +materialized: table 
       +schema: int_jira # field history models will be written here (and are not ephemeral, so they'll exist in the warehouse)
