@@ -27,6 +27,7 @@ vars:
     status: "{{ ref('status') }}"
     user_group: "{{ ref('user_group') }}"
     user: "{{ ref('user') }}"
+    version: "{{ ref('version') }}"
 
   jira:
     issue: "{{ ref('stg_jira__issue') }}"
@@ -36,6 +37,7 @@ vars:
     epic: "{{ ref('stg_jira__epic') }}"
     issue_type: "{{ ref('stg_jira__issue_type') }}"
     status: "{{ ref('stg_jira__status') }}"
+    status_category: "{{ ref('stg_jira__status_category') }}"
     resolution: "{{ ref('stg_jira__resolution') }}"
     priority: "{{ ref('stg_jira__priority') }}"
     issue_multiselect_history: "{{ ref('stg_jira__issue_multiselect_history') }}"
@@ -45,6 +47,7 @@ vars:
     component: "{{ ref('stg_jira__component') }}"
     field: "{{ ref('stg_jira__field') }}"
     sprint: "{{ ref('stg_jira__sprint') }}"
+    version: "{{ ref('stg_jira__version') }}"
 
     issue_field_history_columns: ['summary', 'components', 'story points']
 

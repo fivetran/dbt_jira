@@ -33,7 +33,6 @@ with spine as (
         }} 
     ) as date_spine
 
-    -- todo: i think for incremental runs i'm going to have to pull ALL days for new issues? 
     {% if is_incremental() %}
     -- compare to the earliest possible open_until date so that if a resolved issue is updated after a long period of inactivity, we don't need a full refresh
     -- essentially we need to be able to backfill
