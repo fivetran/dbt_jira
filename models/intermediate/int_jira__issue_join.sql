@@ -87,7 +87,7 @@ join_issue as (
         {% if var('jira_using_sprints', True) %}
         issue_sprint.sprint_id,
         issue_sprint.sprint_name,
-        issue_sprint.count_sprint_changes,
+        coalesce(issue_sprint.count_sprint_changes, 0) as count_sprint_changes,
         issue_sprint.sprint_started_at,
         issue_sprint.sprint_ended_at,
         issue_sprint.sprint_completed_at,
@@ -104,7 +104,7 @@ join_issue as (
 
         {% if var('jira_include_comments', True) %}
         , issue_comments.conversation,
-        issue_comments.count_comments
+        coalesce(issue_comments.count_comments, 0) as count_comments
         {% endif %}
     
     from issue
