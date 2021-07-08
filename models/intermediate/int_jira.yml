@@ -118,7 +118,13 @@ models:
         description: Boolean that is true if the parent is an epic.
       - name: creator_user_id
         description: Foreign key referencing the `user` who first created the issue. Cannot be changed.
-  
+      - name: affects_versions
+        description: Comma-separated list of the names of project versions that this issue affects.
+      - name: fixes_versions
+        description: Comma-separated list of the names of project versions that this issue fixes.
+      - name: current_status_category
+        description: Title of the umbrella status category that the issue is currently in. 
+        
   - name: int_jira__project_metrics
     description: Table calculating issue-related metrics per project.
     columns:
@@ -487,6 +493,8 @@ models:
         tests:
           - unique
           - not_null
+      - name: earliest_open_until_date
+        description: Used for incremental materialization logic.
 
   - name: int_jira__daily_field_history
     description: >
@@ -617,3 +625,17 @@ models:
         tests:
           - unique
           - not_null
+
+  - name: int_jira__issue_versions
+    description: >
+      Table associating issues with the versions that they fix and/or affect. 
+    columns:
+      - name: issue_id
+        description: Foreign key referencing the `issue` tagged with these versions. 
+        tests:
+          - unique
+          - not_null
+      - name: affects_versions
+        description: Comma-separated list of the names of project versions that this issue affects.
+      - name: fixes_versions
+        description: Comma-separated list of the names of project versions that this issue fixes.
