@@ -77,6 +77,7 @@ seeds:
         created: timestamp
         work_ratio: float
         resolved: timestamp
+        updated: timestamp
         assignee: "{{ 'string' if target.name in ('bigquery', 'spark') else 'varchar' }}"
     issue_multiselect_history:
       +column_types:
