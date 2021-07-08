@@ -47,7 +47,6 @@ version_info as (
     select 
         latest_versions.field_id,
         latest_versions.issue_id,
-        {# latest_versions.updated_at, #}
         {{ fivetran_utils.string_agg('version.version_name', "', '") }} as versions
 
     from latest_versions

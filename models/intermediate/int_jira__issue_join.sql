@@ -64,6 +64,12 @@ issue_assignments_and_resolutions as (
 
 ),
 
+issue_versions as (
+
+    select *
+    from {{ ref('int_jira__issue_versions') }}
+),
+
 join_issue as (
 
     select
@@ -90,14 +96,16 @@ join_issue as (
           , false) as is_active_sprint, -- If sprint doesn't have a start date, default to false. If it does have a start date, but no completed date, this means that the sprint is active. The ended_at timestamp is irrelevant here.
         {% endif %}
 
-        {% if var('jira_include_comments', True) %}
-        issue_comments.conversation,
-        issue_comments.count_comments,
-        {% endif %}
-
         issue_assignments_and_resolutions.first_assigned_at,
         issue_assignments_and_resolutions.last_assigned_at,
-        issue_assignments_and_resolutions.first_resolved_at 
+        issue_assignments_and_resolutions.first_resolved_at,
+        issue_versions.fixes_versions,
+        issue_versions.affects_versions
+
+        {% if var('jira_include_comments', True) %}
+        , issue_comments.conversation,
+        issue_comments.count_comments
+        {% endif %}
     
     from issue
     left join project on project.project_id = issue.project_id
@@ -106,6 +114,7 @@ join_issue as (
     left join resolution on resolution.resolution_id = issue.resolution_id
     left join priority on priority.priority_id = issue.priority_id
     left join issue_assignments_and_resolutions on issue_assignments_and_resolutions.issue_id = issue.issue_id
+    left join issue_versions on issue_versions.issue_id = issue.issue_id
     
     {% if var('jira_using_sprints', True) %}
     left join issue_sprint on issue_sprint.issue_id = issue.issue_id
