@@ -36,7 +36,7 @@ issue_enriched_with_epics as (
   
   from issue
   
-  left join issues_w_epics using (issue_id)
+  left join issues_w_epics on issues_w_epics.issue_id = issue.issue_id
 
 ), 
 
@@ -49,7 +49,7 @@ issue_w_types as (
         
     from issue_enriched_with_epics 
     
-    join issue_type using (issue_type_id)
+    left join issue_type on issue_type.issue_type_id = issue_enriched_with_epics.issue_type_id
 ),
 
 add_parent_info as (

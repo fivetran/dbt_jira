@@ -1,5 +1,5 @@
 name: 'jira_integration_tests'
-version: '0.3.0'
+version: '0.3.1'
 config-version: 2
 profile: 'integration_tests'
 
@@ -27,6 +27,7 @@ vars:
     status: "{{ ref('status') }}"
     user_group: "{{ ref('user_group') }}"
     user: "{{ ref('user') }}"
+    version: "{{ ref('version') }}"
 
   jira:
     issue: "{{ ref('stg_jira__issue') }}"
@@ -36,6 +37,7 @@ vars:
     epic: "{{ ref('stg_jira__epic') }}"
     issue_type: "{{ ref('stg_jira__issue_type') }}"
     status: "{{ ref('stg_jira__status') }}"
+    status_category: "{{ ref('stg_jira__status_category') }}"
     resolution: "{{ ref('stg_jira__resolution') }}"
     priority: "{{ ref('stg_jira__priority') }}"
     issue_multiselect_history: "{{ ref('stg_jira__issue_multiselect_history') }}"
@@ -45,6 +47,7 @@ vars:
     component: "{{ ref('stg_jira__component') }}"
     field: "{{ ref('stg_jira__field') }}"
     sprint: "{{ ref('stg_jira__sprint') }}"
+    version: "{{ ref('stg_jira__version') }}"
 
     issue_field_history_columns: ['summary', 'components', 'story points']
 
@@ -77,17 +80,18 @@ seeds:
         created: timestamp
         work_ratio: float
         resolved: timestamp
-        assignee: "{{ 'string' if target.name == 'bigquery' else 'varchar' }}"
+        updated: timestamp
+        assignee: "{{ 'string' if target.name in ('bigquery', 'spark') else 'varchar' }}"
     issue_multiselect_history:
       +column_types:
         time: timestamp
         issue_id: "{{ 'int64' if target.name == 'bigquery' else 'bigint' }}"
-        value: "{{ 'string' if target.name == 'bigquery' else 'varchar' }}"
+        value: "{{ 'string' if target.name in ('bigquery', 'spark') else 'varchar' }}"
     issue_field_history:
       +column_types:
         time: timestamp
         issue_id: "{{ 'int64' if target.name == 'bigquery' else 'bigint' }}"
-        value: "{{ 'string' if target.name == 'bigquery' else 'varchar' }}"
+        value: "{{ 'string' if target.name in ('bigquery', 'spark') else 'varchar' }}"
     sprint: 
       +column_types:
         id: "{{ 'int64' if target.name == 'bigquery' else 'bigint' }}"
@@ -96,4 +100,4 @@ seeds:
         start_date: timestamp
     field: 
       +column_types:
-        id: "{{ 'string' if target.name == 'bigquery' else 'varchar' }}"
+        id: "{{ 'string' if target.name in ('bigquery', 'spark') else 'varchar' }}"
