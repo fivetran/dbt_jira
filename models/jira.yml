@@ -147,7 +147,13 @@ models:
         description: Email associated with the user who reported this issue.
       - name: reporter_timezone
         description: Timezone of the user currently who reported this issue.
-
+      - name: affects_versions
+        description: Comma-separated list of the names of project versions that this issue affects.
+      - name: fixes_versions
+        description: Comma-separated list of the names of project versions that this issue fixes.
+      - name: current_status_category
+        description: Title of the umbrella status category that the issue is currently in. 
+        
   - name: jira__project_enhanced
     description: >
       Table of projects enriched with data about its lead, epics, components, and volume and velocity of worktime.
