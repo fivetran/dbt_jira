@@ -33,7 +33,6 @@ jobs:
             cd integration_tests
             dbt deps
             dbt seed --target spark --full-refresh
-            dbt run --vars '{jira_using_sprints: false, jira_using_components: false}' --target spark --full-refresh
             dbt run --target spark --full-refresh
             dbt run --target spark
             dbt test --target spark
