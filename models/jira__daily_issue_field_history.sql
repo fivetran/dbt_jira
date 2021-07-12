@@ -76,6 +76,23 @@ joined as (
     {% endif %}
 ),
 
+set_values as (
+
+    select
+        date_day,
+        issue_id
+
+        {% for col in pivot_data_columns if col.name|lower not in ['issue_id','issue_day_id','valid_starting_on'] %}
+        , {{ col.name }}
+        -- create a batch/partition once a new value is provided
+        , sum( case when {{ col.name }} is null then 0 else 1 end) over (
+            order by issue_id, date_day rows unbounded preceding) as {{ col.name }}_field_partition
+
+        {% endfor %}
+
+    from joined
+),
+
 fill_values as (
 
     select  
@@ -83,11 +100,13 @@ fill_values as (
         issue_id
 
         {% for col in pivot_data_columns if col.name|lower not in ['issue_id','issue_day_id','valid_starting_on'] %}
-        , last_value({{ col.name }} ignore nulls) over 
-          (partition by issue_id order by date_day asc rows between unbounded preceding and current row) as {{ col.name }}
+        -- grab the value that started this batch/partition
+        , first_value( {{ col.name }} ) over (
+            partition by {{ col.name }}_field_partition 
+            order by date_day asc rows between unbounded preceding and current row) as {{ col.name }}
         {% endfor %}
 
-    from joined
+    from set_values
 ),
 
 fix_null_values as (
