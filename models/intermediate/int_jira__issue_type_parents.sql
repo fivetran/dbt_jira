@@ -36,7 +36,7 @@ issue_enriched_with_epics as (
   
   from issue
   
-  left join issues_w_epics on issue.issue_id = issues_w_epics.issue_id
+  left join issues_w_epics on issues_w_epics.issue_id = issue.issue_id
 
 ), 
 
