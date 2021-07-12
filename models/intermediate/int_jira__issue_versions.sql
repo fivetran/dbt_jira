@@ -1,8 +1,3 @@
-{{
-    config(
-        materialized='view')
-}}
-
 with version as (
 
     select *
