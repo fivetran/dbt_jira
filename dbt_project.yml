@@ -27,7 +27,7 @@ vars:
     jira_using_sprints: true # disable if you are not using sprints in Jira
 
   dbt_utils_dispatch_list: [fivetran_utils, spark_utils]
-  fivetran_utils_dispatch_list: [spark_utils]
+  fivetran_utils_dispatch_list: [dbt_utils, spark_utils]
   
 models:
   jira:
