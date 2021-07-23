@@ -1,9 +1,7 @@
 name: 'jira'
-version: '0.3.1'
+version: '0.4.0'
 config-version: 2
-require-dbt-version: [">=0.18.0", "<0.20.0"]
-
-
+require-dbt-version: [">=0.20.0"]
 vars:
 
   jira:
@@ -23,16 +21,14 @@ vars:
     field: "{{ ref('stg_jira__field') }}"
     sprint: "{{ ref('stg_jira__sprint') }}"
     version: "{{ ref('stg_jira__version') }}"
-    jira_include_comments: true  # this package aggregates issue comments so that you have a single view of all your comments in the jira__issue_enhanced table. This can cause limit errors if you have a large dataset. Disable to remove this functionality.
-    jira_using_sprints: true # disable if you are not using sprints in Jira
-
+    jira_include_comments: true
+    jira_using_sprints: true
   dbt_utils_dispatch_list: [spark_utils, fivetran_utils]
   fivetran_utils_dispatch_list: [spark_utils]
-  
 models:
   jira:
-    +materialized: table # field history tables are configured to be incremental, except for int_jira__field_history_scd, which has to be a table
+    +materialized: table
     +schema: jira
     intermediate:
-      +materialized: ephemeral 
-      +schema: int_jira # field history models will be written here (and are not ephemeral, so they'll exist in the warehouse)
+      +materialized: ephemeral
+      +schema: int_jira
