@@ -26,17 +26,6 @@ jobs:
             mkdir -p ~/.dbt
             cp integration_tests/ci/sample.profiles.yml ~/.dbt/profiles.yml
       - run:
-          name: "Run Tests - Spark"
-          command: |
-            . venv/bin/activate
-            echo `pwd`
-            cd integration_tests
-            dbt deps
-            dbt seed --target spark --full-refresh
-            dbt run --target spark --full-refresh
-            dbt run --target spark
-            dbt test --target spark
-      - run:
           name: "Run Tests - Postgres"
           command: |
             . venv/bin/activate
@@ -87,6 +76,17 @@ jobs:
             dbt run --target redshift --full-refresh
             dbt run --target redshift
             dbt test --target redshift
+      - run:
+          name: "Run Tests - Spark"
+          command: |
+            . venv/bin/activate
+            echo `pwd`
+            cd integration_tests
+            dbt deps
+            dbt seed --target spark --full-refresh
+            dbt run --target spark --full-refresh
+            dbt run --target spark
+            dbt test --target spark
       - save_cache:
           key: deps2-{{ .Branch }}
           paths:
