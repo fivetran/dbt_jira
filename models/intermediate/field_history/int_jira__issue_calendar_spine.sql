@@ -65,7 +65,7 @@ issue_spine as (
     from spine 
     join issue_dates on
         issue_dates.created_on <= spine.date_day
-        and {{ dbt_utils.dateadd('month', var('jira__issue_history_buffer', 1), 'issue_dates.open_until') }} >= spine.date_day
+        and {{ dbt_utils.dateadd('month', var('jira_issue_history_buffer', 1), 'issue_dates.open_until') }} >= spine.date_day
         -- if we cut off issues, we're going to have to do a full refresh to catch issues that have been un-resolved
 
     group by 1,2
