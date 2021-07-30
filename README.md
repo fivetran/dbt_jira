@@ -1,3 +1,4 @@
+[![Apache License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0) ![dbt logo and version](https://img.shields.io/static/v1?logo=dbt&label=dbt-version&message=0.20.x&color=orange)
 # Jira ([docs](https://fivetran-dbt-jira.netlify.app/#!/overview))
 
 This package models Jira data from [Fivetran's connector](https://fivetran.com/docs/applications/jira). It uses data in the format described by [this ERD](https://fivetran.com/docs/applications/jira/#schemainformation).
@@ -28,7 +29,7 @@ Check [dbt Hub](https://hub.getdbt.com/) for the latest installation instruction
 # packages.yml
 packages:
   - package: fivetran/jira
-    version: [">=0.3.0", "<0.4.0"]
+    version: [">=0.4.0", "<0.5.0"]
 ```
 
 ## Configuration
@@ -61,10 +62,26 @@ vars:
     issue_field_history_columns: ['the', 'list', 'of', 'field', 'IDs']
 ```
 
-> Note: `sprint` and `status` will always be tracked, as they are necessary for creating common agile reports. 
+> Note: `sprint` and `status` will always be tracked, as they are necessary for creating common agile reports.
 
-### Disabling models
+### Extending an Issue's History Period
+This package will create a row in `jira__daily_issue_field_history` for each day that an issue is open or being updated. For currently open issues, the latest date will be the current date. For closed issues, the latest date will be  when the issue was last resolved or updated in any way, plus a _buffer period_ that is by default equal to 1 month. This buffer exists for two reasons:
+1. The daily issue field history model is materialized incrementally, and if your closed issues are being opened or updated often, this will avoid requiring a full refresh to catch these changes.
+2. You may want to create a longer timeline of issues, regardless of their status, for easier reporting.
 
+If you would like to extend this buffer period to longer than 1 month, add the following configuration to your `dbt_project.yml` file:
+
+```yml
+# dbt_project.yml
+
+...
+config-version: 2
+
+vars:
+  jira_issue_history_buffer: integer_number_of_months # default is an interval of 1 month
+```
+
+### Disabling Models
 It's possible that your Jira connector does not sync every table that this package expects. If your syncs exclude certain tables, it is because you either don't use that functionality in Jira or actively excluded some tables from your syncs. To disable the corresponding functionality in the package, you must add the relevant variables. By default, all variables are assumed to be `true`. Add variables for only the tables you would like to disable:  
 
 ```yml
@@ -99,7 +116,7 @@ and running the package? If so, we highly encourage and welcome contributions to
 Please create issues or open PRs against `master`. Check out [this post](https://discourse.getdbt.com/t/contributing-to-a-dbt-package/657) on the best workflow for contributing to a package.
 
 ## Database Support
-This package has been tested on BigQuery, Snowflake and Redshift.
+This package has been tested on BigQuery, Snowflake, Redshift, and Postgres.
 
 ## Resources:
 - Provide [feedback](https://www.surveymonkey.com/r/DQ7K7WW) on our existing dbt packages or what you'd like to see next
