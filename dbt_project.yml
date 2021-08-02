@@ -1,7 +1,7 @@
 name: 'jira'
-version: '0.3.1'
+version: '0.4.0'
 config-version: 2
-require-dbt-version: [">=0.18.0", "<0.20.0"]
+require-dbt-version: ">=0.20.0"
 
 
 vars:
@@ -23,11 +23,11 @@ vars:
     field: "{{ ref('stg_jira__field') }}"
     sprint: "{{ ref('stg_jira__sprint') }}"
     version: "{{ ref('stg_jira__version') }}"
+
     jira_include_comments: true  # this package aggregates issue comments so that you have a single view of all your comments in the jira__issue_enhanced table. This can cause limit errors if you have a large dataset. Disable to remove this functionality.
     jira_using_sprints: true # disable if you are not using sprints in Jira
+    jira_issue_history_buffer: 1 # in months
 
-  dbt_utils_dispatch_list: [spark_utils, fivetran_utils]
-  fivetran_utils_dispatch_list: [spark_utils]
   
 models:
   jira:

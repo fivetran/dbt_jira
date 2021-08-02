@@ -5,8 +5,10 @@ models:
     description: >
       Each record represents a snapshot of an issue's selected fields (as specified in
       the `issue_history_columns` variable + sprint and status by default) on a given day.
-      Each issue will have a record for every day in which it was open (plus a month afterward,
-      in case issues are reopened -- if they are reopened even later, you'll need to perform a full refresh). 
+      Each issue will have a record for every day in which it was open and/or being updated. 
+      For currently open issues, the latest date will be the current date, and for closed issues,
+      this will be the last time the issue was resolved OR updated in any way (plus a configurable buffer afterward,
+      set to a month by default).
       Note: this is an incremental model.
     columns:
       - name: date_day

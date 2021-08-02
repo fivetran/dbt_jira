@@ -10,7 +10,7 @@ with issue as (
 {%- set issue_data_columns_clean = [] -%}
 
 {%- for k in issue_data_columns -%}
-    {{ issue_data_columns_clean.append(k.name)|default("", True)  }}
+    {{ issue_data_columns_clean.append(k.name|lower)|default("", True)  }}
 {%- endfor -%}
 
 daily_issue_field_history as (
