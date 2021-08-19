@@ -1,3 +1,5 @@
+{{ config(enabled=var('jira_using_versions', True)) }}
+
 with version as (
 
     select *
