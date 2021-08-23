@@ -1,5 +1,5 @@
 [![Apache License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0) ![dbt logo and version](https://img.shields.io/static/v1?logo=dbt&label=dbt-version&message=0.20.x&color=orange)
-# Jira ([docs](https://fivetran-dbt-jira.netlify.app/#!/overview))
+# Jira
 
 This package models Jira data from [Fivetran's connector](https://fivetran.com/docs/applications/jira). It uses data in the format described by [this ERD](https://fivetran.com/docs/applications/jira/#schemainformation).
 
@@ -92,6 +92,7 @@ config-version: 2
 
 vars:
   jira_using_sprints: false # Disable if you do not have the sprint table, or if you do not want sprint related metrics reported
+  jira_using_versions: true # Disable if you do not have the version table, or if you do not want version related metrics reported
   jira_using_components: false # Disable if you do not have the component table, or if you do not want component related metrics reported
   jira_include_comments: false # this package aggregates issue comments so that you have a single view of all your comments in the jira__issue_enhanced table. This can cause limit errors if you have a large dataset. Disable to remove this functionality.
 ```
