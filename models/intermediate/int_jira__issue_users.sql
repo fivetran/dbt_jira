@@ -11,7 +11,7 @@ with issue as (
         coalesce(revised_parent_issue_id, parent_issue_id) as parent_issue_id,
 
         {{ dbt_utils.star(from=ref('int_jira__issue_type_parents'), 
-                            except= except_columns | upper if target.type == 'snowflake' else except_columns) }}
+                            except=except_columns) }}
 
 
     
