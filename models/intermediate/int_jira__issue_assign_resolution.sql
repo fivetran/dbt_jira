@@ -25,7 +25,7 @@ issue_dates as (
         max(case when field_id = 'assignee' then updated_at end) as last_assigned_at,
         min(case when field_id = 'resolutiondate' then updated_at end) as first_resolved_at -- in case it's been re-opened
 
-    from issue_field_history
+    from filtered
     group by 1
 )
 
