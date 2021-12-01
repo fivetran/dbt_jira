@@ -19,7 +19,7 @@ with issue_multiselect_history as (
 
     {% if is_incremental() %}
     -- always refresh the most recent day of data
-    where cast( {{ dbt_utils.dateadd('day', -1, 'updated_at') }} as date) >= (select max(date_day) from {{ this }})
+    where cast(updated_at as date) >= {{ dbt_utils.dateadd('day', -1, '(select max(date_day) from ' ~ this ~ ')') }}
     {% endif %}
 
 ),
