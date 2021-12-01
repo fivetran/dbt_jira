@@ -81,7 +81,7 @@ surrogate_key as (
 
     from issue_spine
 
-    where cast(date_day as {{ dbt_utils.type_timestamp() }} ) <= {{ dbt_utils.date_trunc('day',dbt_utils.current_timestamp_in_utc()) }}
+    where date_day <= cast( {{ dbt_utils.date_trunc('day',dbt_utils.current_timestamp_in_utc()) }} as date)
 )
 
 select * from surrogate_key 
