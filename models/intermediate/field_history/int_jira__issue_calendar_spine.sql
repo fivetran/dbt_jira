@@ -28,7 +28,7 @@ with spine as (
             dbt_utils.date_spine(
                 datepart = "day", 
                 start_date =  "cast('" ~ first_date[0:10] ~ "' as date)", 
-                end_date = dbt_utils.dateadd("week", 1, "current_date")
+                end_date = dbt_utils.dateadd("week", 1, dbt_utils.current_timestamp_in_utc())
             )   
         }} 
     ) as date_spine
@@ -48,7 +48,7 @@ issue_dates as (
 
         -- resolved_at will become null if an issue is marked as un-resolved. if this sorta thing happens often, you may want to run full-refreshes of the field_history models often
         -- if it's not resolved include everything up to today. if it is, look at the last time it was updated 
-        cast({{ dbt_utils.date_trunc('day', 'case when resolved_at is null then ' ~ dbt_utils.current_timestamp() ~ ' else updated_at end') }} as date) as open_until
+        cast({{ dbt_utils.date_trunc('day', 'case when resolved_at is null then ' ~ dbt_utils.current_timestamp_in_utc() ~ ' else updated_at end') }} as date) as open_until
 
     from {{ var('issue') }}
 
@@ -81,7 +81,7 @@ surrogate_key as (
 
     from issue_spine
 
-    where date_day <= current_date
+    where date_day <= cast( {{ dbt_utils.date_trunc('day',dbt_utils.current_timestamp_in_utc()) }} as date)
 )
 
 select * from surrogate_key 
