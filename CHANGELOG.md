@@ -7,5 +7,8 @@
 ## Under the Hood
 - Modified the `int_jira__issue_calendar_spine` model to use the `dbt-utils.current_timestamp_in_utc` to better capture the current datetime across regions. ([#47](https://github.com/fivetran/dbt_jira/pull/47))
 
+## Contributors
+- @thibonacci ([#45](https://github.com/fivetran/dbt_jira/pull/45))
+
 # dbt_jira v0.1.0 -> v0.5.1
 Refer to the relevant release notes on the Github repository for specific details for the previous releases. Thank you!
