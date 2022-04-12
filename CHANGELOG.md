@@ -1,3 +1,7 @@
+# dbt_jira v0.8.0
+## 🚨 Breaking Changes 🚨
+- Previously the `jira__daily_field_history` and `jira__issue_enhanced` models allowed for users to leverage the `issue_field_history_columns` to bring through custom `field_id`s. However, the `field_id` was not very intuitive to report off. Therefore, the package has been updated to bring through the `field_name` values in the variable and persist through to the final models.
+  - Please note, if you leveraged this variable in the past then you will want to update the `filed_id` (customfield_000123) to be the `field_name` (Cool Custom Field) now. Further, a `dbt run --full-refresh` will be required as well.
 # dbt_jira v0.7.0
 🎉 dbt v1.0.0 Compatibility 🎉
 ## 🚨 Breaking Changes 🚨
