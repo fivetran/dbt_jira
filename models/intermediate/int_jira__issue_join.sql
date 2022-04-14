@@ -84,9 +84,9 @@ join_issue as (
         ,status.status_name as current_status
         ,status_category.status_category_name as current_status_category   
         ,resolution.resolution_name as resolution_type
-		{% if var('jira_using_priorities', True) %}
+        {% if var('jira_using_priorities', True) %}
         ,priority.priority_name as current_priority
-		{% endif %}
+	{% endif %}
 
         {% if var('jira_using_sprints', True) %}
         ,issue_sprint.sprint_id
