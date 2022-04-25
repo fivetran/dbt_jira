@@ -88,7 +88,7 @@ set_values as (
         issue_id
 
         {% for col in pivot_data_columns if col.name|lower not in ['issue_id','issue_day_id','valid_starting_on'] %}
-        , coalesce(field_option_{{ loop.index }}.field_option_name, {{ col.name }}) as {{ col.name }}
+        , coalesce(field_option_{{ col.name }}.field_option_name, {{ col.name }}) as {{ col.name }}
         -- create a batch/partition once a new value is provided
         , sum( case when {{ col.name }} is null then 0 else 1 end) over ( partition by issue_id
             order by date_day rows unbounded preceding) as {{ col.name }}_field_partition
@@ -97,8 +97,8 @@ set_values as (
 
     from joined
     {% for col in pivot_data_columns if col.name|lower not in ['issue_id','issue_day_id','valid_starting_on'] %}
-    left join field_option as field_option_{{ loop.index }}
-        on cast(field_option_{{ loop.index }}.field_id as {{ dbt_utils.type_string() }}) = {{ col.name }}
+    left join field_option as field_option_{{ col.name }}
+        on cast(field_option_{{ col.name }}.field_id as {{ dbt_utils.type_string() }}) = {{ col.name }}
     {% endfor %}
 ),
 
