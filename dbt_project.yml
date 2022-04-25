@@ -21,6 +21,7 @@ vars:
     issue_link: "{{ ref('stg_jira__issue_link') }}"
     component: "{{ ref('stg_jira__component') }}"
     field: "{{ ref('stg_jira__field') }}"
+    field_option: "{{ ref('stg_jira__field_option') }}"
     sprint: "{{ ref('stg_jira__sprint') }}"
     version: "{{ ref('stg_jira__version') }}"
 
