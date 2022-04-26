@@ -22,10 +22,8 @@ agg_epics as (
     select 
         project_id,
         {{ fivetran_utils.string_agg( "issue_name", "', '" ) }} as epics
-
     from {{ ref('jira__issue_enhanced') }}
     where lower(issue_type) = 'epic'
-    -- should we limit to active epics?
     group by 1
 
 ),
@@ -38,9 +36,7 @@ agg_components as (
     select 
         project_id,
         {{ fivetran_utils.string_agg( "component_name", "', '" ) }} as components
-
     from {{ var('component') }}
-
     group by 1
 ),
 
@@ -65,10 +61,8 @@ project_join as (
         -- days
         project_metrics.avg_close_time_days,
         project_metrics.avg_assigned_close_time_days,
-
         project_metrics.avg_age_currently_open_days,
         project_metrics.avg_age_currently_open_assigned_days,
-
         project_metrics.median_close_time_days, 
         project_metrics.median_age_currently_open_days,
         project_metrics.median_assigned_close_time_days,
@@ -77,19 +71,20 @@ project_join as (
         -- seconds
         project_metrics.avg_close_time_seconds,
         project_metrics.avg_assigned_close_time_seconds,
-
         project_metrics.avg_age_currently_open_seconds,
         project_metrics.avg_age_currently_open_assigned_seconds,
-
         project_metrics.median_close_time_seconds, 
         project_metrics.median_age_currently_open_seconds,
         project_metrics.median_assigned_close_time_seconds,
         project_metrics.median_age_currently_open_assigned_seconds
 
     from project
-    left join project_metrics on project.project_id = project_metrics.project_id
-    left join jira_user on project.project_lead_user_id = jira_user.user_id
-    left join agg_epics on project.project_id = agg_epics.project_id 
+    left join project_metrics 
+        on project.project_id = project_metrics.project_id
+    left join jira_user 
+        on project.project_lead_user_id = jira_user.user_id
+    left join agg_epics 
+        on project.project_id = agg_epics.project_id 
     
     {% if var('jira_using_components', True) %}
     left join agg_components on project.project_id = agg_components.project_id 
@@ -97,4 +92,5 @@ project_join as (
 
 )
 
-select * from project_join
+select * 
+from project_join

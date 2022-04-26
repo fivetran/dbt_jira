@@ -19,7 +19,6 @@ daily_issue_field_history as (
         *,
         row_number() over (partition by issue_id order by date_day desc) = 1 as latest_record
     from {{ ref('jira__daily_issue_field_history')}}
-
 ),
 
 latest_issue_field_history as (
@@ -33,9 +32,7 @@ latest_issue_field_history as (
 final as (
 
     select 
-    
         issue.*,
-
         {{ dbt_utils.datediff('created_at', "coalesce(resolved_at, " ~ dbt_utils.current_timestamp() ~ ')', 'second') }} open_duration_seconds,
 
         -- this will be null if no one has been assigned
@@ -51,10 +48,8 @@ final as (
         {% endfor %}
 
     from issue
-    
     left join latest_issue_field_history 
         on issue.issue_id = latest_issue_field_history.issue_id
-        
 )
 
 select *

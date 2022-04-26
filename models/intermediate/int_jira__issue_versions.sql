@@ -10,7 +10,6 @@ version_history as (
 
     select *
     from {{ ref('int_jira__issue_multiselect_history') }}
-
     where field_id = 'versions'
         or field_id = 'fixVersions'
 ),
@@ -24,7 +23,6 @@ order_versions as (
             partition by field_id, issue_id
             order by updated_at desc
             ) as row_num
-
     from version_history
 ),
 
@@ -45,10 +43,9 @@ version_info as (
         latest_versions.field_id,
         latest_versions.issue_id,
         {{ fivetran_utils.string_agg('version.version_name', "', '") }} as versions
-
     from latest_versions
-    join version on latest_versions.version_id = version.version_id
-
+    join version 
+        on latest_versions.version_id = version.version_id
     group by 1,2
 ),
 

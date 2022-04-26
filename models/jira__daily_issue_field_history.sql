@@ -19,7 +19,6 @@ with pivoted_daily_history as (
     from {{ ref('int_jira__field_history_scd') }}
 
     {% if is_incremental() %}
-    
     where valid_starting_on >= (select max(date_day) from {{ this }} )
 
 -- If no issue fields have been updated since the last incremental run, the pivoted_daily_history CTE will return no record/rows.
@@ -32,7 +31,6 @@ with pivoted_daily_history as (
         *
     from {{ this }}
     where date_day = (select max(date_day) from {{ this }} )
-
 {% endif %}
 
 ),
@@ -129,7 +127,6 @@ surrogate_key as (
     select
         *,
         {{ dbt_utils.surrogate_key(['date_day','issue_id']) }} as issue_day_id
-
     from fix_null_values
 )
 

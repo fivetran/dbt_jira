@@ -2,14 +2,12 @@ with issue_multiselect_history as (
 
     select *
     from {{ var('issue_multiselect_history') }}
-    
 ), 
 
 fields as (
       
     select *
     from {{ var('field') }}
-
 ), 
 
 joined as (
@@ -19,8 +17,8 @@ joined as (
     fields.field_name
 
   from issue_multiselect_history
-  join fields using (field_id)
-
+  left join fields 
+    on issue_multiselect_history.field_id = fields.field_id
 )
 
 select *

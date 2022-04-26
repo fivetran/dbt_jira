@@ -32,12 +32,10 @@ pivot_out as (
         max(case when lower(field_name) = 'sprint' then field_value end) as sprint -- As sprint is a custom field, we aggregate on the field_name.
 
         {% for col in var('issue_field_history_columns', []) -%}
-        ,
-            max(case when lower(field_id) = '{{ col | lower }}' then field_value end) as {{ col | replace(' ', '_') | lower }}
+            ,max(case when lower(field_id) = '{{ col | lower }}' then field_value end) as {{ col | replace(' ', '_') | lower }}
         {% endfor -%}
 
     from daily_field_history
-
     group by 1,2
 ),
 
@@ -46,8 +44,8 @@ surrogate_key as (
     select 
         *,
         {{ dbt_utils.surrogate_key(['valid_starting_on','issue_id']) }} as issue_day_id
-
     from pivot_out
 )
 
-select * from surrogate_key 
+select * 
+from surrogate_key 
