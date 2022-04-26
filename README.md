@@ -1,26 +1,28 @@
 <p align="center">
-    <a alt="Licensce">
+    <a alt="License"
+        href="https://github.com/fivetran/dbt_jira/blob/main/LICENSE">
         <img src="https://img.shields.io/badge/License-Apache%202.0-blue.svg" /></a>
-    <a alt="Fivetran-State">
-        <img src="https://img.shields.io/badge/Fivetran State-_Beta-orange.svg" /></a>
+    <a alt="Fivetran-Release"
+        href="https://fivetran.com/docs/getting-started/core-concepts#releasephases">
+        <img src="https://img.shields.io/badge/Fivetran Release Phase-_Beta-orange.svg" /></a>
     <a alt="dbt-core">
         <img src="https://img.shields.io/badge/dbt_core-version_>=1.0.0_<2.0.0-orange.svg" /></a>
     <a alt="Maintained?">
         <img src="https://img.shields.io/badge/Maintained%3F-yes-green.svg" /></a>
     <a alt="PRs">
-        <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square" /></a>
+        <img src="https://img.shields.io/badge/Contributions-welcome-blueviolet" /></a>
 </p>
 
 # Jira Modeling dbt Package
 # 📣 What does this dbt package do?
-This package cleans, tests, and preps Jira data from [Fivetran's connector](https://fivetran.com/docs/applications/Jira). It uses data in the format described by [this ERD](https://fivetran.com/docs/applications/jira/#schemainformation).
+This package cleans, tests, and prepares Jira data from [Fivetran's connector](https://fivetran.com/docs/applications/Jira) for analysis. It uses data in the format described by [this ERD](https://fivetran.com/docs/applications/jira/#schemainformation) and builds off the output of our [Jira source package](https://github.com/fivetran/dbt_jira_source).
 
 This package enables you to better understand the workload, performance, and velocity of work done by your team using Jira issues. It achieves this by:
 - Creating a daily issue history table to enable the quick creation of agile reports, such as burndown charts, along any issue field
 - Enriching the core issue table with relevant data regarding its workflow and current state
 - Aggregating bandwidth and issue velocity metrics along projects and users
 
-Refer to the table below for a detailed view of all models materialized by default within this package. Additionally, check out our [Docs site](https://fivetran.github.io/dbt_jira/#!/overview/jira) for more details about these models. 
+Refer to the table below for a detailed view of all models materialized by default within this package. Additionally, check out our [Docs site](https://fivetran.github.io/dbt_jira/#!/overview?g_v=1) for more details about these models. 
 | **model**                | **description**                                                                                                                                |
 | ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------- |
 | [jira__daily_issue_field_history](https://fivetran.github.io/dbt_jira/#!/model/model.jira.jira__daily_issue_field_history)             | Each record represents a day in which an issue remained open, complete with the issue's sprint, its status, and the values of any fields specified by the `issue_field_history_columns` variable. |
@@ -36,7 +38,7 @@ To effectively install this package and leverage the pre-made models, you will f
 ## Step 1: Pre-Requisites
 You will need to ensure you have the following before leveraging the dbt package.
 - **Connector**: Have the Fivetran Jira connector syncing data into your warehouse. 
-- **Database support**: This package has been tested on BigQuery, Snowflake, Redshift, and Postgres. Ensure you are using one of these supported databases.
+- **Database support**: This package has been tested on **BigQuery**, **Snowflake**, **Redshift**, and **Postgres**. Ensure you are using one of these supported databases.
 - **dbt Version**: This dbt package requires you have a functional dbt project that utilizes a dbt version within the respective range `>=1.0.0, <2.0.0`.
 ## Step 2: Installing the Package
 Include the following jira_source package version in your `packages.yml`
@@ -44,7 +46,7 @@ Include the following jira_source package version in your `packages.yml`
 ```yaml
 packages:
   - package: fivetran/jira
-    version: [">=0.5.0", "<0.6.0"]
+    version: [">=0.8.0", "<0.9.0"]
 ```
 ## Step 3: Configure Your Variables
 ### Database and Schema Variables
@@ -90,12 +92,12 @@ This dbt package is dependent on the following dbt packages. For more informatio
 packages:
     - package: fivetran/jira_source
       version: [">=0.5.0", "<0.6.0"]
+
     - package: fivetran/fivetran_utils
       version: [">=0.3.0", "<0.4.0"]
+
     - package: dbt-labs/dbt_utils
       version: [">=0.8.0", "<0.9.0"]
-    - package: dbt-labs/spark_utils
-      version: [">=0.3.0", "<0.4.0"]
 ```
 # 🙌 How is this package maintained and can I contribute?
 ## Package Maintenance
