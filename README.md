@@ -13,16 +13,16 @@
         <img src="https://img.shields.io/badge/Contributions-welcome-blueviolet" /></a>
 </p>
 
-# Jira Modeling dbt Package
+# Jira Modeling dbt Package ([Docs](https://fivetran.github.io/dbt_jira/))
 # 📣 What does this dbt package do?
-This package cleans, tests, and prepares Jira data from [Fivetran's connector](https://fivetran.com/docs/applications/Jira) for analysis. It uses data in the format described by [this ERD](https://fivetran.com/docs/applications/jira/#schemainformation) and builds off the output of our [Jira source package](https://github.com/fivetran/dbt_jira_source).
+- Clean, tests, and prepares your Jira data from [Fivetran's connector](https://fivetran.com/docs/applications/Jira) for analysis.
+- Generates a comprehensive data dictionary of your Jira data via the [dbt docs site](https://fivetran.github.io/dbt_jira/)
+- Produces tables that leverage data in the format described by [this ERD](https://fivetran.com/docs/applications/jira/#schemainformation) and builds off the output of our [Jira source package](https://github.com/fivetran/dbt_jira_source) to enable you to better understand the workload, performance, and velocity of work done by your team using Jira issues. It achieves this by:
+  - Creating a daily issue history table to enable the quick creation of agile reports, such as burndown charts, along any issue field
+  - Enrich the core issue table with relevant data regarding its workflow and current state
+  - Aggregating bandwidth and issue velocity metrics along projects and users
 
-This package enables you to better understand the workload, performance, and velocity of work done by your team using Jira issues. It achieves this by:
-- Creating a daily issue history table to enable the quick creation of agile reports, such as burndown charts, along any issue field
-- Enriching the core issue table with relevant data regarding its workflow and current state
-- Aggregating bandwidth and issue velocity metrics along projects and users
-
-Refer to the table below for a detailed view of all models materialized by default within this package. Additionally, check out our [Docs site](https://fivetran.github.io/dbt_jira/#!/overview?g_v=1) for more details about these models. 
+Refer to the table below for a detailed view of all models materialized by default within this package. Additionally, check out our [docs site](https://fivetran.github.io/dbt_jira/#!/overview?g_v=1) for more details about these models. 
 | **model**                | **description**                                                                                                                                |
 | ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------- |
 | [jira__daily_issue_field_history](https://fivetran.github.io/dbt_jira/#!/model/model.jira.jira__daily_issue_field_history)             | Each record represents a day in which an issue remained open, complete with the issue's sprint, its status, and the values of any fields specified by the `issue_field_history_columns` variable. |
