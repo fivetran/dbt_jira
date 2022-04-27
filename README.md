@@ -15,7 +15,7 @@
 
 # Jira Modeling dbt Package ([Docs](https://fivetran.github.io/dbt_jira/))
 # 📣 What does this dbt package do?
-- Clean, tests, and prepares your Jira data from [Fivetran's connector](https://fivetran.com/docs/applications/Jira) for analysis.
+- Cleans, tests, and prepares your Jira data from [Fivetran's connector](https://fivetran.com/docs/applications/Jira) for analysis.
 - Generates a comprehensive data dictionary of your Jira data via the [dbt docs site](https://fivetran.github.io/dbt_jira/)
 - Produces tables that leverage data in the format described by [this ERD](https://fivetran.com/docs/applications/jira/#schemainformation) and builds off the output of our [Jira source package](https://github.com/fivetran/dbt_jira_source) to enable you to better understand the workload, performance, and velocity of work done by your team using Jira issues. It achieves this by:
   - Creating a daily issue history table to enable the quick creation of agile reports, such as burndown charts, along any issue field
