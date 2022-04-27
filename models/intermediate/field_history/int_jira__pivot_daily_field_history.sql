@@ -33,7 +33,7 @@ pivot_out as (
 
         {% for col in var('issue_field_history_columns', []) -%}
         ,
-            max(case when lower(field_id) = '{{ col | lower }}' then field_value end) as {{ col | replace(' ', '_') | lower }}
+            max(case when lower(field_name) = '{{ col|lower }}' then field_value end) as {{ dbt_utils.slugify(col) | replace(' ', '_') | lower }}
         {% endfor -%}
 
     from daily_field_history
