@@ -15,11 +15,12 @@
 
 # Jira Modeling dbt Package ([Docs](https://fivetran.github.io/dbt_jira/))
 # 📣 What does this dbt package do?
-- Generates a comprehensive data dictionary of your source and modeled Jira data via the [dbt docs site](https://fivetran.github.io/dbt_jira/)
-- Produces tables that leverage data in the format described by [this ERD](https://fivetran.com/docs/applications/jira/#schemainformation) and builds off the output of our [Jira source package](https://github.com/fivetran/dbt_jira_source) to enable you to better understand the workload, performance, and velocity of work done by your team using Jira issues. It achieves this by:
+- Produces modeled tables that leverage Jira data from [Fivetran's connector](https://fivetran.com/docs/applications/jira) in the format described by [this ERD](https://docs.google.com/presentation/d/10lOpfJxsFWWP5OQKcYb-QX9YlQJvOcT4XyIDI_o7Vm0/edit) and builds off the output of our [Jira source package](https://github.com/fivetran/dbt_jira_source).
+- The above mentioned models enable you to better understand the workload, performance, and velocity of work done by your team using Jira issues. It achieves this by:
   - Creating a daily issue history table to enable the quick creation of agile reports, such as burndown charts, along any issue field
   - Enrich the core issue table with relevant data regarding its workflow and current state
   - Aggregating bandwidth and issue velocity metrics along projects and users
+- Generates a comprehensive data dictionary of your source and modeled Jira data via the [dbt docs site](https://fivetran.github.io/dbt_jira/)
 
 Refer to the table below for a detailed view of all models materialized by default within this package. Additionally, check out our [docs site](https://fivetran.github.io/dbt_jira/#!/overview?g_v=1) for more details about these models. 
 | **model**                | **description**                                                                                                                                |
