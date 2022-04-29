@@ -32,7 +32,7 @@ median_metrics as (
         median_assigned_close_time_seconds,
         median_age_currently_open_assigned_seconds
     from calculate_medians
-    group by 1,2,3,4,5
+    {{ dbt_utils.group_by(n=5) }}
 ),
 
 

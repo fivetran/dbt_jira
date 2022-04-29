@@ -16,9 +16,9 @@ issue_type as (
     select *
     from {{ var('issue_type') }}
 ), 
+
 -- issue-epic relationships are either captured via the issue's parent_issue_id (next-gen projects)
 -- or through the 'Epic Link' field (classic projects)
-
 issues_w_epics as (
 
     select * 
@@ -54,6 +54,7 @@ add_parent_info as (
         parent.issue_key as parent_issue_key,
         lower(coalesce(parent.issue_type, '')) = 'epic' as is_parent_epic
     from issue_w_types
+
     -- do a left join so we can grab all issue types from this table in `issue_join`
     left join issue_w_types as parent 
         on issue_w_types.revised_parent_issue_id = parent.issue_id

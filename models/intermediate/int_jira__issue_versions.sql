@@ -18,11 +18,12 @@ order_versions as (
 
     select
         *,
+        
         -- using rank so batches stick together
         rank() over (
             partition by field_id, issue_id
             order by updated_at desc
-            ) as row_num
+        ) as row_num
     from version_history
 ),
 

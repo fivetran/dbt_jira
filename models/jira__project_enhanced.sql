@@ -11,8 +11,9 @@ project_metrics as (
 ),
 
 -- user is reserved in AWS
-jira_user as (
 -- to grab the project lead
+jira_user as (
+
     select *
     from {{ var('user') }}
 ),
@@ -27,19 +28,16 @@ agg_epics as (
     group by 1
 
 ),
-
 {% if var('jira_using_components', True) %}
 
 agg_components as (
-    -- i'm just aggregating the components here, but perhaps pivoting out components (and epics) 
-    -- into columns where the values are the number of issues completed and/or open would be more valuable
+
     select 
         project_id,
         {{ fivetran_utils.string_agg( "component_name", "', '" ) }} as components
     from {{ var('component') }}
     group by 1
 ),
-
 {% endif %}
 
 project_join as (

@@ -14,9 +14,9 @@ with change_data as (
         issue_id,
         issue_day_id
 
+        -- create a batch/partition once a new value is provided
         {% for col in issue_columns if col.name|lower not in ['valid_starting_on','issue_id','issue_day_id'] %} 
         , {{ col.name }}
-        -- create a batch/partition once a new value is provided
         , sum( case when {{ col.name }} is null then 0 else 1 end) over ( partition by issue_id 
             order by valid_starting_on rows unbounded preceding) as {{ col.name }}_field_partition
         {% endfor %}
@@ -32,11 +32,12 @@ with change_data as (
         issue_id,
         issue_day_id
         
-        {% for col in issue_columns if col.name|lower not in ['valid_starting_on','issue_id','issue_day_id'] %} 
         -- grab the value that started this batch/partition
+        {% for col in issue_columns if col.name|lower not in ['valid_starting_on','issue_id','issue_day_id'] %} 
         , first_value( {{ col.name }} ) over (
             partition by issue_id, {{ col.name }}_field_partition 
-            order by valid_starting_on asc rows between unbounded preceding and current row) as {{ col.name }}
+            order by valid_starting_on asc rows between unbounded preceding and current row
+        ) as {{ col.name }}
         {% endfor %}
 
     from set_values

@@ -4,8 +4,9 @@ with issue_field_history as (
     from {{ ref('int_jira__issue_field_history') }}
 ), 
 
+-- we're only looking at assignments and resolutions, which are single-field values
 filtered as (
-    -- we're only looking at assignments and resolutions, which are single-field values
+
     select *
     from issue_field_history
     where (lower(field_id) = 'assignee'

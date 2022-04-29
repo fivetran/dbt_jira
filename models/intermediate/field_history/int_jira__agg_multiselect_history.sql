@@ -11,13 +11,13 @@
 
 -- issue_multiselect_history splits out an array-type field into multiple rows with unique individual values
 -- to combine with issue_field_history we need to aggregate the multiselect field values.
-
 with issue_multiselect_history as (
 
     select *
     from {{ ref('int_jira__issue_multiselect_history') }}
-    {% if is_incremental() %}
+
     -- always refresh the most recent day of data
+    {% if is_incremental() %}
     where cast(updated_at as date) >= {{ dbt_utils.dateadd('day', -1, '(select max(date_day) from ' ~ this ~ ')') }}
     {% endif %}
 ),
@@ -44,8 +44,9 @@ consolidate_batches as (
         -- if the field refers to an object captured in a table elsewhere (ie sprint, users, field_option for custom fields),
         -- the value is actually a foreign key to that table. 
         {{ fivetran_utils.string_agg('batch_updates.field_value', "', '") }} as field_values 
+        
     from batch_updates
-    group by 1,2,3,4,5,6
+    {{ dbt_utils.group_by(n=6) }}
 )
 
 select *

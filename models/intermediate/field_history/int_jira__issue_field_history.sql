@@ -15,7 +15,6 @@ joined as (
   select
     field_history.*,
     fields.field_name
-
   from field_history
   left join fields 
     on fields.field_id = field_history.field_id

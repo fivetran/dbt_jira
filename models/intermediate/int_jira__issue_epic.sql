@@ -13,8 +13,8 @@ order_epic_links as (
         issue_id,
         cast(field_value as {{ dbt_utils.type_int() }} ) as epic_issue_id,
         row_number() over (
-                partition by issue_id order by updated_at desc
-                ) as row_num
+            partition by issue_id order by updated_at desc
+        ) as row_num
     from epic_field_history
 ),
 

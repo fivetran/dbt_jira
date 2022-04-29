@@ -18,18 +18,17 @@ with combined_field_histories as (
     {% endif %}
 ),
 
-
-limit_to_relevant_fields as (
 -- let's remove unncessary rows moving forward and grab field names 
+limit_to_relevant_fields as (
+
     select 
         combined_field_histories.*
     from combined_field_histories
-    where lower(field_name) = 'sprint' -- As sprint is a custom field, we filter by field name only for sprint. All others are on field_id.
-        or lower(field_id) in ('status' 
-            {%- for col in var('issue_field_history_columns', []) -%}
-                , {{ "'" ~ (col|lower) ~ "'" }}
-            {%- endfor -%} )
-    
+    where lower(field_id) = 'status'
+        or lower(field_name) in ('sprint'
+        {%- for col in var('issue_field_history_columns', []) -%}
+        , '{{ (col|lower) }}'
+        {%- endfor -%} )
 ),
 
 order_daily_values as (
@@ -40,7 +39,7 @@ order_daily_values as (
         row_number() over (
             partition by valid_starting_on, issue_id, field_id
             order by valid_starting_at desc
-            ) as row_num
+        ) as row_num
     from limit_to_relevant_fields
 ),
 
@@ -58,8 +57,10 @@ final as (
         field_id,
         issue_id,
         field_name,
+
         -- doing this to figure out what values are actually null and what needs to be backfilled in jira__daily_issue_field_history
         case when field_value is null then 'is_null' else field_value end as field_value,
+
         valid_starting_at,
         valid_ending_at, 
         valid_starting_on,

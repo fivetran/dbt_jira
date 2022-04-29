@@ -8,7 +8,7 @@ with sprint as (
 
 field_history as (
 
-     -- sprints don't appear to be capable of multiselect in the UI...
+    -- sprints don't appear to be capable of multiselect in the UI...
     select *
     from {{ ref('int_jira__issue_multiselect_history') }}
 ),
@@ -30,7 +30,6 @@ last_sprint as (
     select *
     from sprint_field_history
     where row_num = 1
-
 ),
 
 sprint_rollovers as (
