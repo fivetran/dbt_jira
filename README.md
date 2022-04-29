@@ -47,6 +47,7 @@ Include the following jira_source package version in your `packages.yml`
 packages:
   - package: fivetran/jira
     version: [">=0.9.0", "<0.10.0"]
+
 ```
 ## Step 3: Configure Your Variables
 ### Database and Schema Variables
@@ -58,9 +59,9 @@ vars:
     jira_schema: your_schema_name 
     jira__<default_source_table_name>_identifier: your_table_name
 ```
+
 ### Disabling Components
 Your Jira connector might not sync every table that this package expects. If you do not have the `SPRINT`, `COMPONENT`, or `VERSION` tables synced, add the respective variables to your root `dbt_project.yml` file. Additionally, if you wish to remove comment aggregations from your `jira__issue_enhanced` model, then add the `jira_include_comments` variable to your root `dbt_project.yml`:
-
 ```yml
 vars:
     jira_using_sprints: false   # Disable if you do not have the sprint table, or if you do not want sprint related metrics reported
@@ -68,6 +69,15 @@ vars:
     jira_using_versions: false # Disable if you do not have the versions table, or if you do not want versions related metrics reported
     jira_include_comments: false # this package aggregates issue comments so that you have a single view of all your comments in the jira__issue_enhanced table. This can cause limit errors if you have a large dataset. Disable to remove this functionality.
 ```
+### Daily Issue Field History Columns
+The `jira__daily_issue_field_history` model generates historical data for the columns specified by the `issue_field_history_columns` variable. By default, the only columns tracked are `status` and `sprint`, but all fields found in the `field_name` column within the Jira `FIELD` table can be included in this model. The most recent value of any tracked column is also captured in `jira__issue_enhanced`.
+**If you would like to change these columns, add the following configuration to your dbt_project.yml file. Then, after adding the columns to your `dbt_project.yml` file, run the `dbt run --full-refresh` command to fully refresh any existing models.**
+
+```yml
+vars:
+    issue_field_history_columns: ['the', 'list', 'of', 'field', 'names']
+```
+
 ## (Optional) Step 4: Additional Configurations
 ### Change the Build Schema
 By default, this package builds the Jira staging models within a schema titled (<target_schema> + _stg_jira) and your Jira modeling models within a schema titled (<target_schema> + _jira) in your target database. If this is not where you would like your Jira data to be written to, add the following configuration to your root `dbt_project.yml` file:
