@@ -15,39 +15,42 @@
 
 # Jira Modeling dbt Package ([Docs](https://fivetran.github.io/dbt_jira/))
 # 📣 What does this dbt package do?
-- Produces modeled tables that leverage Jira data from [Fivetran's connector](https://fivetran.com/docs/applications/jira) in the format described by [this ERD](https://docs.google.com/presentation/d/10lOpfJxsFWWP5OQKcYb-QX9YlQJvOcT4XyIDI_o7Vm0/edit) and builds off the output of our [Jira source package](https://github.com/fivetran/dbt_jira_source).
-- The above mentioned models enable you to better understand the workload, performance, and velocity of work done by your team using Jira issues. It achieves this by:
-  - Creating a daily issue history table to enable the quick creation of agile reports, such as burndown charts, along any issue field
-  - Enrich the core issue table with relevant data regarding its workflow and current state
-  - Aggregating bandwidth and issue velocity metrics along projects and users
-- Generates a comprehensive data dictionary of your source and modeled Jira data via the [dbt docs site](https://fivetran.github.io/dbt_jira/)
+- Produces modeled tables that leverage Jira data from [Fivetran's connector](https://fivetran.com/docs/applications/jira) in the format described by [this ERD](https://docs.google.com/presentation/d/10lOpfJxsFWWP5OQKcYb-QX9YlQJvOcT4XyIDI_o7Vm0/edit) and build off the output of our [Jira source package](https://github.com/fivetran/dbt_jira_source).
+- Enables you to better understand the workload, performance, and velocity of your team's work using Jira issues. It performs the following actions:
+  - Creates a daily issue history table so you can quickly create agile reports, such as burndown charts, along any issue field.
+  - Enriches the core issue table with relevant data regarding its workflow and current state.
+  - Aggregates bandwidth and issue velocity metrics along projects and users.
+- Generates a comprehensive data dictionary of your source and modeled Jira data through the [dbt docs site](https://fivetran.github.io/dbt_jira/).
 
-Refer to the table below for a detailed view of all models materialized by default within this package. Additionally, check out our [docs site](https://fivetran.github.io/dbt_jira/#!/overview?g_v=1) for more details about these models. 
-| **model**                | **description**                                                                                                                                |
+The following table provides a detailed list of all models materialized within this package by default. 
+> TIP: See more details about these models in the package's [dbt docs site](https://fivetran.github.io/dbt_jira/#!/overview?g_v=1).
+
+| **Model**                | **Description**                                                                                                                                |
 | ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------- |
-| [jira__daily_issue_field_history](https://fivetran.github.io/dbt_jira/#!/model/model.jira.jira__daily_issue_field_history)             | Each record represents a day in which an issue remained open, complete with the issue's sprint, its status, and the values of any fields specified by the `issue_field_history_columns` variable. |
-| [jira__issue_enhanced](https://fivetran.github.io/dbt_jira/#!/model/model.jira.jira__issue_enhanced)            | Each record represents a Jira issue, enriched with data about its current assignee, reporter, sprint, epic, project, resolution, issue type, priority, and status. Also includes metrics reflecting assignments, sprint rollovers, and re-openings of the issue. Note: all epics are considered `issues` in Jira, and are therefore included in this model (where `issue_type='epic'`). |
-| [jira__project_enhanced](https://fivetran.github.io/dbt_jira/#!/model/model.jira.jira__project_enhanced)            | Each record represents a project, enriched with data about the users involved, how many issues have been opened or closed, the velocity of work, and the breadth of the project (ie its components and epics). |
+| [jira__daily_issue_field_history](https://fivetran.github.io/dbt_jira/#!/model/model.jira.jira__daily_issue_field_history)             | Each record represents a day in which an issue remained open, enriched with data about the issue's sprint, its status, and the values of any fields specified by the `issue_field_history_columns` variable. |
+| [jira__issue_enhanced](https://fivetran.github.io/dbt_jira/#!/model/model.jira.jira__issue_enhanced)            | Each record represents a Jira issue, enriched with data about its current assignee, reporter, sprint, epic, project, resolution, issue type, priority, and status. It also includes metrics reflecting assignments, sprint rollovers, and re-openings of the issue. Note that all epics are considered `issues` in Jira and are therefore included in this model (where `issue_type='epic'`). |
+| [jira__project_enhanced](https://fivetran.github.io/dbt_jira/#!/model/model.jira.jira__project_enhanced)            | Each record represents a project, enriched with data about the users involved, how many issues have been opened or closed, the velocity of work, and the breadth of the project (i.e., its components and epics). |
 | [jira__user_enhanced](https://fivetran.github.io/dbt_jira/#!/model/model.jira.jira__user_enhanced)            | Each record represents a user, enriched with metrics regarding their open issues, completed issues, the projects they work on, and the velocity of their work. |
 
 # 🎯 How do I use the dbt package?
-To effectively install this package and leverage the pre-made models, you will follow the below steps:
-## Step 1: Pre-Requisites
-You will need to ensure you have the following before leveraging the dbt package.
-- **Connector**: Have the Fivetran Jira connector syncing data into your warehouse. 
-- **Database support**: This package has been tested on **BigQuery**, **Snowflake**, **Redshift**, and **Postgres**. Ensure you are using one of these supported databases.
 
-## Step 2: Installing the Package
-Include the following jira_source package version in your `packages.yml`
-> Check [dbt Hub](https://hub.getdbt.com/) for the latest installation instructions, or [read the dbt docs](https://docs.getdbt.com/docs/package-management) for more information on installing packages.
+## Step 1: Prerequisites
+To use this dbt package, you must have the following:
+
+- At least one Fivetran Jira connector syncing data into your destination.
+- A **BigQuery**, **Snowflake**, **Redshift**, or **PostgreSQL** destination.
+
+## Step 2: Install the package
+Include the following jira_source package version in your `packages.yml`:
+> TIP: Check [dbt Hub](https://hub.getdbt.com/) for the latest installation instructions or [read the dbt docs](https://docs.getdbt.com/docs/package-management) for more information on installing packages.
 ```yaml
 packages:
   - package: fivetran/jira
     version: [">=0.9.0", "<0.10.0"]
 
 ```
-## Step 3: Define Database and Schema Variables
-By default, this package will run using your target database and the `jira` schema. If this is not where your Jira data is (perhaps your Jira schema is `jira_fivetran`), add the following configuration to your root `dbt_project.yml` file:
+## Step 3: Define database and schema variables
+By default, this package runs using your destination and the `jira` schema. If this is not where your Jira data is (for example, if your Jira schema is named `jira_fivetran`), add the following configuration to your root `dbt_project.yml` file:
 
 ```yml
 vars:
@@ -55,8 +58,8 @@ vars:
     jira_schema: your_schema_name 
 ```
 
-## Step 4: Disable Models for Non Existent Sources
-Your Jira connector might not sync every table that this package expects. If you do not have the `SPRINT`, `COMPONENT`, or `VERSION` tables synced, add the respective variables to your root `dbt_project.yml` file. Additionally, if you wish to remove comment aggregations from your `jira__issue_enhanced` model, then add the `jira_include_comments` variable to your root `dbt_project.yml`:
+## Step 4: Disable models for non-existent sources
+Your Jira connector may not sync every table that this package expects. If you do not have the `SPRINT`, `COMPONENT`, or `VERSION` tables synced, add the respective variables to your root `dbt_project.yml` file. Additionally, if you want to remove comment aggregations from your `jira__issue_enhanced` model,  add the `jira_include_comments` variable to your root `dbt_project.yml`:
 ```yml
 vars:
     jira_using_sprints: false   # Disable if you do not have the sprint table, or if you do not want sprint related metrics reported
@@ -64,19 +67,20 @@ vars:
     jira_using_versions: false # Disable if you do not have the versions table, or if you do not want versions related metrics reported
     jira_include_comments: false # this package aggregates issue comments so that you have a single view of all your comments in the jira__issue_enhanced table. This can cause limit errors if you have a large dataset. Disable to remove this functionality.
 ```
-## Step 5: Define Daily Issue Field History Columns
-The `jira__daily_issue_field_history` model generates historical data for the columns specified by the `issue_field_history_columns` variable. By default, the only columns tracked are `status` and `sprint`, but all fields found in the `field_name` column within the Jira `FIELD` table can be included in this model. The most recent value of any tracked column is also captured in `jira__issue_enhanced`.
-**If you would like to change these columns, add the following configuration to your dbt_project.yml file. Then, after adding the columns to your `dbt_project.yml` file, run the `dbt run --full-refresh` command to fully refresh any existing models.**
+## Step 5: Define daily issue field history columns
+The `jira__daily_issue_field_history` model generates historical data for the columns specified by the `issue_field_history_columns` variable. By default, the only columns tracked are `status` and `sprint`, but all fields found in the Jira `FIELD` table's `field_name` column can be included in this model. The most recent value of any tracked column is also captured in `jira__issue_enhanced`.
+
+If you would like to change these columns, add the following configuration to your `dbt_project.yml` file. After adding the columns to your `dbt_project.yml` file, run the `dbt run --full-refresh` command to fully refresh any existing models:
 
 ```yml
 vars:
     issue_field_history_columns: ['the', 'list', 'of', 'field', 'names']
 ```
-## (Optional) Step 6: Additional Configurations
+## (Optional) Step 6: Additional configurations
 <details><summary>Expand for configurations</summary>
     
-### Change the Build Schema
-By default, this package builds the Jira staging models within a schema titled (<target_schema> + _stg_jira) and your Jira modeling models within a schema titled (<target_schema> + _jira) in your target database. If this is not where you would like your Jira data to be written to, add the following configuration to your root `dbt_project.yml` file:
+### Change the build schema
+By default, this package builds the Jira staging models within a schema titled (`<target_schema>` + `_stg_jira`) and your Jira modeling models within a schema titled (`<target_schema>` + `_jira`) in your destination. If this is not where you would like your Jira data to be written to, add the following configuration to your root `dbt_project.yml` file:
 
 ```yml
 models:
@@ -86,8 +90,11 @@ models:
       +schema: my_new_schema_name # leave blank for just the target_schema
 ```
     
-### Change the Source Table References
-If an individual source table has a different name than expected (see this projects [dbt_project.yml](https://github.com/fivetran/dbt_jira_source/blob/main/dbt_project.yml) variable declarations for expected names), provide the name of the table as it appears in your warehouse to the respecitve variable as identified below:
+### Change the source table references
+If an individual source table has a different name than the package expects, add the table name as it appears in your destination to the respective variable:
+
+> IMPORTANT: See this project's [`dbt_project.yml`](https://github.com/fivetran/dbt_jira/blob/main/dbt_project.yml) variable declarations to see the expected names.
+
 ```yml
 vars:
     jira_<default_source_table_name>_identifier: your_table_name 
@@ -98,12 +105,13 @@ vars:
 <details><summary>Expand for details</summary>
 <br>
     
-Fivetran offers the ability for you to orchestrate your dbt project through [Fivetran Transformations for dbt Core™](https://fivetran.com/docs/transformations/dbt). Refer to the linked docs for more information on how to setup your project for orchestration through Fivetran. 
+Fivetran offers the ability for you to orchestrate your dbt project through [Fivetran Transformations for dbt Core™](https://fivetran.com/docs/transformations/dbt). Learn how to set up your project for orchestration through Fivetran in our [Transformations for dbt Core setup guides](https://fivetran.com/docs/transformations/dbt#setupguide).
 </details>
 
 # 🔍 Does this package have dependencies?
-This dbt package is dependent on the following dbt packages. For more information on the below packages, refer to the [dbt hub](https://hub.getdbt.com/) site.
-> **If you have any of these dependent packages in your own `packages.yml` I highly recommend you remove them to ensure there are no package version conflicts.**
+This dbt package is dependent on the following dbt packages. For more information on the following packages, refer to the [dbt hub](https://hub.getdbt.com/) site.
+> IMPORTANT: If you have any of these dependent packages in your own `packages.yml`, we highly recommend that you remove them to avoid package version conflicts.
+    
 ```yml
 packages:
     - package: fivetran/jira_source
@@ -117,14 +125,14 @@ packages:
 ```
 # 🙌 How is this package maintained and can I contribute?
 ## Package Maintenance
-The Fivetran team maintaining this package **only** maintains the latest version of the package. We highly recommend you stay consistent with the [latest version](https://hub.getdbt.com/fivetran/jira/latest/) of the package and refer to the [CHANGELOG](https://github.com/fivetran/dbt_jira/blob/main/CHANGELOG.md) and release notes for more information on changes across versions.
+The Fivetran team maintaining this package _only_ maintains the latest version of the package. We highly recommend you stay consistent with the [latest version](https://hub.getdbt.com/fivetran/jira/latest/) of the package and refer to the [CHANGELOG](https://github.com/fivetran/dbt_jira/blob/main/CHANGELOG.md) and release notes for more information on changes across versions.
 
 ## Contributions
-These dbt packages are developed by a small team of analytics engineers at Fivetran. However, the packages are made better by community contributions! 
+A small team of analytics engineers at Fivetran develops these dbt packages. However, the packages are made better by community contributions! 
 
 We highly encourage and welcome contributions to this package. Check out [this post](https://discourse.getdbt.com/t/contributing-to-a-dbt-package/657) on the best workflow for contributing to a package!
 
 # 🏪 Are there any resources available?
-- If you encounter any questions or want to reach out for help, please refer to the [GitHub Issue](https://github.com/fivetran/dbt_jira/issues/new/choose) section to find the right avenue of support for you.
-- If you would like to provide feedback to the dbt package team at Fivetran, or would like to request a future dbt package to be developed, then feel free to fill out our [Feedback Form](https://www.surveymonkey.com/r/DQ7K7WW).
-- Have questions or want to just say hi? Book a time during our office hours [here](https://calendly.com/fivetran-solutions-team/fivetran-solutions-team-office-hours) or send us an email at solutions@fivetran.com.
+- If you have questions or want to reach out for help, please refer to the [GitHub Issue](https://github.com/fivetran/dbt_jira/issues/new/choose) section to find the right avenue of support for you.
+- If you would like to provide feedback to the dbt package team at Fivetran or would like to request a new dbt package, fill out our [Feedback Form](https://www.surveymonkey.com/r/DQ7K7WW).
+- Have questions or want to just say hi? Book a time during our office hours [on Calendly](https://calendly.com/fivetran-solutions-team/fivetran-solutions-team-office-hours) or email us at solutions@fivetran.com.
