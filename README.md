@@ -54,7 +54,7 @@ By default, this package runs using your destination and the `jira` schema. If t
 
 ```yml
 vars:
-    jira_database: your_database_name
+    jira_database: your_destination_name
     jira_schema: your_schema_name 
 ```
 
@@ -62,10 +62,10 @@ vars:
 Your Jira connector may not sync every table that this package expects. If you do not have the `SPRINT`, `COMPONENT`, or `VERSION` tables synced, add the respective variables to your root `dbt_project.yml` file. Additionally, if you want to remove comment aggregations from your `jira__issue_enhanced` model,  add the `jira_include_comments` variable to your root `dbt_project.yml`:
 ```yml
 vars:
-    jira_using_sprints: false   # Disable if you do not have the sprint table, or if you do not want sprint related metrics reported
-    jira_using_components: false # Disable if you do not have the component table, or if you do not want component related metrics reported
-    jira_using_versions: false # Disable if you do not have the versions table, or if you do not want versions related metrics reported
-    jira_include_comments: false # this package aggregates issue comments so that you have a single view of all your comments in the jira__issue_enhanced table. This can cause limit errors if you have a large dataset. Disable to remove this functionality.
+    jira_using_sprints: false   # Disable if you do not have the sprint table or do not want sprint-related metrics reported
+    jira_using_components: false # Disable if you do not have the component table or do not want component-related metrics reported
+    jira_using_versions: false # Disable if you do not have the versions table or do not want versions-related metrics reported
+    jira_include_comments: false # This package aggregates issue comments so that you have a single view of all your comments in the jira__issue_enhanced table. This can cause limit errors if you have a large dataset. Disable to remove this functionality.
 ```
 ## Step 5: Define daily issue field history columns
 The `jira__daily_issue_field_history` model generates historical data for the columns specified by the `issue_field_history_columns` variable. By default, the only columns tracked are `status` and `sprint`, but all fields found in the Jira `FIELD` table's `field_name` column can be included in this model. The most recent value of any tracked column is also captured in `jira__issue_enhanced`.
@@ -130,7 +130,7 @@ The Fivetran team maintaining this package _only_ maintains the latest version o
 ## Contributions
 A small team of analytics engineers at Fivetran develops these dbt packages. However, the packages are made better by community contributions! 
 
-We highly encourage and welcome contributions to this package. Check out [this post](https://discourse.getdbt.com/t/contributing-to-a-dbt-package/657) on the best workflow for contributing to a package!
+We highly encourage and welcome contributions to this package. Check out [this dbt Discourse article](https://discourse.getdbt.com/t/contributing-to-a-dbt-package/657) on the best workflow for contributing to a package!
 
 # 🏪 Are there any resources available?
 - If you have questions or want to reach out for help, please refer to the [GitHub Issue](https://github.com/fivetran/dbt_jira/issues/new/choose) section to find the right avenue of support for you.
