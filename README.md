@@ -13,9 +13,9 @@
         <img src="https://img.shields.io/badge/Contributions-welcome-blueviolet" /></a>
 </p>
 
-# Jira Modeling dbt Package ([Docs](https://fivetran.github.io/dbt_jira/))
+# Jira Transformation dbt Package ([Docs](https://fivetran.github.io/dbt_jira/))
 # 📣 What does this dbt package do?
-- Produces modeled tables that leverage Jira data from [Fivetran's connector](https://fivetran.com/docs/applications/jira) in the format described by [this ERD](https://docs.google.com/presentation/d/10lOpfJxsFWWP5OQKcYb-QX9YlQJvOcT4XyIDI_o7Vm0/edit) and build off the output of our [Jira source package](https://github.com/fivetran/dbt_jira_source).
+- Produces modeled tables that leverage Jira data from [Fivetran's connector](https://fivetran.com/docs/applications/jira) in the format described by [this ERD](https://fivetran.com/docs/applications/jira#schemainformation) and build off the output of our [Jira source package](https://github.com/fivetran/dbt_jira_source).
 - Enables you to better understand the workload, performance, and velocity of your team's work using Jira issues. It performs the following actions:
   - Creates a daily issue history table so you can quickly create agile reports, such as burndown charts, along any issue field.
   - Enriches the core issue table with relevant data regarding its workflow and current state.
