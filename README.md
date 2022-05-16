@@ -23,7 +23,7 @@
 - Generates a comprehensive data dictionary of your source and modeled Jira data through the [dbt docs site](https://fivetran.github.io/dbt_jira/).
 
 The following table provides a detailed list of all models materialized within this package by default. 
-> TIP: See more details about these models in the package's [dbt docs site](https://fivetran.github.io/dbt_jira/#!/overview?g_v=1).
+> TIP: See more details about these models in the package's [dbt docs site](https://fivetran.github.io/dbt_jira/#!/overview?g_v=1&g_e=seeds).
 
 | **Model**                | **Description**                                                                                                                                |
 | ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------- |
