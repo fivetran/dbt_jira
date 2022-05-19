@@ -1,3 +1,7 @@
+# dbt_jira v0.9.0
+## 🎉 Documentation and Feature Updates
+- Updated README documentation updates for easier navigation and setup of the dbt package
+- Added `jira_[source_table_name]_identifier` variables to allow for easier flexibility of the package to refer to source tables with different names.
 # dbt_jira v0.8.0
 ## 🚨 Breaking Changes 🚨
 - Previously the `jira__daily_field_history` and `jira__issue_enhanced` models allowed for users to leverage the `issue_field_history_columns` to bring through custom `field_id`s. However, the `field_id` was not very intuitive to report off. Therefore, the package has been updated to bring through the `field_name` values in the variable and persist through to the final models. ([#54](https://github.com/fivetran/dbt_jira/pull/54))
