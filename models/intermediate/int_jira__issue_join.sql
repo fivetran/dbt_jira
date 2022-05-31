@@ -35,11 +35,13 @@ resolution as (
     from {{ var('resolution') }}
 ),
 
+{% if var('jira_using_priorities', True) %}
 priority as (
 
     select * 
     from {{ var('priority') }}
 ),
+{% endif %}
 
 {% if var('jira_using_sprints', True) %}
 issue_sprint as (
@@ -82,7 +84,9 @@ join_issue as (
         ,status.status_name as current_status
         ,status_category.status_category_name as current_status_category   
         ,resolution.resolution_name as resolution_type
+        {% if var('jira_using_priorities', True) %}
         ,priority.priority_name as current_priority
+	{% endif %}
 
         {% if var('jira_using_sprints', True) %}
         ,issue_sprint.sprint_id
@@ -115,7 +119,9 @@ join_issue as (
     left join status on status.status_id = issue.status_id
     left join status_category on status.status_category_id = status_category.status_category_id
     left join resolution on resolution.resolution_id = issue.resolution_id
+	{% if var('jira_using_priorities', True) %}
     left join priority on priority.priority_id = issue.priority_id
+	{% endif %}
     left join issue_assignments_and_resolutions on issue_assignments_and_resolutions.issue_id = issue.issue_id
 
     {% if var('jira_using_versions', True) %}
