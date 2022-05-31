@@ -1,6 +1,6 @@
 # dbt_jira v0.8.1
 ## Features
-- Makes priority data optional. Allows new env var `jira_using_priorities`. Models `jira__issue_enhanced` and `int_jira__issue_join` won't require source `jira.priority` or contain priority-related columns if `jira_using_priorities: false`.
+- Makes priority data optional. Allows new env var `jira_using_priorities`. Models `jira__issue_enhanced` and `int_jira__issue_join` won't require source `jira.priority` or contain priority-related columns if `jira_using_priorities: false`. ([#55](https://github.com/fivetran/dbt_jira/pull/55))
 
 ## Contributors
 - @everettttt ([#55](https://github.com/fivetran/dbt_jira/pull/55))

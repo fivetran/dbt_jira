@@ -92,8 +92,9 @@ config-version: 2
 
 vars:
   jira_using_sprints: false # Disable if you do not have the sprint table, or if you do not want sprint related metrics reported
-  jira_using_versions: true # Disable if you do not have the version table, or if you do not want version related metrics reported
+  jira_using_versions: false # Disable if you do not have the version table, or if you do not want version related metrics reported
   jira_using_components: false # Disable if you do not have the component table, or if you do not want component related metrics reported
+  jira_using_priorities: false # disable if you are not using priorities in Jira
   jira_include_comments: false # this package aggregates issue comments so that you have a single view of all your comments in the jira__issue_enhanced table. This can cause limit errors if you have a large dataset. Disable to remove this functionality.
 ```
 
@@ -123,7 +124,7 @@ This package has been tested on BigQuery, Snowflake, Redshift, and Postgres.
 - Provide [feedback](https://www.surveymonkey.com/r/DQ7K7WW) on our existing dbt packages or what you'd like to see next
 - Have questions or feedback, or need help? Book a time during our office hours [here](https://calendly.com/fivetran-solutions-team/fivetran-solutions-team-office-hours) or shoot us an email at solutions@fivetran.com
 - Find all of Fivetran's pre-built dbt packages in our [dbt hub](https://hub.getdbt.com/fivetran/)
-- Learn how to orchestrate dbt transformations with Fivetran [here](https://fivetran.com/docs/transformations/dbt)
+- Learn how to orchestrate your models with [Fivetran Transformations for dbt Core™](https://fivetran.com/docs/transformations/dbt)
 - Learn more about Fivetran overall [in our docs](https://fivetran.com/docs)
 - Check out [Fivetran's blog](https://fivetran.com/blog)
 - Learn more about dbt [in the dbt docs](https://docs.getdbt.com/docs/introduction)
