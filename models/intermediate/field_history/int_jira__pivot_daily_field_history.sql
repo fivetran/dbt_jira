@@ -32,9 +32,22 @@ pivot_out as (
         max(case when lower(field_name) = 'sprint' then field_value end) as sprint -- As sprint is a custom field, we aggregate on the field_name.
 
         {% for col in var('issue_field_history_columns', []) -%}
-        ,
-            max(case when lower(field_name) = '{{ col|lower }}' then field_value end) as {{ dbt_utils.slugify(col) | replace(' ', '_') | lower }}
+        , max(case when lower(field_name) = '{{ col|lower }}' then field_value end) as {{ dbt_utils.slugify(col) | replace(' ', '_') | lower }}
         {% endfor -%}
+
+        {% if var('issue_field_history_columns_ids', []) != [] %}
+        {% for col in var('issue_field_history_columns_ids', []) -%}
+
+        --Map the corresponding field id that is used in the variable to the field name from the staging model
+        {% set name_mapping = dbt_utils.get_column_values(
+            table=ref('stg_jira__field'),
+            column='field_name',
+            where="field_id = '" ~ col ~ "'")
+        %}
+
+        , max(case when lower(field_id) = '{{ col|lower }}' then field_value end) as {{ dbt_utils.slugify(name_mapping[0]) | replace(' ', '_') | lower }}
+        {% endfor -%}
+        {%endif %}
 
     from daily_field_history
 

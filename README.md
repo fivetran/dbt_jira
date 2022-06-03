@@ -49,6 +49,8 @@ vars:
 ### Daily Issue Field History Columns
 The `jira__daily_issue_field_history` model generates historical data for the columns specified by the `issue_field_history_columns` variable. By default, the only columns tracked are `status` and `sprint`, but all fields found in the `field_name` column within the Jira `FIELD` table can be included in this model. The most recent value of any tracked column is also captured in `jira__issue_enhanced`.
 
+Additionally, if you are concerned about the mutable nature of the `field_name` being used for the custom fields. This package includes another variable `issue_field_history_columns_ids` that can be used to include the `field_id` value of your custom fields. A positive of this is that the materialized models will leverage the `field_name` for the column name. Please note if your field names are constantly changing then new columns will appear in your end model.
+
 **If you would like to change these columns, add the following configuration to your dbt_project.yml file. Then, after adding the columns to your `dbt_project.yml` file, run the `dbt run --full-refresh` command to fully refresh any existing models.**
 
 ```yml
@@ -60,6 +62,7 @@ config-version: 2
 vars:
   jira:
     issue_field_history_columns: ['the', 'list', 'of', 'field', 'names']
+    issue_field_history_columns_ids: ['this_id', 'that_id', 'ids_id']
 ```
 
 > Note: `sprint` and `status` will always be tracked, as they are necessary for creating common agile reports.

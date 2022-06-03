@@ -28,7 +28,12 @@ limit_to_relevant_fields as (
 
     from combined_field_histories
 
-    where lower(field_id) = 'status' -- As sprint is a custom field, we filter by field name only for sprint. All others are on field_id.
+    -- As sprint is a custom field, we filter by field name only for sprint. All others are on field_id.
+    where lower(field_id) in ('status' 
+            {%- for col in var('issue_field_history_columns_ids', []) -%}
+                ,'{{ (col|lower) }}'
+            {%- endfor -%} )
+
         or lower(field_name) in ('status'
             {%- for col in var('issue_field_history_columns', []) -%}
                 ,'{{ (col|lower) }}'
