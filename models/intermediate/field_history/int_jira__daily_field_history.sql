@@ -28,9 +28,8 @@ limit_to_relevant_fields as (
 
     from combined_field_histories
 
-    where lower(field_name) in 
-            ('status'
-            ,'sprint'
+    where lower(field_id) = 'status' 
+            or lower(field_name) in ('sprint'
             {%- for col in var('issue_field_history_columns', []) -%}
                 ,'{{ (col|lower) }}'
             {%- endfor -%} )
