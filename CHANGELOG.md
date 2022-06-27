@@ -1,9 +1,10 @@
 # dbt_jira v0.8.2
 ## Bug Fixes
-- Corrected bug introduced in 8.0 that would prevent `sprint` data from being passed to model `jira__daily_issue_field_history`
+- Corrected bug introduced in 0.8.0 that would prevent `sprint` data from being passed to model `jira__daily_issue_field_history`. ([#62](https://github.com/fivetran/dbt_jira/pull/62))
+
 
 ## Contributors
-- @troyschuetrumpf-elation
+- [@troyschuetrumpf-elation](https://github.com/troyschuetrumpf-elation) ([#62](https://github.com/fivetran/dbt_jira/pull/62))
 
 # dbt_jira v0.8.1
 ## Features
