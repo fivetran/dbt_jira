@@ -1,3 +1,11 @@
+# dbt_jira v0.8.2
+## Bug Fixes
+- Corrected bug introduced in 0.8.0 that would prevent `sprint` data from being passed to model `jira__daily_issue_field_history`. ([#62](https://github.com/fivetran/dbt_jira/pull/62))
+
+
+## Contributors
+- [@troyschuetrumpf-elation](https://github.com/troyschuetrumpf-elation) ([#62](https://github.com/fivetran/dbt_jira/pull/62))
+
 # dbt_jira v0.8.1
 ## Features
 - Makes priority data optional. Allows new env var `jira_using_priorities`. Models `jira__issue_enhanced` and `int_jira__issue_join` won't require source `jira.priority` or contain priority-related columns if `jira_using_priorities: false`. ([#55](https://github.com/fivetran/dbt_jira/pull/55))
