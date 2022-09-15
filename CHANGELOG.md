@@ -1,3 +1,7 @@
+# dbt_jira v0.9.0
+## Bug Fixes
+- Corrected bug introduced in 0.8.0 that would prevent the correct `status` data from being passed to model `jira__daily_issue_field_history`.
+  - Please note, a `dbt run --full-refresh` will be required after upgrading to this version in order to capture the updates.
 # dbt_jira v0.8.2
 ## Bug Fixes
 - Corrected bug introduced in 0.8.0 that would prevent `sprint` data from being passed to model `jira__daily_issue_field_history`. ([#62](https://github.com/fivetran/dbt_jira/pull/62))

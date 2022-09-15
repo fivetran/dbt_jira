@@ -41,6 +41,12 @@ with pivoted_daily_history as (
     from {{ var('field_option') }}
 ),
 
+statuses as (
+    
+    select *
+    from {{ var('status') }}
+),
+
 -- in intermediate/field_history/
 calendar as (
 
@@ -85,9 +91,10 @@ set_values as (
 
     select
         date_day,
-        issue_id
+        issue_id,
+        statuses.status_name as status
 
-        {% for col in pivot_data_columns if col.name|lower not in ['issue_id','issue_day_id','valid_starting_on'] %}
+        {% for col in pivot_data_columns if col.name|lower not in ['issue_id','issue_day_id','valid_starting_on','status'] %}
         , coalesce(field_option_{{ col.name }}.field_option_name, {{ col.name }}) as {{ col.name }}
         -- create a batch/partition once a new value is provided
         , sum( case when {{ col.name }} is null then 0 else 1 end) over ( partition by issue_id
@@ -96,7 +103,11 @@ set_values as (
         {% endfor %}
 
     from joined
-    {% for col in pivot_data_columns if col.name|lower not in ['issue_id','issue_day_id','valid_starting_on'] %}
+
+    left join statuses
+        on cast(statuses.status_id as {{ dbt_utils.type_string() }}) = joined.status
+
+    {% for col in pivot_data_columns if col.name|lower not in ['issue_id','issue_day_id','valid_starting_on','status'] %}
     left join field_option as field_option_{{ col.name }}
         on cast(field_option_{{ col.name }}.field_id as {{ dbt_utils.type_string() }}) = {{ col.name }}
     {% endfor %}
@@ -106,9 +117,10 @@ fill_values as (
 
     select  
         date_day,
-        issue_id
+        issue_id,
+        status
 
-        {% for col in pivot_data_columns if col.name|lower not in ['issue_id','issue_day_id','valid_starting_on'] %}
+        {% for col in pivot_data_columns if col.name|lower not in ['issue_id','issue_day_id','valid_starting_on','status'] %}
         -- grab the value that started this batch/partition
         , first_value( {{ col.name }} ) over (
             partition by issue_id, {{ col.name }}_field_partition 
