@@ -1,5 +1,7 @@
 # dbt_jira v0.9.0
 PR [#63](https://github.com/fivetran/dbt_jira/pull/63) incorporates the following updates:
+## 🚨 Breaking Changes 🚨
+- The default schema for the source tables are now built within a schema titled (`<target_schema>` + `_jira_source`) in your destination. The previous default schema was (`<target_schema>` + `_stg_jira`) for source. This may be overwritten if desired.
 ## 🎉 Documentation and Feature Updates
 - Updated README documentation updates for easier navigation and setup of the dbt package
 - Added `jira_[source_table_name]_identifier` variables to allow for easier flexibility of the package to refer to source tables with different names.

@@ -79,7 +79,7 @@ vars:
 ```
     
 ### Change the build schema
-By default, this package builds the Jira staging models within a schema titled (`<target_schema>` + `_source_jira`) and your Jira modeling models within a schema titled (`<target_schema>` + `_jira`) in your destination. If this is not where you would like your Jira data to be written to, add the following configuration to your root `dbt_project.yml` file:
+By default, this package builds the Jira staging models within a schema titled (`<target_schema>` + `_jira_source`) and your Jira modeling models within a schema titled (`<target_schema>` + `_jira`) in your destination. If this is not where you would like your Jira data to be written to, add the following configuration to your root `dbt_project.yml` file:
 
 ```yml
 models:
