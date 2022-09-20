@@ -1,4 +1,8 @@
 # dbt_jira v0.9.0
+PR [#63](https://github.com/fivetran/dbt_jira/pull/63) incorporates the following updates:
+## 🎉 Documentation and Feature Updates
+- Updated README documentation updates for easier navigation and setup of the dbt package
+- Added `jira_[source_table_name]_identifier` variables to allow for easier flexibility of the package to refer to source tables with different names.
 ## Bug Fixes
 - Corrected bug introduced in 0.8.0 that would prevent the correct `status` data from being passed to model `jira__daily_issue_field_history`.
   - Please note, a `dbt run --full-refresh` will be required after upgrading to this version in order to capture the updates.
