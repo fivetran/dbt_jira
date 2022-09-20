@@ -1,3 +1,8 @@
+# dbt_jira v0.9.0
+## 🚨 Breaking Changes 🚨
+- Flipped column aliases `sum_close_time_seconds` and `sum_current_open_seconds` of intermediate model `int_jira__user_metrics.sql`.
+- This ensures that downstream model `jira__user_enhanced.sql` calculates columns `avg_age_currently_open_seconds` and `avg_close_time_seconds` correctly.
+
 # dbt_jira v0.8.2
 ## Bug Fixes
 - Corrected bug introduced in 0.8.0 that would prevent `sprint` data from being passed to model `jira__daily_issue_field_history`. ([#62](https://github.com/fivetran/dbt_jira/pull/62))
