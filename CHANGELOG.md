@@ -1,8 +1,17 @@
 # dbt_jira v0.9.0
-
 ## 🚨 Breaking Changes 🚨
- - Flipped column aliases `sum_close_time_seconds` and `sum_current_open_seconds` of intermediate model `int_jira__user_metrics.sql`. ([#66](https://github.com/fivetran/dbt_jira/pull/66))
- - This ensures that downstream model `jira__user_enhanced.sql` calculates columns `avg_age_currently_open_seconds` and `avg_close_time_seconds` correctly. ([#66](https://github.com/fivetran/dbt_jira/pull/66))
+
+- The default schema for the source tables are now built within a schema titled (`<target_schema>` + `_jira_source`) in your destination. The previous default schema was (`<target_schema>` + `_stg_jira`) for source. This may be overwritten if desired. ([#63](https://github.com/fivetran/dbt_jira/pull/63))
+- Flipped column aliases `sum_close_time_seconds` and `sum_current_open_seconds` of intermediate model `int_jira__user_metrics.sql`. ([#66](https://github.com/fivetran/dbt_jira/pull/66))
+- This ensures that downstream model `jira__user_enhanced.sql` calculates columns `avg_age_currently_open_seconds` and `avg_close_time_seconds` correctly. ([#66](https://github.com/fivetran/dbt_jira/pull/66))
+
+## 🎉 Documentation and Feature Updates
+- Updated README documentation updates for easier navigation and setup of the dbt package. ([#63](https://github.com/fivetran/dbt_jira/pull/63))
+- Added `jira_[source_table_name]_identifier` variables to allow for easier flexibility of the package to refer to source tables with different names. ([#63](https://github.com/fivetran/dbt_jira/pull/63))
+
+## Bug Fixes
+- Corrected bug introduced in 0.8.0 that would prevent the correct `status` data from being passed to model `jira__daily_issue_field_history`. ([#63](https://github.com/fivetran/dbt_jira/pull/63))
+  - Please note, a `dbt run --full-refresh` will be required after upgrading to this version in order to capture the updates.
 
 # dbt_jira v0.8.2
 ## Bug Fixes
