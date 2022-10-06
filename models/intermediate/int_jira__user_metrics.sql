@@ -39,8 +39,8 @@ user_issues as (
         sum(case when resolved_at is not null then 1 else 0 end) as count_closed_issues,
         sum(case when resolved_at is null then 1 else 0 end) as count_open_issues,
 
-        sum(case when resolved_at is not null then last_assignment_duration_seconds end) as sum_current_open_seconds,
-        sum(case when resolved_at is null then last_assignment_duration_seconds end) as sum_close_time_seconds
+        sum(case when resolved_at is not null then last_assignment_duration_seconds end) as sum_close_time_seconds,
+        sum(case when resolved_at is null then last_assignment_duration_seconds end) as sum_current_open_seconds
 
     from issue
 
