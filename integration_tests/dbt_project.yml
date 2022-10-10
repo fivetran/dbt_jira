@@ -1,5 +1,5 @@
 name: 'jira_integration_tests'
-version: '0.8.2'
+version: '0.9.0'
 config-version: 2
 profile: 'integration_tests'
 
@@ -55,9 +55,6 @@ seeds:
   jira_integration_tests:
     +column_types:
       _fivetran_synced: timestamp
-    board:
-      +column_types:
-        id: "{{ 'int64' if target.name == 'bigquery' else 'bigint' }}"
     comment:
       +column_types:
         id: "{{ 'int64' if target.name == 'bigquery' else 'bigint' }}"
