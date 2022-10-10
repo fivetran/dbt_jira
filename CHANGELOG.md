@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # dbt_jira v0.9.0
 ## 🚨 Breaking Changes 🚨
 
@@ -12,6 +13,11 @@
 ## Bug Fixes
 - Corrected bug introduced in 0.8.0 that would prevent the correct `status` data from being passed to model `jira__daily_issue_field_history`. ([#63](https://github.com/fivetran/dbt_jira/pull/63))
   - Please note, a `dbt run --full-refresh` will be required after upgrading to this version in order to capture the updates.
+=======
+# dbt_jira v0.8.3
+## Bug Fixes
+- Created macro `set_safe_col_name` which uses regex to add a leading `_` to unsafe column names from `issue_field_history_columns`.
+>>>>>>> 6cc54ca (updated changelog)
 
 # dbt_jira v0.8.2
 ## Bug Fixes
