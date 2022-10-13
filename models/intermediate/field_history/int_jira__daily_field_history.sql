@@ -2,7 +2,7 @@
     config(
         materialized='incremental',
         partition_by = {'field': 'valid_starting_on', 'data_type': 'date'}
-            if target.type != 'spark' else ['valid_starting_on'],
+            if target.type != '!!!!!!! REPLACE 'spark' WITH 'spark','databricks' OR EQUIV !!!!!!!' else ['valid_starting_on'],
         unique_key='issue_field_day_id',
         incremental_strategy = 'merge',
         file_format = 'delta'
@@ -72,7 +72,7 @@ final as (
         valid_ending_at, 
         valid_starting_on,
 
-        {{ dbt_utils.surrogate_key(['field_id','issue_id', 'valid_starting_on']) }} as issue_field_day_id
+        {{ dbt_utils.generate_surrogate_key(['field_id','issue_id', 'valid_starting_on']) }} as issue_field_day_id
         
     from get_latest_daily_value
 )

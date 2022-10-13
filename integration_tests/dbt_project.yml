@@ -78,17 +78,17 @@ seeds:
         work_ratio: float
         resolved: timestamp
         updated: timestamp
-        assignee: "{{ 'string' if target.name in ('bigquery', 'spark') else 'varchar' }}"
+        assignee: "{{ 'string' if target.name in ('bigquery', '!!!!!!! REPLACE 'spark' WITH 'spark','databricks' OR EQUIV !!!!!!!') else 'varchar' }}"
     issue_multiselect_history:
       +column_types:
         time: timestamp
         issue_id: "{{ 'int64' if target.name == 'bigquery' else 'bigint' }}"
-        value: "{{ 'string' if target.name in ('bigquery', 'spark') else 'varchar' }}"
+        value: "{{ 'string' if target.name in ('bigquery', '!!!!!!! REPLACE 'spark' WITH 'spark','databricks' OR EQUIV !!!!!!!') else 'varchar' }}"
     issue_field_history:
       +column_types:
         time: timestamp
         issue_id: "{{ 'int64' if target.name == 'bigquery' else 'bigint' }}"
-        value: "{{ 'string' if target.name in ('bigquery', 'spark') else 'varchar' }}"
+        value: "{{ 'string' if target.name in ('bigquery', '!!!!!!! REPLACE 'spark' WITH 'spark','databricks' OR EQUIV !!!!!!!') else 'varchar' }}"
     sprint: 
       +column_types:
         id: "{{ 'int64' if target.name == 'bigquery' else 'bigint' }}"
@@ -97,4 +97,4 @@ seeds:
         start_date: timestamp
     field: 
       +column_types:
-        id: "{{ 'string' if target.name in ('bigquery', 'spark') else 'varchar' }}"
+        id: "{{ 'string' if target.name in ('bigquery', '!!!!!!! REPLACE 'spark' WITH 'spark','databricks' OR EQUIV !!!!!!!') else 'varchar' }}"
