@@ -2,7 +2,7 @@
     config(
         materialized='incremental',
         partition_by = {'field': 'valid_starting_on', 'data_type': 'date'}
-            if target.type != '!!!!!!! REPLACE 'spark' WITH 'spark','databricks' OR EQUIV !!!!!!!' else ['valid_starting_on'],
+            if target.type not in ['spark', 'databricks'] else ['valid_starting_on'],
         unique_key='issue_field_day_id',
         incremental_strategy = 'merge',
         file_format = 'delta'

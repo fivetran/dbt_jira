@@ -2,7 +2,7 @@
     config(
         materialized='incremental',
         partition_by = {'field': 'valid_starting_on', 'data_type': 'date'}
-            if target.type != 'spark' else ['valid_starting_on'],
+            if target.type not in ['spark','databricks'] else ['valid_starting_on'],
         unique_key='issue_day_id',
         incremental_strategy = 'merge',
         file_format = 'delta'
@@ -45,7 +45,7 @@ surrogate_key as (
 
     select 
         *,
-        {{ dbt_utils.surrogate_key(['valid_starting_on','issue_id']) }} as issue_day_id
+        {{ dbt_utils.generate_surrogate_key(['valid_starting_on','issue_id']) }} as issue_day_id
 
     from pivot_out
 )
