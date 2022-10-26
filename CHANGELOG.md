@@ -1,4 +1,4 @@
-# package v0.10.0
+# dbt_jira v0.10.0
 
 ## 🚨 Breaking Changes 🚨:
 [PR #74](https://github.com/fivetran/dbt_jira/pull/74) includes the following breaking changes:
