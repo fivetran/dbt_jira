@@ -1,4 +1,5 @@
 # dbt_jira v0.9.1
+[PR #76](https://github.com/fivetran/dbt_jira/pull/76) includes the following changes:
 ## 🐞 Bug Fixes
 Updated logic model `int_jira__issue_sprint` to adjust how current sprint is determined. It now uses the newest `started_at` date of the sprint instead of the `updated_at` date of the issue.
 # dbt_jira v0.9.0
