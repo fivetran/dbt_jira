@@ -1,3 +1,6 @@
+# dbt_jira v0.9.1
+## 🐞 Bug Fixes
+Updated logic model `int_jira__issue_sprint` to adjust how current sprint is determined. It now uses the newest `started_at` date of the sprint instead of the `updated_at` date of the issue.
 # dbt_jira v0.9.0
 ## 🚨 Breaking Changes 🚨
 

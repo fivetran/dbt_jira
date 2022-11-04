@@ -16,8 +16,10 @@ field_history as (
 ),
 
 sprint_field_history as (
-    select field_history.*,
-    row_number() over (
+
+    select 
+        field_history.*,
+        row_number() over (
                     partition by field_history.issue_id 
                     order by sprint.started_at desc
                     ) as row_num
