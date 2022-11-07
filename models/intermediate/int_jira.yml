@@ -239,13 +239,13 @@ models:
       - dbt_utils.unique_combination_of_columns:
           combination_of_columns: 
             - issue_id  
-            - sprint_id
+            - current_sprint_id
     columns:
       - name: issue_id
         description: Unique ID of the issue. 
-      - name: sprint_id
+      - name: current_sprint_id
         description: Unique ID of the sprint.
-      - name: sprint_name
+      - name: current_sprint_name
         description: Title of the sprint.
       - name: board_id
         description: Foreign key referencing the ID of the `board` that the sprint lives in.
