@@ -52,8 +52,8 @@ issue_sprint as (
 
     select 
         last_sprint.issue_id,
-        last_sprint.field_value as sprint_id,
-        concat('active_sprint__', sprint.sprint_name) as sprint_name,
+        last_sprint.field_value as current_sprint_id,
+        sprint.sprint_name as current_sprint_name,
         sprint.board_id,
         sprint.started_at as sprint_started_at,
         sprint.ended_at as sprint_ended_at,
