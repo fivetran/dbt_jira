@@ -75,9 +75,9 @@ models:
           in the project's workflow).
       - name: status_changed_at
         description: Timestamp of when the status was last changed.
-      - name: sprint_id
+      - name: current_sprint_id
         description: Foreign key referencing the `sprint` that the issue is currently in.
-      - name: sprint_name
+      - name: current_sprint_name
         description: Title of the issue's sprint.
       - name: count_sprint_changes
         description: The total number of sprints that the issue has belonged to.
