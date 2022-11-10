@@ -8,7 +8,7 @@ Updated logic for model `int_jira__issue_sprint` to adjust how current sprint is
 # dbt_jira v0.9.0
 ## 🚨 Breaking Changes 🚨
 
-- The default schema for the source tables are now built within a schema titled (`<target_schema>` + `_jira_source`) in your destination. The previous default schema was (`<target_schema>` + `_stg_jira`) for source. This may be overwritten if de`sired. ([#63](https://github.com/fivetran/dbt_jira/pull/63))
+- The default schema for the source tables are now built within a schema titled (`<target_schema>` + `_jira_source`) in your destination. The previous default schema was (`<target_schema>` + `_stg_jira`) for source. This may be overwritten if desired. ([#63](https://github.com/fivetran/dbt_jira/pull/63))
 - Flipped column aliases `sum_close_time_seconds` and `sum_current_open_seconds` of intermediate model `int_jira__user_metrics.sql`. ([#66](https://github.com/fivetran/dbt_jira/pull/66))
 - This ensures that downstream model `jira__user_enhanced.sql` calculates columns `avg_age_currently_open_seconds` and `avg_close_time_seconds` correctly. ([#66](https://github.com/fivetran/dbt_jira/pull/66))
 
