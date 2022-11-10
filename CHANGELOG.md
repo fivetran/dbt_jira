@@ -1,10 +1,11 @@
 # dbt_jira v0.10.0
-[PR #76](https://github.com/fivetran/dbt_jira/pull/76) includes the following changes:
-## 🚨 Breaking Change
-For model `jira__issue_enhanced`, update column names `sprint_id` and `sprint_name` to `current_sprint_id` and `current_sprint_name`, respectively, to confirm the record is for the current sprint.
+
+## 🚨 Breaking Changes
+For model `jira__issue_enhanced`, updated column names `sprint_id` and `sprint_name` to `current_sprint_id` and `current_sprint_name`, respectively, to confirm the record is for the current sprint. ([#76](https://github.com/fivetran/dbt_jira/pull/76))
 
 ## 🐞 Bug Fix
-Updated logic for model `int_jira__issue_sprint` to adjust how current sprint is determined. It now uses the newest `started_at` date of the sprint instead of the `updated_at` date.
+Updated logic for model `int_jira__issue_sprint` to adjust how current sprint is determined. It now uses the newest `started_at` date of the sprint instead of the `updated_at` date. ([#76](https://github.com/fivetran/dbt_jira/pull/76))
+
 # dbt_jira v0.9.0
 ## 🚨 Breaking Changes 🚨
 
