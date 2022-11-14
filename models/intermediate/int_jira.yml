@@ -75,9 +75,9 @@ models:
           in the project's workflow).
       - name: status_changed_at
         description: Timestamp of when the status was last changed.
-      - name: sprint_id
+      - name: current_sprint_id
         description: Foreign key referencing the `sprint` that the issue is currently in.
-      - name: sprint_name
+      - name: current_sprint_name
         description: Title of the issue's sprint.
       - name: count_sprint_changes
         description: The total number of sprints that the issue has belonged to.
@@ -239,13 +239,13 @@ models:
       - dbt_utils.unique_combination_of_columns:
           combination_of_columns: 
             - issue_id  
-            - sprint_id
+            - current_sprint_id
     columns:
       - name: issue_id
         description: Unique ID of the issue. 
-      - name: sprint_id
+      - name: current_sprint_id
         description: Unique ID of the sprint.
-      - name: sprint_name
+      - name: current_sprint_name
         description: Title of the sprint.
       - name: board_id
         description: Foreign key referencing the ID of the `board` that the sprint lives in.

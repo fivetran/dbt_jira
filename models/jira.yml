@@ -90,10 +90,10 @@ models:
         description: Title of the category of status.
       - name: status_changed_at
         description: Timestamp of when the status was last changed.
-      - name: sprint_id
-        description: Foreign key referencing the `sprint` that the issue is currently in.
-      - name: sprint_name
-        description: Title of the issue's sprint.
+      - name: current_sprint_id
+        description: Foreign key referencing the current `sprint` associate with the issue.
+      - name: current_sprint_name
+        description: Title of the current sprint associated with the issue.
       - name: count_sprint_changes
         description: The total number of sprints that the issue has belonged to.
       - name: is_active_sprint
@@ -104,6 +104,10 @@ models:
         description: Timestamp of when the sprint is planned to end.
       - name: sprint_started_at
         description: Timestamp of when the sprint began. 
+      - name: sprint
+        description: List of associated sprint IDs.
+      - name: status
+        description: ID of the associated status.
       - name: original_estimate_seconds
         description: The original estimate of how long working on this issue would take, in seconds.
       - name: remaining_estimate_seconds
