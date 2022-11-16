@@ -19,12 +19,13 @@ sprint_field_history as (
 
     select 
         field_history.*,
+        sprint.*,
         row_number() over (
                     partition by field_history.issue_id 
                     order by sprint.started_at desc
                     ) as row_num
     from field_history
-    left join sprint on field_history.field_value = cast(sprint.sprint_id as {{dbt_utils.type_string()}})
+    join sprint on field_history.field_value = cast(sprint.sprint_id as {{dbt_utils.type_string()}})
     where lower(field_history.field_name) = 'sprint'
 ),
 
@@ -53,16 +54,15 @@ issue_sprint as (
     select 
         last_sprint.issue_id,
         last_sprint.field_value as current_sprint_id,
-        sprint.sprint_name as current_sprint_name,
-        sprint.board_id,
-        sprint.started_at as sprint_started_at,
-        sprint.ended_at as sprint_ended_at,
-        sprint.completed_at as sprint_completed_at,
+        last_sprint.sprint_name as current_sprint_name,
+        last_sprint.board_id,
+        last_sprint.started_at as sprint_started_at,
+        last_sprint.ended_at as sprint_ended_at,
+        last_sprint.completed_at as sprint_completed_at,
         coalesce(sprint_rollovers.count_sprint_changes, 0) as count_sprint_changes
 
     from 
     last_sprint 
-    join sprint on last_sprint.field_value = cast(sprint.sprint_id as {{dbt_utils.type_string()}})
     left join sprint_rollovers on sprint_rollovers.issue_id = last_sprint.issue_id
     
 )
