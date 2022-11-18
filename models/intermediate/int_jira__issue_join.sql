@@ -89,8 +89,8 @@ join_issue as (
 	{% endif %}
 
         {% if var('jira_using_sprints', True) %}
-        ,issue_sprint.sprint_id
-        ,issue_sprint.sprint_name
+        ,issue_sprint.current_sprint_id
+        ,issue_sprint.current_sprint_name
         ,coalesce(issue_sprint.count_sprint_changes, 0) as count_sprint_changes
         ,issue_sprint.sprint_started_at
         ,issue_sprint.sprint_ended_at

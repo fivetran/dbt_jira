@@ -15,28 +15,27 @@ field_history as (
 
 ),
 
--- only grab history pertaining to sprints
 sprint_field_history as (
 
     select 
         field_history.*,
         row_number() over (
-                    partition by issue_id order by updated_at desc
+                    partition by field_history.issue_id 
+                    order by sprint.started_at desc
                     ) as row_num
-
     from field_history
-    where lower(field_name) = 'sprint'
-
+    left join sprint on field_history.field_value = cast(sprint.sprint_id as {{dbt_utils.type_string()}})
+    where lower(field_history.field_name) = 'sprint'
 ),
 
 last_sprint as (
-  
+
     select *
     from sprint_field_history
     
     where row_num = 1
 
-),
+), 
 
 sprint_rollovers as (
 
@@ -53,8 +52,8 @@ issue_sprint as (
 
     select 
         last_sprint.issue_id,
-        last_sprint.field_value as sprint_id,
-        sprint.sprint_name,
+        last_sprint.field_value as current_sprint_id,
+        sprint.sprint_name as current_sprint_name,
         sprint.board_id,
         sprint.started_at as sprint_started_at,
         sprint.ended_at as sprint_ended_at,
