@@ -27,7 +27,6 @@ sprint_field_history as (
     from field_history
     join sprint on field_history.field_value = cast(sprint.sprint_id as {{dbt_utils.type_string()}})
     where lower(field_history.field_name) = 'sprint'
-    and sprint.started_at is not null 
 ),
 
 
