@@ -5,8 +5,8 @@ profile: 'integration_tests'
 
 
 vars:
-  jira_schema: jira_integration_tests
   jira_source:
+    jira_schema: jira_integration_tests
     comment: "{{ ref('comment') }}"
     component: "{{ ref('component') }}"
     epic: "{{ ref('epic') }}"
