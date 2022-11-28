@@ -1,6 +1,6 @@
 # dbt_jira v0.10.1
 ## 🐞 Bug Fix
-- Updated logic for model `int_jira__issue_sprint` to further adjust how current sprint is determined. It now uses a combination of the newest `updated_at` date for the issue and the newest `started_at` date of the sprint. This is to account for times when jira updates two sprint records at the same time. ([#77](https://github.com/fivetran/dbt_jira/pull/77))
+- Updated logic for model `int_jira__issue_sprint` to further adjust how current sprint is determined. It now uses a combination of the newest `updated_at` date for the issue and the newest `started_at` date of the sprint. This is to account for times when jira updates two sprint records at the same time. ([#77](https://github.com/fivetran/dbt_jira/pull/77) and [#78](https://github.com/fivetran/dbt_jira/pull/78))
 ## Contributors
 - [@jingyu-spenmo](https://github.com/jingyu-spenmo) ([#78](https://github.com/fivetran/dbt_jira/pull/78))
 
