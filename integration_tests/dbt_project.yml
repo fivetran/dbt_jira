@@ -1,12 +1,12 @@
 name: 'jira_integration_tests'
-version: '0.10.0'
+version: '0.10.1'
 config-version: 2
 profile: 'integration_tests'
 
 
 vars:
-  jira_schema: jira_integration_tests
   jira_source:
+    jira_schema: jira_integration_tests
     comment: "{{ ref('comment') }}"
     component: "{{ ref('component') }}"
     epic: "{{ ref('epic') }}"
