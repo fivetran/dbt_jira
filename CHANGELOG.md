@@ -1,5 +1,4 @@
-# dbt_jira v0.10.0
-
+# dbt_jira v0.11.0
 ## 🚨 Breaking Changes 🚨:
 [PR #74](https://github.com/fivetran/dbt_jira/pull/74) includes the following breaking changes:
 - Dispatch update for dbt-utils to dbt-core cross-db macros migration. Specifically `{{ dbt_utils.<macro> }}` have been updated to `{{ dbt.<macro> }}` for the below macros:
@@ -37,6 +36,22 @@
     - `dbt.current_timestamp_in_utc_backcompat`
 - `dbt_utils.surrogate_key` has also been updated to `dbt_utils.generate_surrogate_key`. Since the method for creating surrogate keys differ, we suggest all users do a `full-refresh` for the most accurate data. For more information, please refer to dbt-utils [release notes](https://github.com/dbt-labs/dbt-utils/releases) for this update.
 - Dependencies on `fivetran/fivetran_utils` have been upgraded, previously `[">=0.3.0", "<0.4.0"]` now `[">=0.4.0", "<0.5.0"]`.
+
+# dbt_jira v0.10.1
+## ❗Please Note❗
+- While this is a patch update, it may also require a full refresh. Please run `dbt run --full-refresh` after upgrading to ensure you have the latest incremental logic.
+## 🐞 Bug Fix
+- Updated logic for model `int_jira__issue_sprint` to further adjust how current sprint is determined. It now uses a combination of the newest `updated_at` date for the issue and the newest `started_at` date of the sprint. This is to account for times when jira updates two sprint records at the same time. ([#77](https://github.com/fivetran/dbt_jira/pull/77) and [#78](https://github.com/fivetran/dbt_jira/pull/78))
+## Contributors
+- [@jingyu-spenmo](https://github.com/jingyu-spenmo) ([#78](https://github.com/fivetran/dbt_jira/pull/78))
+
+
+# dbt_jira v0.10.0
+## 🚨 Breaking Changes
+- For model `jira__issue_enhanced`, updated column names `sprint_id` and `sprint_name` to `current_sprint_id` and `current_sprint_name`, respectively, to confirm the record is for the current sprint. ([#76](https://github.com/fivetran/dbt_jira/pull/76))
+
+## 🐞 Bug Fix
+- Updated logic for model `int_jira__issue_sprint` to adjust how current sprint is determined. It now uses the newest `started_at` date of the sprint instead of the `updated_at` date. ([#76](https://github.com/fivetran/dbt_jira/pull/76))
 
 # dbt_jira v0.9.0
 ## 🚨 Breaking Changes 🚨
