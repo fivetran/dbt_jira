@@ -2,9 +2,9 @@
     config(
         materialized='incremental',
         partition_by = {'field': 'date_day', 'data_type': 'date'}
-            if target.type != 'spark' else ['date_day'],
+            if target.type not in ['spark', 'databricks'] else ['date_day'],
         unique_key='issue_day_id',
-        incremental_strategy = 'merge',
+        incremental_strategy = 'merge' if target.type not in ('snowflake', 'postgres', 'redshift') else 'delete+insert',
         file_format = 'delta'
     )
 }}
@@ -107,11 +107,11 @@ set_values as (
     from joined
 
     left join statuses
-        on cast(statuses.status_id as {{ dbt_utils.type_string() }}) = joined.status
+        on cast(statuses.status_id as {{ dbt.type_string() }}) = joined.status
 
     {% for col in pivot_data_columns if col.name|lower not in ['issue_id','issue_day_id','valid_starting_on','status'] %}
     left join field_option as field_option_{{ col.name }}
-        on cast(field_option_{{ col.name }}.field_id as {{ dbt_utils.type_string() }}) = {{ col.name }}
+        on cast(field_option_{{ col.name }}.field_id as {{ dbt.type_string() }}) = {{ col.name }}
     {% endfor %}
 ),
 
@@ -154,7 +154,7 @@ surrogate_key as (
 
     select
         *,
-        {{ dbt_utils.surrogate_key(['date_day','issue_id']) }} as issue_day_id
+        {{ dbt_utils.generate_surrogate_key(['date_day','issue_id']) }} as issue_day_id
 
     from fix_null_values
 )

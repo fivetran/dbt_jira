@@ -34,7 +34,7 @@ latest_versions as (
         field_id,
         issue_id,	
         updated_at,
-        cast(field_value as {{ dbt_utils.type_int() }}) as version_id
+        cast(field_value as {{ dbt.type_int() }}) as version_id
     from order_versions
     where row_num = 1
 ),

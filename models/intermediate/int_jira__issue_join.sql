@@ -95,8 +95,8 @@ join_issue as (
         ,issue_sprint.sprint_started_at
         ,issue_sprint.sprint_ended_at
         ,issue_sprint.sprint_completed_at
-        ,coalesce(issue_sprint.sprint_started_at <= {{ dbt_utils.current_timestamp() }}
-          and coalesce(issue_sprint.sprint_completed_at, {{ dbt_utils.current_timestamp() }}) >= {{ dbt_utils.current_timestamp() }}  
+        ,coalesce(issue_sprint.sprint_started_at <= {{ dbt.current_timestamp_backcompat() }}
+          and coalesce(issue_sprint.sprint_completed_at, {{ dbt.current_timestamp_backcompat() }}) >= {{ dbt.current_timestamp_backcompat() }}  
           , false) as is_active_sprint -- If sprint doesn't have a start date, default to false. If it does have a start date, but no completed date, this means that the sprint is active. The ended_at timestamp is irrelevant here.
         {% endif %}
 

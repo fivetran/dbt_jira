@@ -2,9 +2,9 @@
     config(
         materialized='incremental',
         partition_by = {'field': 'date_day', 'data_type': 'date'}
-            if target.type != 'spark' else ['date_day'],
+            if target.type not in ['spark', 'databricks'] else ['date_day'],
         unique_key='issue_day_id',
-        incremental_strategy = 'merge',
+        incremental_strategy = 'merge' if target.type not in ('snowflake', 'postgres', 'redshift') else 'delete+insert',
         file_format = 'delta'
     )
 }}
@@ -28,7 +28,7 @@ with spine as (
             dbt_utils.date_spine(
                 datepart = "day", 
                 start_date =  "cast('" ~ first_date[0:10] ~ "' as date)", 
-                end_date = dbt_utils.dateadd("week", 1, dbt_utils.current_timestamp_in_utc())
+                end_date = dbt.dateadd("week", 1, dbt.current_timestamp_in_utc_backcompat())
             )   
         }} 
     ) as date_spine
@@ -44,11 +44,11 @@ issue_dates as (
 
     select
         issue_id,
-        cast( {{ dbt_utils.date_trunc('day', 'created_at') }} as date) as created_on,
+        cast( {{ dbt.date_trunc('day', 'created_at') }} as date) as created_on,
 
         -- resolved_at will become null if an issue is marked as un-resolved. if this sorta thing happens often, you may want to run full-refreshes of the field_history models often
         -- if it's not resolved include everything up to today. if it is, look at the last time it was updated 
-        cast({{ dbt_utils.date_trunc('day', 'case when resolved_at is null then ' ~ dbt_utils.current_timestamp_in_utc() ~ ' else updated_at end') }} as date) as open_until
+        cast({{ dbt.date_trunc('day', 'case when resolved_at is null then ' ~ dbt.current_timestamp_in_utc_backcompat() ~ ' else updated_at end') }} as date) as open_until
 
     from {{ var('issue') }}
 
@@ -65,7 +65,7 @@ issue_spine as (
     from spine 
     join issue_dates on
         issue_dates.created_on <= spine.date_day
-        and {{ dbt_utils.dateadd('month', var('jira_issue_history_buffer', 1), 'issue_dates.open_until') }} >= spine.date_day
+        and {{ dbt.dateadd('month', var('jira_issue_history_buffer', 1), 'issue_dates.open_until') }} >= spine.date_day
         -- if we cut off issues, we're going to have to do a full refresh to catch issues that have been un-resolved
 
     group by 1,2
@@ -76,12 +76,12 @@ surrogate_key as (
     select 
         date_day,
         issue_id,
-        {{ dbt_utils.surrogate_key(['date_day','issue_id']) }} as issue_day_id,
+        {{ dbt_utils.generate_surrogate_key(['date_day','issue_id']) }} as issue_day_id,
         earliest_open_until_date
 
     from issue_spine
 
-    where date_day <= cast( {{ dbt_utils.date_trunc('day',dbt_utils.current_timestamp_in_utc()) }} as date)
+    where date_day <= cast( {{ dbt.date_trunc('day',dbt.current_timestamp_in_utc_backcompat()) }} as date)
 )
 
 select * from surrogate_key 
