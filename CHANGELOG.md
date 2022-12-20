@@ -36,6 +36,7 @@
     - `dbt.current_timestamp_in_utc_backcompat`
 - `dbt_utils.surrogate_key` has also been updated to `dbt_utils.generate_surrogate_key`. Since the method for creating surrogate keys differ, we suggest all users do a `full-refresh` for the most accurate data. For more information, please refer to dbt-utils [release notes](https://github.com/dbt-labs/dbt-utils/releases) for this update.
 - Dependencies on `fivetran/fivetran_utils` have been upgraded, previously `[">=0.3.0", "<0.4.0"]` now `[">=0.4.0", "<0.5.0"]`.
+- Incremental strategies for all incremental models in this package have been adjusted to use `delete+insert` if the warehouse being used is Snowflake, Postgres, or Redshift.
 
 # dbt_jira v0.10.1
 ## ❗Please Note❗

@@ -25,7 +25,7 @@ sprint_field_history as (
                     order by field_history.updated_at desc, sprint.started_at desc         
                     ) as row_num
     from field_history
-    join sprint on field_history.field_value = cast(sprint.sprint_id as {{dbt_utils.type_string()}})
+    join sprint on field_history.field_value = cast(sprint.sprint_id as {{ dbt.type_string() }})
     where lower(field_history.field_name) = 'sprint'
 ),
 

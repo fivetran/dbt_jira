@@ -4,7 +4,7 @@
         partition_by = {'field': 'valid_starting_on', 'data_type': 'date'}
             if target.type not in ['spark', 'databricks'] else ['valid_starting_on'],
         unique_key='issue_field_day_id',
-        incremental_strategy = 'merge',
+        incremental_strategy = 'merge' if target.type not in ('snowflake', 'postgres', 'redshift') else 'delete+insert',
         file_format = 'delta'
     )
 }}
