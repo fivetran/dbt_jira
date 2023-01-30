@@ -1,6 +1,6 @@
 # dbt_jira v0.11.1
 ## 🎉 Feature Updates
-- Databricks compatibility 🧱 ([#79](https://github.com/fivetran/dbt_jira/pull/79))
+- Databricks compatibility 🧱 ([#80](https://github.com/fivetran/dbt_jira/pull/80))
 # dbt_jira v0.11.0
 ## 🚨 Breaking Changes 🚨:
 [PR #74](https://github.com/fivetran/dbt_jira/pull/74) includes the following breaking changes:
