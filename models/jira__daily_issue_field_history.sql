@@ -121,8 +121,7 @@ set_values as (
         , coalesce(field_option_{{ col.name }}.field_option_name, {{ col.name }}) as {{ col.name }}
         -- create a batch/partition once a new value is provided
         , sum( case when {{ col.name }} is null then 0 else 1 end) over ( partition by issue_id
-            order by date_day rows unbounded preceding) as {{ col.name }}_field_partition
-
+        order by date_day rows unbounded preceding) as {{ col.name }}_field_partition
         {% endfor %}
 
     from joined
@@ -154,9 +153,7 @@ fill_values as (
 
         {% for col in pivot_data_columns if col.name|lower not in ['issue_id', 'issue_day_id', 'valid_starting_on', 'status', 'components'] %}
         -- grab the value that started this batch/partition
-        , first_value( {{ col.name }} ) over (
-            partition by issue_id, {{ col.name }}_field_partition 
-            order by date_day asc rows between unbounded preceding and current row) as {{ col.name }}
+        , first_value( {{ col.name }} ) over ( partition by issue_id, {{ col.name }}_field_partition order by date_day asc rows between unbounded preceding and current row) as {{ col.name }}
         {% endfor %}
 
     from set_values
@@ -172,9 +169,7 @@ fix_null_values as (
         {% if var('jira_using_components', True) %}
         , case when component = 'is_null' then null else component end as component
         {% endif %}
-
         {% for col in pivot_data_columns if col.name|lower not in ['issue_id','issue_day_id','valid_starting_on', 'status', 'components'] %} 
-
         -- we de-nulled the true null values earlier in order to differentiate them from nulls that just needed to be backfilled
         , case when {{ col.name }} = 'is_null' then null else {{ col.name }} end as {{ col.name }}
         {% endfor %}
@@ -188,7 +183,6 @@ surrogate_key as (
     select
         *,
         {{ dbt_utils.generate_surrogate_key(['date_day','issue_id']) }} as issue_day_id
-
     from fix_null_values
 )
 
