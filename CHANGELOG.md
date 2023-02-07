@@ -1,6 +1,10 @@
-# dbt_jira v0.11.1
+# dbt_jira v0.12.0
+## 🚨 Breaking Changes 🚨:
+- Fixed `jira__daily_issue_field_history` model to make sure component values are correctly joined into our issue models ([#81](https://github.com/fivetran/dbt_jira/pull/81)).
+- Please note, a `dbt run --full-refresh` will be required after upgrading to this version in order to capture the updates.
 ## 🎉 Feature Updates 🎉
-- Databricks compatibility 🧱 ([#80](https://github.com/fivetran/dbt_jira/pull/80))
+- Databricks compatibility 🧱 ([#80](https://github.com/fivetran/dbt_jira/pull/80)).
+
 # dbt_jira v0.11.0
 ## 🚨 Breaking Changes 🚨:
 [PR #74](https://github.com/fivetran/dbt_jira/pull/74) includes the following breaking changes:
