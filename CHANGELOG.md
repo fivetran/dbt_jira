@@ -1,3 +1,6 @@
+# dbt_jira v0.12.2
+- Corrected `jira__daily_issue_field_history` logic to account for cases where components is not being used by customers. ([#83](https://github.com/fivetran/dbt_jira/pull/83))
+
 # dbt_jira v0.12.1
 ## 🚨 Breaking Changes 🚨:
 - Fixed `jira__daily_issue_field_history` model to make sure component values are correctly joined into our issue models ([#81](https://github.com/fivetran/dbt_jira/pull/81)).
