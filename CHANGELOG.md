@@ -1,5 +1,5 @@
 # dbt_jira v0.12.2
-- Corrected `jira__daily_issue_field_history` logic to account for cases where components is not being used by customers. ([#83](https://github.com/fivetran/dbt_jira/pull/83))
+- Corrected `jira__daily_issue_field_history` logic to account for cases where the `components` model is not being used by customers. ([#84](https://github.com/fivetran/dbt_jira/pull/84))
 
 # dbt_jira v0.12.1
 ## 🚨 Breaking Changes 🚨:
