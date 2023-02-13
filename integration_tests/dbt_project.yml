@@ -1,5 +1,6 @@
 name: 'jira_integration_tests'
 version: '0.12.2'
+
 config-version: 2
 profile: 'integration_tests'
 
@@ -29,7 +30,7 @@ vars:
     jira_user_identifier: "user"
     jira_version_identifier: "version"
 
-    issue_field_history_columns: ['summary', 'components', 'story points']
+  issue_field_history_columns: ['summary', 'components', 'story points']
 
 seeds:
   jira_integration_tests:
@@ -78,3 +79,7 @@ seeds:
     field: 
       +column_types:
         id: "{{ 'string' if target.name in ('bigquery', 'spark', 'databricks') else 'varchar' }}"
+
+dispatch:
+  - macro_namespace: dbt_utils
+    search_order: ['spark_utils', 'dbt_utils']
