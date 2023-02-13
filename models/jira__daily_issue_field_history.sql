@@ -101,7 +101,7 @@ set_values as (
         -- create a batch/partition once a new value is provided
         , sum( case when {{ col.name }} is null then 0 else 1 end) over ( partition by issue_id
             order by date_day rows unbounded preceding) as {{ col.name }}_field_partition
-            
+
         {% endfor %}
 
     from joined
@@ -141,6 +141,7 @@ fix_null_values as (
         issue_id,
         case when status = 'is_null' then null else status end as status
         {% for col in pivot_data_columns if col.name|lower not in ['issue_id','issue_day_id','valid_starting_on', 'status'] %} 
+
         -- we de-nulled the true null values earlier in order to differentiate them from nulls that just needed to be backfilled
         , case when {{ col.name }} = 'is_null' then null else {{ col.name }} end as {{ col.name }}
         {% endfor %}
@@ -154,6 +155,7 @@ surrogate_key as (
     select
         *,
         {{ dbt_utils.generate_surrogate_key(['date_day','issue_id']) }} as issue_day_id
+        
     from fix_null_values
 )
 
