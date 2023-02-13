@@ -51,7 +51,7 @@ Include the following jira_source package version in your `packages.yml` file:
 ```yaml
 packages:
   - package: fivetran/jira
-    version: [">=0.11.0", "<0.12.0"]
+    version: [">=0.12.0", "<0.13.0"]
 
 ```
 ## Step 3: Define database and schema variables
