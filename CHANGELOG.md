@@ -1,6 +1,6 @@
 # dbt_jira v0.12.2
 ## Bug Fixes
-- Reverting the changes introduced within v0.12.1 as a bug was uncovered following release that needed to be rolled back. Please stay tuned for a future release that will integrate the v0.12.1 changes in a bug free release.
+- Reverting the changes introduced within v0.12.1 as a bug was uncovered following release that needed to be rolled back. Please stay tuned for a future release that will integrate the v0.12.1 changes in a bug free release. ([#86](https://github.com/fivetran/dbt_jira/pull/86))
 
 # dbt_jira v0.12.1
 ## 🚨 Breaking Changes 🚨:
