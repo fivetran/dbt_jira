@@ -19,7 +19,7 @@ joined as (
     fields.field_name
 
   from issue_multiselect_history
-    join fields using (field_id)
+  join fields using (field_id)
 
 )
 

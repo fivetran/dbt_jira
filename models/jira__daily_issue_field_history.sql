@@ -47,7 +47,6 @@ statuses as (
     from {{ var('status') }}
 ),
 
-
 -- in intermediate/field_history/
 calendar as (
 
@@ -65,16 +64,16 @@ joined as (
         calendar.date_day,
         calendar.issue_id
 
-        {% if is_incremental() %}    
-            {% for col in pivot_data_columns if col.name|lower not in ['issue_day_id','issue_id','valid_starting_on'] %} 
-            , coalesce(pivoted_daily_history.{{ col.name }}, most_recent_data.{{ col.name }}) as {{ col.name }}
-            {% endfor %}
+    {% if is_incremental() %}    
+        {% for col in pivot_data_columns if col.name|lower not in ['issue_day_id','issue_id','valid_starting_on'] %} 
+        , coalesce(pivoted_daily_history.{{ col.name }}, most_recent_data.{{ col.name }}) as {{ col.name }}
+        {% endfor %}
 
-        {% else %}
-            {% for col in pivot_data_columns if col.name|lower not in ['issue_day_id','issue_id','valid_starting_on'] %} 
-            , {{ col.name }}
-            {% endfor %}
-        {% endif %}
+    {% else %}
+        {% for col in pivot_data_columns if col.name|lower not in ['issue_day_id','issue_id','valid_starting_on'] %} 
+        , {{ col.name }}
+        {% endfor %}
+    {% endif %}
     
     from calendar
     left join pivoted_daily_history 
@@ -101,7 +100,7 @@ set_values as (
         , coalesce(field_option_{{ col.name }}.field_option_name, {{ col.name }}) as {{ col.name }}
         -- create a batch/partition once a new value is provided
         , sum( case when {{ col.name }} is null then 0 else 1 end) over ( partition by issue_id
-        order by date_day rows unbounded preceding) as {{ col.name }}_field_partition
+            order by date_day rows unbounded preceding) as {{ col.name }}_field_partition
         {% endfor %}
 
     from joined
@@ -140,7 +139,6 @@ fix_null_values as (
         date_day,
         issue_id,
         case when status = 'is_null' then null else status end as status
-        
         {% for col in pivot_data_columns if col.name|lower not in ['issue_id','issue_day_id','valid_starting_on', 'status'] %} 
         -- we de-nulled the true null values earlier in order to differentiate them from nulls that just needed to be backfilled
         , case when {{ col.name }} = 'is_null' then null else {{ col.name }} end as {{ col.name }}
