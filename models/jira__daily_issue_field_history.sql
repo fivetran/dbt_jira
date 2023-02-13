@@ -101,6 +101,7 @@ set_values as (
         -- create a batch/partition once a new value is provided
         , sum( case when {{ col.name }} is null then 0 else 1 end) over ( partition by issue_id
             order by date_day rows unbounded preceding) as {{ col.name }}_field_partition
+            
         {% endfor %}
 
     from joined
