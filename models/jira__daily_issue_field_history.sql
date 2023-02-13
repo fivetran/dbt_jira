@@ -68,7 +68,7 @@ joined as (
         {% for col in pivot_data_columns if col.name|lower not in ['issue_day_id','issue_id','valid_starting_on'] %} 
         , coalesce(pivoted_daily_history.{{ col.name }}, most_recent_data.{{ col.name }}) as {{ col.name }}
         {% endfor %}
-
+    
     {% else %}
         {% for col in pivot_data_columns if col.name|lower not in ['issue_day_id','issue_id','valid_starting_on'] %} 
         , {{ col.name }}
@@ -155,7 +155,7 @@ surrogate_key as (
     select
         *,
         {{ dbt_utils.generate_surrogate_key(['date_day','issue_id']) }} as issue_day_id
-        
+
     from fix_null_values
 )
 
