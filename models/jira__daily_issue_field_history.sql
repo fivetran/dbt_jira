@@ -64,7 +64,7 @@ joined as (
         calendar.date_day,
         calendar.issue_id
     
-    {% if is_incremental() %}    
+    {% if is_incremental() %}     
         {% for col in pivot_data_columns if col.name|lower not in ['issue_day_id','issue_id','valid_starting_on'] %} 
         , coalesce(pivoted_daily_history.{{ col.name }}, most_recent_data.{{ col.name }}) as {{ col.name }}
         {% endfor %}
