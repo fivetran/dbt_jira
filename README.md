@@ -46,12 +46,12 @@ dispatch:
 ```
 
 ## Step 2: Install the package
-Include the following jira_source package version in your `packages.yml` file:
+Include the following jira package version in your `packages.yml` file:
 > TIP: Check [dbt Hub](https://hub.getdbt.com/) for the latest installation instructions or [read the dbt docs](https://docs.getdbt.com/docs/package-management) for more information on installing packages.
 ```yaml
 packages:
   - package: fivetran/jira
-    version: [">=0.11.0", "<0.12.0"]
+    version: [">=0.12.0", "<0.13.0"]
 
 ```
 ## Step 3: Define database and schema variables
