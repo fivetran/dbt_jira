@@ -16,7 +16,7 @@ joined as (
   
   select
     field_history.*,
-    fields.field_name
+    lower(fields.field_name) as field_name
 
   from field_history
   join fields using (field_id)
