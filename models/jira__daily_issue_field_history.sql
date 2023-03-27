@@ -51,10 +51,10 @@ field_options_with_names as (
 
     select 
         field_option.*,
-        {{ dbt_utils.slugify('field.field_name') | replace(' ', '_') | lower }} as field_name
+        regexp_replace(regexp_replace(regexp_replace(lower(field.field_name), '^[0-9]', '_' || substring(lower(field.field_name),2)), '[^a-z0-9_]+', ''), '[ -]+', '_') as field_name
     from field_option 
     join field
-        on field_option.field_id = field.field_id
+        on ('customfield_' || field_option.field_id) = field.field_id
 ),
 
 statuses as (
