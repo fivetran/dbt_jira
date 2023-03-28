@@ -51,7 +51,7 @@ field_options_with_names as (
 
     select 
         field_option.*,
-        regexp_replace(regexp_replace(regexp_replace(lower(field.field_name), '^[0-9]', '_' || substring(lower(field.field_name),2)), '[^a-z0-9_]+', ''), '[ -]+', '_') as field_name
+        {{ fivetran_utils.slugify_sql('field_name') }} as field_name
     from field_option 
     join field
         on ('customfield_' || field_option.field_id) = field.field_id
