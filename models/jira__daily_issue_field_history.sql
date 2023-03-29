@@ -41,22 +41,6 @@ with pivoted_daily_history as (
     from {{ var('field_option') }}
 ),
 
-field as (
-
-    select *
-    from {{ var('field') }}
-),
-
-field_options_with_names as (
-
-    select 
-        field_option.*,
-        {{ fivetran_utils.slugify_sql('field_name') }} as field_name
-    from field_option 
-    join field
-        on ('customfield_' || field_option.field_id) = field.field_id
-),
-
 statuses as (
     
     select *
@@ -126,8 +110,8 @@ set_values as (
         on cast(statuses.status_id as {{ dbt.type_string() }}) = joined.status
 
     {% for col in pivot_data_columns if col.name|lower not in ['issue_id', 'issue_day_id', 'valid_starting_on', 'status'] %}
-    left join field_options_with_names as field_option_{{ col.name }}
-        on field_option_{{ col.name }}.field_name = lower({{ col.name }})
+    left join field_option as field_option_{{ col.name }}
+        on cast(field_option_{{ col.name }}.field_id as {{ dbt.type_string() }}) ={{ col.name }}
     {% endfor %}
 ),
 
