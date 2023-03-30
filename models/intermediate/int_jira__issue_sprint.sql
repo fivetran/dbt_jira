@@ -9,7 +9,6 @@ with sprint as (
 
 field_history as (
 
-     -- sprints don't appear to be capable of multiselect in the UI...
     select *
     from {{ ref('int_jira__issue_multiselect_history') }}
 
@@ -25,7 +24,7 @@ sprint_field_history as (
                     order by field_history.updated_at desc, sprint.started_at desc         
                     ) as row_num
     from field_history
-    join sprint on field_history.field_value = cast(sprint.sprint_id as {{ dbt.type_string() }})
+    left join sprint on field_history.field_value = cast(sprint.sprint_id as {{ dbt.type_string() }})
     where lower(field_history.field_name) = 'sprint'
 ),
 
