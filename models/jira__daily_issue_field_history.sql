@@ -92,11 +92,14 @@ set_values as (
     select
         date_day,
         issue_id,
+        joined.status_id,
+        sum( case when joined.status_id is null then 0 else 1 end) over ( partition by issue_id
+            order by date_day rows unbounded preceding) as status_id_field_partition,
         statuses.status_name as status,
         sum( case when statuses.status_name is null then 0 else 1 end) over ( partition by issue_id
             order by date_day rows unbounded preceding) as status_field_partition
 
-        {% for col in pivot_data_columns if col.name|lower not in ['issue_id', 'issue_day_id', 'valid_starting_on', 'status'] %}
+        {% for col in pivot_data_columns if col.name|lower not in ['issue_id', 'issue_day_id', 'valid_starting_on', 'status', 'status_id'] %}
         , coalesce(field_option_{{ col.name }}.field_option_name, {{ col.name }}) as {{ col.name }}
         -- create a batch/partition once a new value is provided
         , sum( case when {{ col.name }} is null then 0 else 1 end) over ( partition by issue_id
@@ -107,9 +110,9 @@ set_values as (
     from joined
 
     left join statuses
-        on cast(statuses.status_id as {{ dbt.type_string() }}) = joined.status
+        on cast(statuses.status_id as {{ dbt.type_string() }}) = joined.status_id
 
-    {% for col in pivot_data_columns if col.name|lower not in ['issue_id', 'issue_day_id', 'valid_starting_on', 'status'] %}
+    {% for col in pivot_data_columns if col.name|lower not in ['issue_id', 'issue_day_id', 'valid_starting_on', 'status', 'status_id'] %}
     left join field_option as field_option_{{ col.name }}
         on cast(field_option_{{ col.name }}.field_id as {{ dbt.type_string() }}) = {{ col.name }}
     {% endfor %}
@@ -120,11 +123,14 @@ fill_values as (
     select  
         date_day,
         issue_id,
+        first_value( status_id ) over (
+            partition by issue_id, status_id_field_partition 
+            order by date_day asc rows between unbounded preceding and current row) as status_id,
         first_value( status ) over (
             partition by issue_id, status_field_partition 
             order by date_day asc rows between unbounded preceding and current row) as status
 
-        {% for col in pivot_data_columns if col.name|lower not in ['issue_id', 'issue_day_id', 'valid_starting_on', 'status'] %}
+        {% for col in pivot_data_columns if col.name|lower not in ['issue_id', 'issue_day_id', 'valid_starting_on', 'status', 'status_id'] %}
         -- grab the value that started this batch/partition
         , first_value( {{ col.name }} ) over (
             partition by issue_id, {{ col.name }}_field_partition 
