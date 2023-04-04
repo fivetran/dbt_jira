@@ -2,7 +2,7 @@
 
 ## 🎉 Feature Updates 🎉
 [PR #93](https://github.com/fivetran/dbt_jira/pull/93) applies the following changes:
-- Adds the option to use `field_name` instead of `field_id` as the field-grain for issue field history transformations. Previously, the package would strictly partition and join issue field data using `field_id`. However, this assumed that it was impossible to have fields with the same name in Jira. For instance, it is very easy to create another `Sprint` field, and different Jira userss across your organization may choose the wrong or inconsistent version of the field. 
+- Adds the option to use `field_name` instead of `field_id` as the field-grain for issue field history transformations. Previously, the package would strictly partition and join issue field data using `field_id`. However, this assumed that it was impossible to have fields with the same name in Jira. For instance, it is very easy to create another `Sprint` field, and different Jira users across your organization may choose the wrong or inconsistent version of the field. 
   - Thus, to treat these as the same field, set the new `jira_field_grain` variable to `'field_name'` in your `dbt_project.yml` file.
 
 # dbt_jira v0.12.2
