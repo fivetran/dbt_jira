@@ -111,7 +111,7 @@ set_values as (
 
     {% for col in pivot_data_columns if col.name|lower not in ['issue_id', 'issue_day_id', 'valid_starting_on', 'status'] %}
     left join field_option as field_option_{{ col.name }}
-        on cast(field_option_{{ col.name }}.field_id as {{ dbt.type_string() }}) ={{ col.name }}
+        on cast(field_option_{{ col.name }}.field_id as {{ dbt.type_string() }}) = {{ col.name }}
     {% endfor %}
 ),
 
