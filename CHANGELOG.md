@@ -1,6 +1,6 @@
 # dbt_jira v0.13.0
 ## 🚨 Breaking Changes 🚨:
-- Added the `status_id` column as a default field for the `jira__daily_issue_field_history` model. This is required to perform an accurate join for the `sprint` field in incremental runs.
+- Added the `status_id` column as a default field for the `jira__daily_issue_field_history` model. This is required to perform an accurate join for the `status` field in incremental runs.
   - Please be aware a `dbt run --full-refresh` will be required following this upgrade. ([#95](https://github.com/fivetran/dbt_jira/pull/95))
 
 ## Contributors
