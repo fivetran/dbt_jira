@@ -16,7 +16,7 @@ joined as (
   
   select
     issue_multiselect_history.*,
-    fields.field_name
+    lower(fields.field_name) as field_name
 
   from issue_multiselect_history
   join fields using (field_id)
