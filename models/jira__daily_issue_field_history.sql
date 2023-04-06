@@ -136,7 +136,6 @@ fix_null_values as (
     select  
         date_day,
         issue_id
-        -- case when status_id = 'is_null' then null else status_id end as status_id
         {% for col in pivot_data_columns if col.name|lower not in ['issue_id','issue_day_id','valid_starting_on', 'status'] %} 
 
         -- we de-nulled the true null values earlier in order to differentiate them from nulls that just needed to be backfilled
