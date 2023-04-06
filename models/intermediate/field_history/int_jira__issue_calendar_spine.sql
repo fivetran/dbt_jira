@@ -82,6 +82,5 @@ surrogate_key as (
     from issue_spine
 
     where date_day <= cast( {{ dbt.date_trunc('day',dbt.current_timestamp_in_utc_backcompat()) }} as date)
-
 )
 select * from surrogate_key 
