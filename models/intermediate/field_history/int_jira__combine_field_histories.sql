@@ -73,7 +73,7 @@ surrogate_key as (
 
     select 
     *,
-    {{ dbt_utils.generate_surrogate_key([var('jira_field_grain', 'field_id'),'issue_id', 'valid_starting_at']) }} as combined_history_id
+    {{ dbt_utils.generate_surrogate_key(['field_id', 'issue_id', 'valid_starting_at']) }} as combined_history_id
 
     from get_valid_dates
 
