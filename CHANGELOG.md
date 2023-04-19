@@ -1,3 +1,21 @@
+# dbt_jira v0.13.0
+## 🚨 Breaking Changes 🚨:
+[PR #95](https://github.com/fivetran/dbt_jira/pull/95) applies the following changes:
+- Added the `status_id` column as a default field for the `jira__daily_issue_field_history` model. This is required to perform an accurate join for the `status` field in incremental runs.
+  - Please be aware a `dbt run --full-refresh` will be required following this upgrade.
+
+## 🎉 Feature Updates 🎉
+[PR #93](https://github.com/fivetran/dbt_jira/pull/93) applies the following changes:
+- Adds the option to use `field_name` instead of `field_id` as the field-grain for issue field history transformations. Previously, the package would strictly partition and join issue field data using `field_id`. However, this assumed that it was impossible to have fields with the same name in Jira. For instance, it is very easy to create another `Sprint` field, and different Jira users across your organization may choose the wrong or inconsistent version of the field. 
+  - Thus, to treat these as the same field, set the new `jira_field_grain` variable to `'field_name'` in your `dbt_project.yml` file. You must run a full refresh to accurately fold this change in.
+
+## Under the Hood
+[PR #95](https://github.com/fivetran/dbt_jira/pull/95) applies the following changes:
+- With the addition of the default `status_id` field in the `jira__daily_issue_field_history` model, there is no longer a need to do the extra partitioning to fill values for the `status` field. As such, the `status` partitions were removed in place of `status_id`. However, in the final cte of the model we join in the status staging model to populate the appropriate status per the accurate status_id for the given day.
+
+## Contributors
+- [@RivkiHofman](https://github.com/RivkiHofman) ([#92](https://github.com/fivetran/dbt_jira/pull/92))
+
 # dbt_jira v0.12.2
 ## Bug Fixes
 - Reverting the changes introduced between v0.12.1 except Databricks compatibility. Please stay tuned for a future release that will integrate the v0.12.1 changes in a bug free release. ([#88](https://github.com/fivetran/dbt_jira/pull/88))

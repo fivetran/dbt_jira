@@ -43,7 +43,7 @@ order_daily_values as (
 
         -- want to grab last value for an issue's field for each day
         row_number() over (
-            partition by valid_starting_on, issue_id, field_id
+            partition by valid_starting_on, issue_id, {{ var('jira_field_grain', 'field_id') }}
             order by valid_starting_at desc
             ) as row_num
 
@@ -72,7 +72,7 @@ final as (
         valid_ending_at, 
         valid_starting_on,
 
-        {{ dbt_utils.generate_surrogate_key(['field_id','issue_id', 'valid_starting_on']) }} as issue_field_day_id
+        {{ dbt_utils.generate_surrogate_key([var('jira_field_grain', 'field_id'),'issue_id', 'valid_starting_on']) }} as issue_field_day_id
         
     from get_latest_daily_value
 )

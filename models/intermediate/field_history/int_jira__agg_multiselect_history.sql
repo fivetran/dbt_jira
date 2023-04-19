@@ -29,7 +29,7 @@ batch_updates as (
 
     select 
         *,
-        {{ dbt_utils.generate_surrogate_key(['field_id', 'issue_id', 'updated_at']) }} as batch_id
+        {{ dbt_utils.generate_surrogate_key([var('jira_field_grain', 'field_id'), 'issue_id', 'updated_at']) }} as batch_id
 
     from issue_multiselect_history 
 ),

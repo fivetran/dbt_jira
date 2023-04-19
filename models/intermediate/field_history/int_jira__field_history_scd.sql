@@ -12,7 +12,10 @@ with change_data as (
     select 
         valid_starting_on, 
         issue_id,
-        issue_day_id
+        issue_day_id,
+        status as status_id,
+        sum( case when status is null then 0 else 1 end) over ( partition by issue_id 
+            order by valid_starting_on rows unbounded preceding) as status_id_field_partition
 
         {% for col in issue_columns if col.name|lower not in ['valid_starting_on','issue_id','issue_day_id'] %} 
         , {{ col.name }}
@@ -31,7 +34,10 @@ with change_data as (
     select 
         valid_starting_on, 
         issue_id,
-        issue_day_id
+        issue_day_id,
+        first_value( status ) over (
+            partition by issue_id, status_id_field_partition 
+            order by valid_starting_on asc rows between unbounded preceding and current row) as status_id
         
         {% for col in issue_columns if col.name|lower not in ['valid_starting_on','issue_id','issue_day_id'] %} 
 

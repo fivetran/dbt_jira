@@ -56,7 +56,7 @@ Include the following jira package version in your `packages.yml` file:
 ```yaml
 packages:
   - package: fivetran/jira
-    version: [">=0.12.0", "<0.13.0"]
+    version: [">=0.13.0", "<0.14.0"]
 
 ```
 ## Step 3: Define database and schema variables
@@ -83,7 +83,7 @@ vars:
 <details><summary>Expand to view configurations</summary>
 
 ### Define daily issue field history columns
-The `jira__daily_issue_field_history` model generates historical data for the columns specified by the `issue_field_history_columns` variable. By default, the only columns tracked are `status` and `sprint`, but all fields found in the Jira `FIELD` table's `field_name` column can be included in this model. The most recent value of any tracked column is also captured in `jira__issue_enhanced`.
+The `jira__daily_issue_field_history` model generates historical data for the columns specified by the `issue_field_history_columns` variable. By default, the only columns tracked are `status`, `status_id`, and `sprint`, but all fields found in the Jira `FIELD` table's `field_name` column can be included in this model. The most recent value of any tracked column is also captured in `jira__issue_enhanced`.
 
 If you would like to change these columns, add the following configuration to your `dbt_project.yml` file. After adding the columns to your `dbt_project.yml` file, run the `dbt run --full-refresh` command to fully refresh any existing models:
 

@@ -61,7 +61,7 @@ get_valid_dates as (
         updated_at as valid_starting_at,
 
         -- this value is valid until the next value is updated
-        lead(updated_at, 1) over(partition by issue_id, field_id order by updated_at asc) as valid_ending_at, 
+        lead(updated_at, 1) over(partition by issue_id, {{ var('jira_field_grain', 'field_id') }} order by updated_at asc) as valid_ending_at, 
 
         cast( {{ dbt.date_trunc('day', 'updated_at') }} as date) as valid_starting_on
 
@@ -73,7 +73,7 @@ surrogate_key as (
 
     select 
     *,
-    {{ dbt_utils.generate_surrogate_key(['field_id','issue_id', 'valid_starting_at']) }} as combined_history_id
+    {{ dbt_utils.generate_surrogate_key(['field_id', 'issue_id', 'valid_starting_at']) }} as combined_history_id
 
     from get_valid_dates
 
