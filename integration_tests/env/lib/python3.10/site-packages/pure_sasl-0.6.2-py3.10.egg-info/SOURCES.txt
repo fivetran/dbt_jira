@@ -1,0 +1,14 @@
+CHANGES.rst
+LICENSE
+MANIFEST.in
+README.rst
+setup.cfg
+setup.py
+pure_sasl.egg-info/PKG-INFO
+pure_sasl.egg-info/SOURCES.txt
+pure_sasl.egg-info/dependency_links.txt
+pure_sasl.egg-info/requires.txt
+pure_sasl.egg-info/top_level.txt
+puresasl/__init__.py
+puresasl/client.py
+puresasl/mechanisms.py

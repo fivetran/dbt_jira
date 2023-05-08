@@ -47,6 +47,16 @@ statuses as (
     from {{ var('status') }}
 ),
 
+
+{% if var('jira_using_components', True) %}
+
+component_data as (
+
+    select * 
+    from {{ var('component') }}
+),
+{% endif %}
+
 -- in intermediate/field_history/
 calendar as (
 
