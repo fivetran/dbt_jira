@@ -30,7 +30,7 @@ end
 # Unset irrelevant variables.
 deactivate nondestructive
 
-set -gx VIRTUAL_ENV "/Users/avinash.kunnath/Documents/dbt_packages/jira/dbt_jira/integration_tests/env"
+set -gx VIRTUAL_ENV "/Users/avinash.kunnath/Documents/dbt_packages/jira/development/env"
 
 set -gx _OLD_VIRTUAL_PATH $PATH
 set -gx PATH "$VIRTUAL_ENV/bin" $PATH

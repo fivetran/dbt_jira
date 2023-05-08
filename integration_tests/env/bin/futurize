@@ -1,4 +1,4 @@
-#!/Users/avinash.kunnath/Documents/dbt_packages/jira/dbt_jira/integration_tests/env/bin/python3
+#!/Users/avinash.kunnath/Documents/dbt_packages/jira/development/env/bin/python3
 # EASY-INSTALL-ENTRY-SCRIPT: 'future==0.18.3','console_scripts','futurize'
 import re
 import sys
