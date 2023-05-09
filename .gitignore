@@ -4,4 +4,3 @@ logs/
 .DS_Store
 models/intermediate/int_jira__all_field_options.sql
 dbt_packages/
-integration_tests/env
