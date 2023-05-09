@@ -30,7 +30,7 @@ vars:
     jira_version_identifier: "version"
 
   issue_field_history_columns: ['summary', 'story points', 'components']
- 
+
 seeds:
   jira_integration_tests:
     +column_types:
