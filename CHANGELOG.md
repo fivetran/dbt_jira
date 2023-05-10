@@ -1,7 +1,9 @@
 # dbt_jira v0.14.0
 ## 🚨 Breaking Changes 🚨:
-- Fixed `jira__daily_issue_field_history` model to make sure component values are correctly joined into our issue models ([#99](https://github.com/fivetran/dbt_jira/pull/99)) and properly execute whether components are being used or not from the issue field history.
+- Fixed `jira__daily_issue_field_history` model to make sure component values are correctly joined into our issue models ([#99](https://github.com/fivetran/dbt_jira/pull/99)) and configure whether to bring in components if the component source is being leveraged and components is specified as one of the `issue_field_history_columns` to bring in. 
+- Added additional seed rows to ensure the new configuration for components properly runs for all edge cases and compare against normal issue field history fields like `summary`. 
 - Please note, a `dbt run --full-refresh` will be required after upgrading to this version in order to capture the updates.
+
 # dbt_jira v0.13.0
 ## 🚨 Breaking Changes 🚨:
 [PR #95](https://github.com/fivetran/dbt_jira/pull/95) applies the following changes:

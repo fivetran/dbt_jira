@@ -49,8 +49,7 @@ statuses as (
 
 
 {% if var('jira_using_components', True) %}
-
-component_data as (
+components as (
 
     select * 
     from {{ var('component') }}
@@ -76,7 +75,7 @@ joined as (
 
         {% if is_incremental() %}    
             {% for col in pivot_data_columns if col.name|lower == 'components' and var('jira_using_components', True) %}
-            , coalesce(pivoted_daily_history.components, most_recent_data.component) as components
+            , coalesce(pivoted_daily_history.components, most_recent_data.components) as components
             {% endfor %} 
             {% for col in pivot_data_columns if col.name|lower not in ['issue_day_id', 'issue_id', 'valid_starting_on', 'components'] %} 
             , coalesce(pivoted_daily_history.{{ col.name }}, most_recent_data.{{ col.name }}) as {{ col.name }}
@@ -112,8 +111,8 @@ set_values as (
             order by date_day rows unbounded preceding) as status_id_field_partition
 
         {% for col in pivot_data_columns if col.name|lower == 'components' and var('jira_using_components', True) %}
-        , component_data.component_name as component
-        , sum(case when component_data.component_name is null then 0 else 1 end) over (partition by issue_id order by date_day rows unbounded preceding) as component_field_partition
+        , coalesce(components.component_name, joined.components) as components
+        , sum(case when components.component_name is null then 0 else 1 end) over (partition by issue_id order by date_day rows unbounded preceding) as component_field_partition
         {% endfor %}
 
         {% for col in pivot_data_columns if col.name|lower not in ['issue_id', 'issue_day_id', 'valid_starting_on', 'status', 'status_id', 'components'] %}
@@ -126,8 +125,8 @@ set_values as (
     from joined
 
     {% for col in pivot_data_columns if col.name|lower == 'components' and var('jira_using_components', True) %}
-    left join component_data   
-        on cast(component_data.component_id as {{ dbt.type_string() }}) = joined.components
+    left join components   
+        on cast(components.component_id as {{ dbt.type_string() }}) = joined.components
     {% endfor %}
 
     {% for col in pivot_data_columns if col.name|lower not in ['issue_id', 'issue_day_id', 'valid_starting_on', 'status', 'status_id', 'components'] %}
@@ -146,7 +145,7 @@ fill_values as (
             order by date_day asc rows between unbounded preceding and current row) as status_id
 
         {% for col in pivot_data_columns if col.name|lower == 'components' and var('jira_using_components', True) %}
-        , first_value(component) over (partition by issue_id, component_field_partition order by date_day asc rows between unbounded preceding and current row) as component
+        , first_value(components) over (partition by issue_id, component_field_partition order by date_day asc rows between unbounded preceding and current row) as components
         {% endfor %}    
 
         {% for col in pivot_data_columns if col.name|lower not in ['issue_id', 'issue_day_id', 'valid_starting_on', 'status', 'status_id', 'components'] %}
@@ -166,7 +165,7 @@ fix_null_values as (
         issue_id
 
         {% for col in pivot_data_columns if col.name|lower == 'components' and var('jira_using_components', True) %}
-        , case when component = 'is_null' then null else component end as component
+        , case when components = 'is_null' then null else components end as components
         {% endfor %}
 
         {% for col in pivot_data_columns if col.name|lower not in ['issue_id','issue_day_id','valid_starting_on', 'status', 'components'] %} 
@@ -189,7 +188,7 @@ surrogate_key as (
         statuses.status_name as status
 
         {% for col in pivot_data_columns if col.name|lower == 'components' and var('jira_using_components', True) %}
-        , case when component = 'is_null' then null else component end as component
+        , case when components = 'is_null' then null else components end as components
         {% endfor %}
 
         {% for col in pivot_data_columns if col.name|lower not in ['issue_id','issue_day_id','valid_starting_on', 'status', 'components'] %} 
