@@ -1,9 +1,13 @@
-# dbt_jira v0.14.0
+# dbt_jira v0.14.0 
 ## 🚨 Breaking Changes 🚨:
 - Fixed `jira__daily_issue_field_history` model to make sure component values are correctly joined into our issue models  and configure whether to bring in components if the component source is being leveraged and components is specified as one of the `issue_field_history_columns` to bring in. [#99](https://github.com/fivetran/dbt_jira/pull/99)
 - Added additional seed rows to ensure the new configuration for components properly runs for all edge cases and compare against normal issue field history fields like `summary`. 
 >**Note**: Please note, a `dbt run --full-refresh` will be required after upgrading to this version in order to capture the updates.
 
+## Under the Hood:
+- Incorporated the new `fivetran_utils.drop_schemas_automation` macro into the end of each Buildkite integration test job. ([PR#98](https://github.com/fivetran/dbt_jira/pull/98))
+- Updated the pull request [templates](/.github). ([PR#98](https://github.com/fivetran/dbt_jira/pull/98))
+ 
 # dbt_jira v0.13.0
 ## 🚨 Breaking Changes 🚨:
 [PR #95](https://github.com/fivetran/dbt_jira/pull/95) applies the following changes:
