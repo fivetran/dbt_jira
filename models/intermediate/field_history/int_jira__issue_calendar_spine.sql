@@ -54,7 +54,7 @@ issue_dates as (
 
         -- resolved_at will become null if an issue is marked as un-resolved. if this sorta thing happens often, you may want to run full-refreshes of the field_history models often
         -- if it's not resolved include everything up to today. if it is, look at the last time it was updated 
-        cast({{ dbt.date_trunc('day', 'case when issue.resolved_at is null then ' ~ dbt.current_timestamp_in_utc_backcompat() ~ ' else issue_history_scd.valid_starting_on end') }} as date) as open_until
+        cast({{ dbt.date_trunc('day', 'case when issue.resolved_at is null then ' ~ dbt.current_timestamp_in_utc_backcompat() ~ ' else cast(issue_history_scd.valid_starting_on as ' ~ dbt.type_timestamp() ~ ') end') }} as date) as open_until
 
     from issue_history_scd
     left join {{ var('issue') }} as issue
