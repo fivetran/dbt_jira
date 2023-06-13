@@ -3,7 +3,7 @@
 ## Bug Fixes
 - Updated the `int_jira__issue_calendar_spine` logic, which now references the `int_jira__field_history_scd` model as an upstream dependency. ([PR #104](https://github.com/fivetran/dbt_jira/pull/104))
 - Modified the `open_until` field  within the `int_jira__issue_calendar_spine` model to be dependent on the `int_jira__field_history_scd` model's `valid_starting_on` column as opposed to the `issue` table's `updated_at` field. ([PR #104](https://github.com/fivetran/dbt_jira/pull/104))
-  - This is required as some resolved issues (outside of the 30 day or `jira_issue_history_buffer` variable window) were having faulty incremental loads due to untracked fields (fields not tracked via the `issue_field_history_columns` variable or other fields not identified in the history tables such as Links, Comments, etc.) causing the `updated_at` column to update, but there were no tracked fields that were updated. Thus causing a faulty incremental load.
+  - This is required as some resolved issues (outside of the 30 day or `jira_issue_history_buffer` variable window) were having faulty incremental loads due to untracked fields (fields not tracked via the `issue_field_history_columns` variable or other fields not identified in the history tables such as Links, Comments, etc.). This caused the `updated_at` column to update, but there were no tracked fields that were updated, thus causing a faulty incremental load.
 
 ## Contributors
 - [@kenzie-marsh](https://github.com/kenzie-marsh) ([Issue #100](https://github.com/fivetran/dbt_jira/issues/100))
