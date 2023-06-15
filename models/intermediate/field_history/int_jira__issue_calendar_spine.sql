@@ -40,18 +40,23 @@ with spine as (
     {% endif %}
 ),
 
+issue_history_scd as (
+    
+    select *
+    from {{ ref('int_jira__field_history_scd') }}
+),
+
 issue_dates as (
 
     select
-        issue_id,
-        cast( {{ dbt.date_trunc('day', 'created_at') }} as date) as created_on,
-
+        issue_history_scd.issue_id,
+        cast( {{ dbt.date_trunc('day', 'issue.created_at') }} as date) as created_on,
         -- resolved_at will become null if an issue is marked as un-resolved. if this sorta thing happens often, you may want to run full-refreshes of the field_history models often
         -- if it's not resolved include everything up to today. if it is, look at the last time it was updated 
-        cast({{ dbt.date_trunc('day', 'case when resolved_at is null then ' ~ dbt.current_timestamp_in_utc_backcompat() ~ ' else updated_at end') }} as date) as open_until
-
-    from {{ var('issue') }}
-
+        cast({{ dbt.date_trunc('day', 'case when issue.resolved_at is null then ' ~ dbt.current_timestamp_in_utc_backcompat() ~ ' else cast(issue_history_scd.valid_starting_on as ' ~ dbt.type_timestamp() ~ ') end') }} as date) as open_until
+    from issue_history_scd
+    left join {{ var('issue') }} as issue
+        on issue_history_scd.issue_id = issue.issue_id
 ),
 
 issue_spine as (
