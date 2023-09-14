@@ -46,13 +46,6 @@ statuses as (
     from {{ var('status') }}
 ),
 
-fields as (
-    
-    select *
-    from {{ var('field') }}
-
-), 
-
 issue_types as (
     
     select *
