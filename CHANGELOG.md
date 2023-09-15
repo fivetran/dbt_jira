@@ -1,7 +1,7 @@
 # dbt_jira v0.15.0
 [PR #107](https://github.com/fivetran/dbt_jira/pull/107) contains the following updates:
 ## 🚨 Breaking Changes 🚨
-- Fixed the `jira__daily_issue_field_history` model to make sure `issue_type` values are correctly joined into the downstream issue models. This applied only if `issue type` is leveraged within the `issue_field_history_columns` variable.
+- Updated the `jira__daily_issue_field_history` model to make sure `issue_type` values are correctly joined into the downstream issue models. This applied only if `issue type` is leveraged within the `issue_field_history_columns` variable.
 >**Note**: Please be aware that a `dbt run --full-refresh` will be required after upgrading to this version in order to capture the updates.
 
 # dbt_jira v0.14.0 
