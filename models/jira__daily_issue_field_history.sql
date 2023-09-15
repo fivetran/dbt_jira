@@ -73,8 +73,6 @@ calendar as (
 
 joined as (
 
-{% set joined_exception_cols = ['issue_day_id', 'issue_id', 'valid_starting_on', 'components', 'issue_type'] %}
-
     select
         calendar.date_day,
         calendar.issue_id
@@ -84,10 +82,7 @@ joined as (
                 {% if col.name|lower == 'components' and var('jira_using_components', True) %}
                 , coalesce(pivoted_daily_history.components, most_recent_data.components) as components
 
-                {% elif col.name|lower == 'issue_type' %}
-                , coalesce(pivoted_daily_history.issue_type, most_recent_data.issue_type) as issue_type
-
-                {% elif col.name|lower not in joined_exception_cols %} 
+                {% elif col.name|lower not in ['issue_day_id', 'issue_id', 'valid_starting_on', 'components'] %} 
                 , coalesce(pivoted_daily_history.{{ col.name }}, most_recent_data.{{ col.name }}) as {{ col.name }}
 
                 {% else %}{% endif %}
@@ -98,11 +93,8 @@ joined as (
                 {% if col.name|lower == 'components' and var('jira_using_components', True) %}
                 , pivoted_daily_history.components   
 
-                {% elif col.name|lower == 'issue_type' %}
-                , pivoted_daily_history.issue_type
-
-                {% elif col.name|lower not in joined_exception_cols %} 
-                , {{ col.name }}
+                {% elif col.name|lower not in ['issue_day_id', 'issue_id', 'valid_starting_on', 'components'] %} 
+                , pivoted_daily_history.{{ col.name }}
 
                 {% else %}{% endif %}
             {% endfor %} 
@@ -120,9 +112,6 @@ joined as (
     {% endif %}
 ),
 
--- list of exception columns
-{% set exception_cols = ['issue_id', 'issue_day_id', 'valid_starting_on', 'status', 'status_id', 'components', 'issue_type'] %}
-
 set_values as (
     select
         date_day,
@@ -131,8 +120,11 @@ set_values as (
         sum( case when joined.status_id is null then 0 else 1 end) over ( partition by issue_id
             order by date_day rows unbounded preceding) as status_id_field_partition
 
+        -- list of exception columns
+        {% set exception_cols = ['issue_id', 'issue_day_id', 'valid_starting_on', 'status', 'status_id', 'components', 'issue_type'] %}
+
         {% for col in pivot_data_columns %}
-            {% if col.name|lower == 'components' and var('jira_using_components', True) %}
+                {% if col.name|lower == 'components' and var('jira_using_components', True) %}
             , coalesce(components.component_name, joined.components) as components
             , sum(case when joined.components is null then 0 else 1 end) over (partition by issue_id order by date_day rows unbounded preceding) as component_field_partition
 
@@ -141,9 +133,9 @@ set_values as (
             , sum(case when joined.issue_type is null then 0 else 1 end) over (partition by issue_id order by date_day rows unbounded preceding) as issue_type_field_partition
 
             {% elif col.name|lower not in exception_cols %}
-            , coalesce(field_option_{{ col.name }}.field_option_name, {{ col.name }}) as {{ col.name }}
+            , coalesce(field_option_{{ col.name }}.field_option_name, joined.{{ col.name }}) as {{ col.name }}
             -- create a batch/partition once a new value is provided
-            , sum( case when {{ col.name }} is null then 0 else 1 end) over ( partition by issue_id
+            , sum( case when joined.{{ col.name }} is null then 0 else 1 end) over ( partition by issue_id
                 order by date_day rows unbounded preceding) as {{ col.name }}_field_partition
 
             {% else %}{% endif %}
@@ -162,7 +154,7 @@ set_values as (
 
         {% elif col.name|lower not in exception_cols %}
         left join field_option as field_option_{{ col.name }}
-            on cast(field_option_{{ col.name }}.field_id as {{ dbt.type_string() }}) = {{ col.name }}
+            on cast(field_option_{{ col.name }}.field_id as {{ dbt.type_string() }}) = joined.{{ col.name }}
 
         {% else %}{% endif %}
     {% endfor %}
@@ -179,19 +171,17 @@ fill_values as (
 
         {% for col in pivot_data_columns %}
             {% if col.name|lower == 'components' and var('jira_using_components', True) %}
-            , first_value(components) over (partition by issue_id, component_field_partition order by date_day asc rows between unbounded preceding and current row) as components
+            , first_value(components) over (
+                partition by issue_id, component_field_partition 
+                order by date_day asc rows between unbounded preceding and current row) as components
 
-            {% elif col.name|lower == 'issue_type' %}
-            , first_value(issue_type) over (partition by issue_id, issue_type_field_partition order by date_day asc rows between unbounded preceding and current row) as issue_type
-
-            {% elif col.name|lower not in exception_cols %}
+            {% elif col.name|lower not in ['issue_id', 'issue_day_id', 'valid_starting_on', 'status', 'status_id', 'components'] %}
             -- grab the value that started this batch/partition
             , first_value( {{ col.name }} ) over (
                 partition by issue_id, {{ col.name }}_field_partition 
                 order by date_day asc rows between unbounded preceding and current row) as {{ col.name }}
 
             {% else %}{% endif %}
-        
         {% endfor %}
 
     from set_values
