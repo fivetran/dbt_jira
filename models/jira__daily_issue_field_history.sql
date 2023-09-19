@@ -124,7 +124,7 @@ set_values as (
         {% set exception_cols = ['issue_id', 'issue_day_id', 'valid_starting_on', 'status', 'status_id', 'components', 'issue_type'] %}
 
         {% for col in pivot_data_columns %}
-                {% if col.name|lower == 'components' and var('jira_using_components', True) %}
+            {% if col.name|lower == 'components' and var('jira_using_components', True) %}
             , coalesce(components.component_name, joined.components) as components
             , sum(case when joined.components is null then 0 else 1 end) over (partition by issue_id order by date_day rows unbounded preceding) as component_field_partition
 
