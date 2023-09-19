@@ -85,7 +85,7 @@ joined as (
                 {% elif col.name|lower not in ['issue_day_id', 'issue_id', 'valid_starting_on', 'components'] %} 
                 , coalesce(pivoted_daily_history.{{ col.name }}, most_recent_data.{{ col.name }}) as {{ col.name }}
 
-                {% else %}{% endif %}
+                {% endif %}
             {% endfor %} 
 
         {% else %}
@@ -96,7 +96,7 @@ joined as (
                 {% elif col.name|lower not in ['issue_day_id', 'issue_id', 'valid_starting_on', 'components'] %} 
                 , pivoted_daily_history.{{ col.name }}
 
-                {% else %}{% endif %}
+                {% endif %}
             {% endfor %} 
         {% endif %}
     
@@ -138,7 +138,7 @@ set_values as (
             , sum( case when joined.{{ col.name }} is null then 0 else 1 end) over ( partition by issue_id
                 order by date_day rows unbounded preceding) as {{ col.name }}_field_partition
 
-            {% else %}{% endif %}
+            {% endif %}
         {% endfor %}
 
     from joined
@@ -156,7 +156,7 @@ set_values as (
         left join field_option as field_option_{{ col.name }}
             on cast(field_option_{{ col.name }}.field_id as {{ dbt.type_string() }}) = joined.{{ col.name }}
 
-        {% else %}{% endif %}
+        {% endif %}
     {% endfor %}
 ),
 
@@ -181,7 +181,7 @@ fill_values as (
                 partition by issue_id, {{ col.name }}_field_partition 
                 order by date_day asc rows between unbounded preceding and current row) as {{ col.name }}
 
-            {% else %}{% endif %}
+            {% endif %}
         {% endfor %}
 
     from set_values
@@ -201,7 +201,7 @@ fix_null_values as (
             -- we de-nulled the true null values earlier in order to differentiate them from nulls that just needed to be backfilled
             , case when {{ col.name }} = 'is_null' then null else {{ col.name }} end as {{ col.name }}
 
-            {% else %}{% endif %}
+            {% endif %}
         {% endfor %}
 
     from fill_values
@@ -222,7 +222,7 @@ surrogate_key as (
             {% elif col.name|lower not in ['issue_id','issue_day_id','valid_starting_on', 'status', 'components'] %} 
             , fix_null_values.{{ col.name }} as {{ col.name }}
 
-            {% else %}{% endif %}
+            {% endif %}
         {% endfor %}
 
         , {{ dbt_utils.generate_surrogate_key(['date_day','issue_id']) }} as issue_day_id
