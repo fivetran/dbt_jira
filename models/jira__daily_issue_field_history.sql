@@ -16,11 +16,11 @@
 with pivoted_daily_history as (
 
     select {{ dbt_utils.star(from=ref('int_jira__field_history_scd'), except=['created_on','open_until']) }} 
-    from {{ ref('int_jira__field_history_scd') }}
+    from {{ ref('int_jira__field_history_scd') }} as scd
 
     {% if is_incremental() %}
     
-    where valid_starting_on >= (select max(date_day) from {{ this }} )
+    where scd.valid_starting_on >= (select max(this.date_day) from {{ this }} as this where this.issue_id = scd.issue_id )
 
 -- If no issue fields have been updated since the last incremental run, the pivoted_daily_history CTE will return no record/rows.
 -- When this is the case, we need to grab the most recent day's records from the previously built table so that we can persist 
@@ -29,8 +29,8 @@ with pivoted_daily_history as (
 ), most_recent_data as ( 
     select 
         *
-    from {{ this }}
-    where date_day = (select max(date_day) from {{ this }} )
+    from {{ this }} as recent
+    where recent.date_day = (select max(this.date_day) from {{ this }} as this where this.issue_id = recent.issue_id )
 
 {% endif %}
 
@@ -64,10 +64,10 @@ components as (
 calendar as (
 
     select *
-    from {{ ref('int_jira__issue_calendar_spine') }}
+    from {{ ref('int_jira__issue_calendar_spine') }} as spine
 
     {% if is_incremental() %}
-    where date_day >= (select max(date_day) from {{ this }} )
+    where spine.date_day >= (select max(this.date_day) from {{ this }} as this where this.issue_id = spine.issue_id )
     {% endif %}
 ),
 

@@ -14,9 +14,9 @@ with spine as (
     select *
     from {{ ref('int_jira__calendar_spine') }} 
 
-    {% if is_incremental() %}
+    {# {% if is_incremental() %}
     where date_day >= (select min(earliest_open_until_date) from {{ this }})
-    {% endif %}  
+    {% endif %}   #}
 ),
 
 issue_dates as (
@@ -37,7 +37,9 @@ issue_spine as (
         issue_dates.created_on <= spine.date_day
         and {{ dbt.dateadd('month', var('jira_issue_history_buffer', 1), 'issue_dates.open_until') }} >= spine.date_day
         -- if we cut off issues, we're going to have to do a full refresh to catch issues that have been un-resolved
-
+    {% if is_incremental() %}
+    where spine.date_day >= (select max(this.earliest_open_until_date) from {{ this }} as this where issue_dates.issue_id = this.issue_id )
+    {% endif %}
     group by 1,2
 ),
 
