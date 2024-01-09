@@ -1,3 +1,14 @@
+# dbt_jira v0.16.0
+[PR #114](https://github.com/fivetran/dbt_jira/pull/114) contains the following updates:
+
+## 🚨 Breaking Changes 🚨
+- Refactored `int_jira__issue_calendar_spine` to reduce computational load and ensure proper incremental runs. The following changes were made:
+  - Created the `int_jira__calendar_spine` to move the calendar spine into its own model.
+  - Moved the `issue_dates` CTE join into `int_jira__field_history_scd` to avoid loading all the issue lines within the intermediate model and disrupting incremental loads. 
+
+## 🚘 Under the Hood 🚘 
+- Updated `jira__daily_issue_field_history` to remove `created_on` and `open_until` from the pivoted columns being brought into each CTE operation.
+
 # dbt_jira v0.15.0
 [PR #108](https://github.com/fivetran/dbt_jira/pull/108) contains the following updates:
 ## 🚨 Breaking Changes 🚨

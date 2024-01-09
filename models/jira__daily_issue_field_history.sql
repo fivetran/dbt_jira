@@ -5,7 +5,7 @@
             if target.type not in ['spark', 'databricks'] else ['date_day'],
         unique_key='issue_day_id',
         incremental_strategy = 'merge' if target.type not in ('snowflake', 'postgres', 'redshift') else 'delete+insert',
-        file_format = 'delta'
+        file_format = 'parquet'
     )
 }}
 
@@ -15,7 +15,7 @@
 -- in intermediate/field_history/
 with pivoted_daily_history as (
 
-    select * 
+    select{{ dbt_utils.star(from=ref('int_jira__field_history_scd'), except=['created_on','open_until']) }} 
     from {{ ref('int_jira__field_history_scd') }}
 
     {% if is_incremental() %}
@@ -82,7 +82,7 @@ joined as (
                 {% if col.name|lower == 'components' and var('jira_using_components', True) %}
                 , coalesce(pivoted_daily_history.components, most_recent_data.components) as components
 
-                {% elif col.name|lower not in ['issue_day_id', 'issue_id', 'valid_starting_on', 'components'] %} 
+                {% elif col.name|lower not in ['issue_day_id', 'issue_id', 'valid_starting_on', 'components', 'created_on', 'open_until'] %} 
                 , coalesce(pivoted_daily_history.{{ col.name }}, most_recent_data.{{ col.name }}) as {{ col.name }}
 
                 {% endif %}
@@ -93,7 +93,7 @@ joined as (
                 {% if col.name|lower == 'components' and var('jira_using_components', True) %}
                 , pivoted_daily_history.components   
 
-                {% elif col.name|lower not in ['issue_day_id', 'issue_id', 'valid_starting_on', 'components'] %} 
+                {% elif col.name|lower not in ['issue_day_id', 'issue_id', 'valid_starting_on', 'components', 'created_on', 'open_until'] %} 
                 , pivoted_daily_history.{{ col.name }}
 
                 {% endif %}
@@ -121,7 +121,7 @@ set_values as (
             order by date_day rows unbounded preceding) as status_id_field_partition
 
         -- list of exception columns
-        {% set exception_cols = ['issue_id', 'issue_day_id', 'valid_starting_on', 'status', 'status_id', 'components', 'issue_type'] %}
+        {% set exception_cols = ['issue_id', 'issue_day_id', 'valid_starting_on', 'status', 'status_id', 'components', 'issue_type', 'created_on', 'open_until'] %}
 
         {% for col in pivot_data_columns %}
             {% if col.name|lower == 'components' and var('jira_using_components', True) %}
@@ -175,7 +175,7 @@ fill_values as (
                 partition by issue_id, component_field_partition 
                 order by date_day asc rows between unbounded preceding and current row) as components
 
-            {% elif col.name|lower not in ['issue_id', 'issue_day_id', 'valid_starting_on', 'status', 'status_id', 'components'] %}
+            {% elif col.name|lower not in ['issue_id', 'issue_day_id', 'valid_starting_on', 'status', 'status_id', 'components', 'created_on', 'open_until'] %}
             -- grab the value that started this batch/partition
             , first_value( {{ col.name }} ) over (
                 partition by issue_id, {{ col.name }}_field_partition 
@@ -197,7 +197,7 @@ fix_null_values as (
             {% if col.name|lower == 'components' and var('jira_using_components', True) %}
             , case when components = 'is_null' then null else components end as components
 
-            {% elif col.name|lower not in ['issue_id','issue_day_id','valid_starting_on', 'status', 'components'] %}
+            {% elif col.name|lower not in ['issue_id','issue_day_id','valid_starting_on', 'status', 'components', 'created_on', 'open_until'] %}
             -- we de-nulled the true null values earlier in order to differentiate them from nulls that just needed to be backfilled
             , case when {{ col.name }} = 'is_null' then null else {{ col.name }} end as {{ col.name }}
 
@@ -219,7 +219,7 @@ surrogate_key as (
             {% if col.name|lower == 'components' and var('jira_using_components', True) %}
             , fix_null_values.components as components
 
-            {% elif col.name|lower not in ['issue_id','issue_day_id','valid_starting_on', 'status', 'components'] %} 
+            {% elif col.name|lower not in ['issue_id','issue_day_id','valid_starting_on', 'status', 'components', 'created_on', 'open_until'] %} 
             , fix_null_values.{{ col.name }} as {{ col.name }}
 
             {% endif %}

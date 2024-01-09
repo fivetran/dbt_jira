@@ -2,12 +2,19 @@
 
 {%- set issue_columns = adapter.get_columns_in_relation(ref('int_jira__pivot_daily_field_history')) -%}
 
-with change_data as (
+with issue as (
+
+    select * 
+    from {{ var('issue') }}
+),   
+    
+change_data as (
 
     select *
     from {{ ref('int_jira__pivot_daily_field_history') }}
+), 
 
-), set_values as (
+set_values as (
 
     select 
         valid_starting_on, 
@@ -27,7 +34,9 @@ with change_data as (
     
     from change_data
 
-), fill_values as (
+), 
+
+fill_values as (
 
 -- each row of the pivoted table includes field values if that field was updated on that day
 -- we need to backfill to persist values that have been previously updated and are still valid 
@@ -50,7 +59,20 @@ with change_data as (
 
     from set_values
 
+),
+
+issue_dates as (
+
+    select
+        fill_values.*,
+        cast( {{ dbt.date_trunc('day', 'issue.created_at') }} as date) as created_on,
+        -- resolved_at will become null if an issue is marked as un-resolved. if this sorta thing happens often, you may want to run full-refreshes of the field_history models often
+        -- if it's not resolved include everything up to today. if it is, look at the last time it was updated 
+        cast({{ dbt.date_trunc('day', 'case when issue.resolved_at is null then ' ~ dbt.current_timestamp_in_utc_backcompat() ~ ' else cast(fill_values.valid_starting_on as ' ~ dbt.type_timestamp() ~ ') end') }} as date) as open_until
+    from fill_values
+    left join issue
+        on fill_values.issue_id = issue.issue_id
 )
 
 select *
-from fill_values
+from issue_dates
