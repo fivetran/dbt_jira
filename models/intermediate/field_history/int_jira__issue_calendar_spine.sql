@@ -5,29 +5,24 @@
             if target.type not in ['spark', 'databricks'] else ['date_day'],
         unique_key='issue_day_id',
         incremental_strategy = 'merge' if target.type not in ('snowflake', 'postgres', 'redshift') else 'delete+insert',
-        file_format = 'parquet'
+        file_format = 'delta'
     )
 }}
 
 with spine as (
 
     select *
-    from {{ ref('int_jira__calendar_spine') }}
-
+    from {{ ref('int_jira__calendar_spine') }} 
 
     {% if is_incremental() %}
-    where date_day >= (select max(date_day) from {{ this }})
+    where date_day >= (select min(earliest_open_until_date) from {{ this }})
     {% endif %}  
 ),
 
 issue_dates as (
     
     select *
-    from {{ ref('int_jira__field_history_scd') }} 
-
-    {% if is_incremental() %}
-    where valid_starting_on >= (select max(date_day) from {{ this }})
-    {% endif %}
+    from {{ ref('int_jira__field_history_scd') }}  
 ), 
 
 issue_spine as (

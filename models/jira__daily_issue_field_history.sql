@@ -5,7 +5,7 @@
             if target.type not in ['spark', 'databricks'] else ['date_day'],
         unique_key='issue_day_id',
         incremental_strategy = 'merge' if target.type not in ('snowflake', 'postgres', 'redshift') else 'delete+insert',
-        file_format = 'parquet'
+        file_format = 'delta'
     )
 }}
 
@@ -15,7 +15,7 @@
 -- in intermediate/field_history/
 with pivoted_daily_history as (
 
-    select{{ dbt_utils.star(from=ref('int_jira__field_history_scd'), except=['created_on','open_until']) }} 
+    select {{ dbt_utils.star(from=ref('int_jira__field_history_scd'), except=['created_on','open_until']) }} 
     from {{ ref('int_jira__field_history_scd') }}
 
     {% if is_incremental() %}
