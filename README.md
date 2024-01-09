@@ -92,6 +92,7 @@ vars:
     issue_field_history_columns: ['the', 'list', 'of', 'field', 'names']
 ```
 
+
 ### Adjust the field-grain for issue field history transformations if duplicate field names
 This package provides the option to use `field_name` instead of `field_id` as the field-grain for issue field history transformations. By default, the package strictly partitions and joins issue field data using `field_id`. However, this assumes that it is impossible to have fields with the same name in Jira. For instance, it is very easy to create another `Sprint` field, and different Jira users across your organization may choose the wrong or inconsistent version of the field. As such, the `jira_field_grain` variable may be adjusted to change the field-grain behavior of the issue field history  models. You may adjust the variable using the following configuration in your root dbt_project.yml.
 
@@ -99,6 +100,17 @@ This package provides the option to use `field_name` instead of `field_id` as th
 vars:
     jira_field_grain: 'field_name' # field_id by default
 ```
+
+### Extend the history of an issue past its closing date
+This packages allows you the option to utilize a buffer variable to bring in issues past their date of close. This is because issues can be left unresolved past that date. This buffer variable ensures that this daily issue history will not be cut off. 
+
+You may adjust the variable using the following configuration in your root `dbt_project.yml`.  
+
+```yml
+vars:
+    jira_issue_history_buffer: insert_number_of_months # 1 by default
+```
+
 
 ### Change the build schema
 By default, this package builds the Jira staging models within a schema titled (`<target_schema>` + `_jira_source`) and your Jira modeling models within a schema titled (`<target_schema>` + `_jira`) in your destination. If this is not where you would like your Jira data to be written to, add the following configuration to your root `dbt_project.yml` file:

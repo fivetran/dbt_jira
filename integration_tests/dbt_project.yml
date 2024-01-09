@@ -1,12 +1,12 @@
 name: 'jira_integration_tests'
-version: '0.15.0'
+version: '0.16.0'
 config-version: 2
 profile: 'integration_tests'
 
 
 vars:
   jira_source:
-    jira_schema: jira_integrations_tests_1
+    jira_schema: jira_integrations_tests_2
     jira_comment_identifier: "comment"
     jira_component_identifier: "component"
     jira_epic_identifier: "epic"
