@@ -100,6 +100,16 @@ vars:
     jira_field_grain: 'field_name' # field_id by default
 ```
 
+### Extend the history of an issue past its closing date
+This packages allows you the option to utilize a buffer variable to bring in issues past their date of close. This is because issues can be left unresolved past that date. This buffer variable ensures that this daily issue history will not cut off field updates to these particular issues. 
+
+You may adjust the variable using the following configuration in your root `dbt_project.yml`.  
+
+```yml
+vars:
+    jira_issue_history_buffer: insert_number_of_months # 1 by default
+```
+
 ### Change the build schema
 By default, this package builds the Jira staging models within a schema titled (`<target_schema>` + `_jira_source`) and your Jira modeling models within a schema titled (`<target_schema>` + `_jira`) in your destination. If this is not where you would like your Jira data to be written to, add the following configuration to your root `dbt_project.yml` file:
 
