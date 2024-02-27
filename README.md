@@ -80,12 +80,12 @@ vars:
 ```
 ## (Optional) Step 5: Additional configurations
 
-<details><summary>Expand to view configurations</summary>
-
 ### Define daily issue field history columns
 The `jira__daily_issue_field_history` model generates historical data for the columns specified by the `issue_field_history_columns` variable. By default, the only columns tracked are `status`, `status_id`, and `sprint`, but all fields found in the Jira `FIELD` table's `field_name` column can be included in this model. The most recent value of any tracked column is also captured in `jira__issue_enhanced`.
 
 If you would like to change these columns, add the following configuration to your `dbt_project.yml` file. After adding the columns to your `dbt_project.yml` file, run the `dbt run --full-refresh` command to fully refresh any existing models:
+
+> IMPORTANT: If you wish to use a custom field, be sure to list the `field_name` and not the `field_id`. The corresponding `field_name` can be found in the `stg_jira__field` model.
 
 ```yml
 vars:
@@ -130,7 +130,6 @@ If an individual source table has a different name than the package expects, add
 vars:
     jira_<default_source_table_name>_identifier: your_table_name 
 ```
-</details>
 
 ## (Optional) Step 6: Orchestrate your models with Fivetran Transformations for dbt Core™
 <details><summary>Expand for details</summary>
