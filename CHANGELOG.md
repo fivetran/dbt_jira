@@ -1,3 +1,8 @@
+# dbt_jira VERSION.VERSION
+
+## Documentation updates
+- Update README to highlight requirements for using custom fields with the `issue_field_history_columns` variable.
+
 # dbt_jira v0.15.0
 [PR #108](https://github.com/fivetran/dbt_jira/pull/108) contains the following updates:
 ## 🚨 Breaking Changes 🚨
