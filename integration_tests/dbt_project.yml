@@ -5,7 +5,7 @@ profile: 'integration_tests'
 
 vars:
   jira_source:
-    jira_schema: jira_integrations_tests_3
+    jira_schema: jira_integrations_tests_41
     jira_comment_identifier: "comment"
     jira_component_identifier: "component"
     jira_epic_identifier: "epic"
