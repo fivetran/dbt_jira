@@ -2,9 +2,9 @@
 [PR #122](https://github.com/fivetran/dbt_jira/pull/122) contains the following updates:
 
 ## 🚨 Breaking Changes: Bug Fixes 🚨
-- The `revised_parent_issue_id` field has been converted to a string datatype (previously integer) to ensure classic Jira projects may link issues to epics. The field datatype change will be seen in the below models. If you are referencing these fields downstream, be sure to make any changes to account for the new datatype.
-  - `int_jira__issue_type_parents`
-  - `jira__issue_enhanced`
+- The following fields in the below mentioned models have been converted to a string datatype (previously integer) to ensure classic Jira projects may link issues to epics. If you are referencing these fields downstream, be sure to make any changes to account for the new datatype.
+  - `revised_parent_issue_id` field within the `int_jira__issue_type_parents` model
+  - `parent_issue_id` field within the `jira__issue_enhanced` model
 
 ## Under the Hood
 - Included auto-releaser GitHub Actions workflow to automate future releases.
