@@ -6,6 +6,9 @@
   - `revised_parent_issue_id` field within the `int_jira__issue_type_parents` model
   - `parent_issue_id` field within the `jira__issue_enhanced` model
 
+## Documentation updates
+- Update README to highlight requirements for using custom fields with the `issue_field_history_columns` variable.
+
 ## Under the Hood
 - Included auto-releaser GitHub Actions workflow to automate future releases.
 - Updated the maintainer PR template to resemble the most up to date format.
