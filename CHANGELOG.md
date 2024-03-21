@@ -1,10 +1,15 @@
 # dbt_jira v0.16.0
-[PR #](https://github.com/fivetran/dbt_jira/pull/) contains the following updates:
+[PR #122](https://github.com/fivetran/dbt_jira/pull/122) contains the following updates:
 
 ## 🚨 Breaking Changes: Bug Fixes 🚨
-- The `revised_parent_id` field has been converted to a string datatype (previously integer) to ensure classic Jira projects may link issues to epics. The field datatype change will be seen in the below models. If you are referencing these fields downstream, be sure to make any changes to account for the new datatype.
+- The `revised_parent_issue_id` field has been converted to a string datatype (previously integer) to ensure classic Jira projects may link issues to epics. The field datatype change will be seen in the below models. If you are referencing these fields downstream, be sure to make any changes to account for the new datatype.
   - `int_jira__issue_type_parents`
   - `jira__issue_enhanced`
+
+## Under the Hood
+- Included auto-releaser GitHub Actions workflow to automate future releases.
+- Updated the maintainer PR template to resemble the most up to date format.
+- Updated `field` and `issue_field_history` seed files to ensure we have an updated test case to capture the epic-link scenario for classic Jira environments.
 
 # dbt_jira v0.15.0
 [PR #108](https://github.com/fivetran/dbt_jira/pull/108) contains the following updates:
