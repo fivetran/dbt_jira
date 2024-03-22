@@ -2,7 +2,7 @@
 [PR #122](https://github.com/fivetran/dbt_jira/pull/122) contains the following updates:
 
 ## 🚨 Breaking Changes: Bug Fixes 🚨
-- The following fields in the below mentioned models have been converted to a string datatype (previously integer) to ensure classic Jira projects may link issues to epics. If you are referencing these fields downstream, be sure to make any changes to account for the new datatype.
+- The following fields in the below mentioned models have been converted to a string datatype (previously integer) to ensure classic Jira projects may link issues to epics. In classic Jira projects the epic reference is in a hyperlink form (ie. "https://ulr-here/epic-key") as opposed to an ID. As such, a string datatype is needed to successfully link issues to epics. If you are referencing these fields downstream, be sure to make any changes to account for the new datatype.
   - `revised_parent_issue_id` field within the `int_jira__issue_type_parents` model
   - `parent_issue_id` field within the `jira__issue_enhanced` model
 
