@@ -24,7 +24,7 @@
 
 <!--section="jira_transformation_model"-->
 The following table provides a detailed list of all models materialized within this package by default. 
-> TIP: See more details about these models in the package's [dbt docs site](https://fivetran.github.io/dbt_jira/#!/overview?g_v=1&g_e=seeds).
+> TIP: See more details about these models in the package's [dbt docs site](https://fivetran.github.io/dbt_jira/#!/overview?g_v=1&g_e=seeds). 
 
 | **Model**                | **Description**                                                                                                                                |
 | ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------- |
