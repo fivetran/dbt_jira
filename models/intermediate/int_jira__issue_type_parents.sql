@@ -32,7 +32,7 @@ issue_enriched_with_epics as (
   select
   
     issue.*,
-    coalesce(parent_issue_id, epic_issue_id) as revised_parent_issue_id
+    coalesce(cast(parent_issue_id as {{ dbt.type_string() }}), cast(epic_issue_id as {{ dbt.type_string() }})) as revised_parent_issue_id
   
   from issue
   
@@ -65,7 +65,8 @@ add_parent_info as (
     issue_w_types
 
     -- do a left join so we can grab all issue types from this table in `issue_join`
-    left join issue_w_types as parent on issue_w_types.revised_parent_issue_id = parent.issue_id
+    left join issue_w_types as parent 
+        on cast(issue_w_types.revised_parent_issue_id as {{ dbt.type_string() }}) = cast(parent.issue_id as {{ dbt.type_string() }})
 
 )
 

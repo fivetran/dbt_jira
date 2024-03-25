@@ -8,7 +8,7 @@ with issue as (
 
     select
         issue_id,
-        coalesce(revised_parent_issue_id, parent_issue_id) as parent_issue_id,
+        coalesce(cast(revised_parent_issue_id as {{ dbt.type_string() }}), cast(parent_issue_id as {{ dbt.type_string() }})) as parent_issue_id,
 
         {{ dbt_utils.star(from=ref('int_jira__issue_type_parents'), 
                             except=except_columns) }}
