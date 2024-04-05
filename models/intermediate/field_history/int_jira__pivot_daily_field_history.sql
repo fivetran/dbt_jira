@@ -3,23 +3,116 @@
         materialized='incremental',
         partition_by = {'field': 'valid_starting_on', 'data_type': 'date'}
             if target.type not in ['spark','databricks'] else ['valid_starting_on'],
+        cluster_by = ['valid_starting_on', 'issue_id'],
         unique_key='issue_day_id',
-        incremental_strategy = 'merge' if target.type not in ('snowflake', 'postgres', 'redshift') else 'delete+insert',
-        file_format = 'delta'
+        incremental_strategy = 'insert_overwrite' if target.type in ('bigquery', 'databricks', 'spark') else 'delete+insert',
+        file_format = 'parquet'
     )
 }}
 
--- latest value per issue field (already limited included fields to sprint, status, and var(issue_field_history_columns))
-with daily_field_history as (
+-- originally int_jira__issue_field_history
+with issue_field_history as (
 
-    select * 
-    from {{ ref('int_jira__daily_field_history') }}
+    select * from {{ ref('int_jira__issue_field_history') }}
 
     {% if is_incremental() %}
-    where valid_starting_on >= (select max(valid_starting_on) from {{ this }} )
+    where cast(updated_at as date) >= (select max(valid_starting_on) from {{ this }} )
     {% endif %}
 ),
 
+issue_multiselect_batch_history as (
+
+    select * from {{ ref('int_jira__agg_multiselect_history') }}
+
+    {% if is_incremental() %}
+    where cast( updated_at as date) >= (select max(valid_starting_on) from {{ this }} )
+    {% endif %}
+),
+
+combine_field_history as (
+-- combining all the field histories together
+    select 
+        field_id,
+        issue_id,
+        updated_at,
+        field_value,
+        field_name
+    from issue_field_history
+
+    union all
+
+    select 
+        field_id,
+        issue_id,
+        updated_at,
+        field_values as field_value, -- this is an aggregated list but we'll just call it field_value
+        field_name
+    from issue_multiselect_batch_history
+),
+
+get_valid_dates as (
+    select 
+        field_id,
+        issue_id,
+        field_value,
+        field_name,
+        updated_at as valid_starting_at,
+
+        -- this value is valid until the next value is updated
+        lead(updated_at, 1) over(partition by issue_id, {{ var('jira_field_grain', 'field_id') }} order by updated_at asc) as valid_ending_at, 
+        cast( {{ dbt.date_trunc('day', 'updated_at') }} as date) as valid_starting_on
+    from combine_field_history
+),
+
+limit_to_relevant_fields as (
+    -- let's remove unncessary rows moving forward and grab field names 
+    select 
+        get_valid_dates.*
+    from get_valid_dates
+
+    where lower(field_id) = 'status' 
+        or lower(field_name) in ('sprint'
+        {%- for col in var('issue_field_history_columns', []) -%}
+            ,'{{ (col|lower) }}'
+        {%- endfor -%} )
+),
+
+order_daily_values as (
+    select 
+        *,
+        -- want to grab last value for an issue's field for each day
+        row_number() over (
+            partition by valid_starting_on, issue_id, {{ var('jira_field_grain', 'field_id') }}
+            order by valid_starting_at desc
+            ) as row_num
+    from limit_to_relevant_fields
+),
+
+-- only looking at the latest value for each day
+get_latest_daily_value as (
+    select * 
+    from order_daily_values
+
+    where row_num = 1
+), 
+
+int_jira__daily_field_history as (
+
+    select
+        field_id,
+        issue_id,
+        field_name,
+
+        -- doing this to figure out what values are actually null and what needs to be backfilled in jira__daily_issue_field_history
+        case when field_value is null then 'is_null' else field_value end as field_value,
+        valid_starting_at,
+        valid_ending_at, 
+        valid_starting_on
+        
+    from get_latest_daily_value
+),
+
+-- 
 pivot_out as (
 
     -- pivot out default columns (status and sprint) and others specified in the var(issue_field_history_columns)
@@ -36,12 +129,12 @@ pivot_out as (
             max(case when lower(field_name) = '{{ col|lower }}' then field_value end) as {{ dbt_utils.slugify(col) | replace(' ', '_') | lower }}
         {% endfor -%}
 
-    from daily_field_history
+    from int_jira__daily_field_history
 
     group by 1,2
 ),
 
-surrogate_key as (
+final as (
 
     select 
         *,
@@ -50,4 +143,5 @@ surrogate_key as (
     from pivot_out
 )
 
-select * from surrogate_key 
+select *
+from final 

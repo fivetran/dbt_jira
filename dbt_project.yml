@@ -30,3 +30,6 @@ models:
     intermediate:
       +materialized: ephemeral
       +schema: int_jira
+  jira_source:
+    stg_jira__user:
+      +materialized: table

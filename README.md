@@ -40,7 +40,7 @@ The following table provides a detailed list of all models materialized within t
 To use this dbt package, you must have the following:
 
 - At least one Fivetran Jira connector syncing data into your destination.
-- A **BigQuery**, **Snowflake**, **Redshift**, **Databricks**, or **PostgreSQL** destination.
+- A **BigQuery**, **Snowflake**, **Redshift**, **Databricks All Purpose Cluster**, or **PostgreSQL** destination.
 
 ### Databricks Dispatch Configuration
 If you are using a Databricks destination with this package you will need to add the below (or a variation of the below) dispatch configuration within your `dbt_project.yml`. This is required in order for the package to accurately search for macros within the `dbt-labs/spark_utils` then the `dbt-labs/dbt_utils` packages respectively.
