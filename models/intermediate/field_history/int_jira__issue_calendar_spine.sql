@@ -22,7 +22,6 @@ with spine as (
     {% else %} {% set first_date = "2016-01-01" %}
     {% endif %}
 
-
     select * 
     from (
         {{
@@ -73,6 +72,11 @@ issue_spine as (
         issue_dates.created_on <= spine.date_day
         and {{ dbt.dateadd('month', var('jira_issue_history_buffer', 1), 'issue_dates.open_until') }} >= spine.date_day
         -- if we cut off issues, we're going to have to do a full refresh to catch issues that have been un-resolved
+
+    {% if is_incremental() %}
+    where spine.date_day >= 
+        {{ jira.jira_lookback(from_date='max(earliest_open_until_date)', datepart='day', interval=var('lookback_window', 3)) }}
+    {% endif %}
 
     group by 1,2
 ),
