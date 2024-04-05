@@ -1,3 +1,10 @@
+# dbt_jira v0.17.0
+[PR #127](https://github.com/fivetran/dbt_jira/pull/127) contains the following updates:
+
+## 🚨 Breaking Changes: Materialization Updates 🚨
+
+## Performance improvements
+
 # dbt_jira v0.16.0
 [PR #122](https://github.com/fivetran/dbt_jira/pull/122) contains the following updates:
 

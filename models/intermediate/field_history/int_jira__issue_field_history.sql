@@ -1,5 +1,3 @@
-{{ config(materialized='table') }}
-
 with field_history as (
 
     select *

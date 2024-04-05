@@ -1,5 +1,3 @@
-{{ config(materialized='table') }}
-
 with issue_multiselect_history as (
 
     select *
@@ -21,7 +19,8 @@ joined as (
     lower(fields.field_name) as field_name
 
   from issue_multiselect_history
-  join fields using (field_id)
+  join fields 
+    on fields.field_id = issue_multiselect_history.field_id
 
 )
 
