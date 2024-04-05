@@ -228,7 +228,7 @@ surrogate_key as (
         {% endfor %}
 
         , {{ dbt_utils.generate_surrogate_key(['date_day','issue_id']) }} as issue_day_id
-        , dbt.current_timestamp_backcompat() as dbt_run_timestamp
+        , {{ dbt.current_timestamp_backcompat() }} as dbt_run_timestamp
 
     from fix_null_values
 
