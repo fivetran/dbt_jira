@@ -32,7 +32,7 @@ vars:
 
 models:
   jira:
-    +schema: "{{ 'sqlw_tests' if target.name == 'databricks-sql' else 'jira' }}"
+    +schema: "{{ 'jira_integrations_tests_sqlw' if target.name == 'databricks-sql' else 'jira' }}"
 
 seeds:
   jira_integration_tests:
