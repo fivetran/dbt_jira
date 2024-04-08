@@ -5,6 +5,9 @@
 
 ## Performance improvements
 
+## Under the Hood:
+- Added integration testing pipeline for Databricks SQL Warehouse.
+
 # dbt_jira v0.16.0
 [PR #122](https://github.com/fivetran/dbt_jira/pull/122) contains the following updates:
 
