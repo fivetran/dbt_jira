@@ -74,8 +74,9 @@ issue_spine as (
         -- if we cut off issues, we're going to have to do a full refresh to catch issues that have been un-resolved
 
     {% if is_incremental() %}
+    -- This is necessary to insert only new rows during an incremental run. The above operations require more rows for backfilling purposes.
     where spine.date_day >= 
-        {{ jira.jira_lookback(from_date='max(earliest_open_until_date)', datepart='day', interval=var('lookback_window', 3)) }}
+        {{ jira.jira_lookback(from_date='max(date_day)', datepart='day', interval=var('lookback_window', 3)) }}
     {% endif %}
 
     group by 1,2
@@ -93,4 +94,6 @@ surrogate_key as (
 
     where date_day <= cast( {{ dbt.date_trunc('day',dbt.current_timestamp_in_utc_backcompat()) }} as date)
 )
-select * from surrogate_key 
+
+select *
+from surrogate_key 

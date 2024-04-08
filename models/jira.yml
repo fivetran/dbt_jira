@@ -27,6 +27,8 @@ models:
       - name: status
         description: The name of the status that an issue has on a given day.
         # other fields included in var(issue_history_columns)
+      - name: dbt_run_timestamp
+        description: Timestamp when the record was added or updated.
 
   - name: jira__issue_enhanced
     description: >
