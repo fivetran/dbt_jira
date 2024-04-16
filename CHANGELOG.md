@@ -5,7 +5,7 @@
 > ⚠️ Since the following changes are breaking, a `--full-refresh` after upgrading will be required.
 - To reduce storage, updated default materialization of the staging models to views. 
 
-## Performance improvements
+## Performance improvements (🚨 Breaking Changes 🚨)
   - Updated the incremental strategy of the following models to `insert_overwrite` for BigQuery and Databricks All Purpose Cluster destinations and `delete+insert` for all other supported destinations. 
     - `int_jira__issue_calendar_spine`
     - `int_jira__pivot_daily_field_history`
@@ -13,6 +13,7 @@
     > At this time, models for Databricks SQL Warehouse destinations are materialized as tables without support for incremental runs.
 
   - Removed intermediate models `int_jira__agg_multiselect_history`, `int_jira__combine_field_histories`, and `int_jira__daily_field_history` by combining them with `int_jira__pivot_daily_field_history`. This is to reduce the redundancy of the data stored in tables, the number of full scans, and the volume of write operations.
+    - Note that if you have previously run this package, these models may still exist in your destination schema, however they will no longer be updated. 
   - Updated the default materialization of `int_jira__issue_type_parents` from a table to a view. This model is used in one downstream model, so a view will reduce storage requirements while not significantly hindering performance.
   - For Snowflake and BigQuery destinations, added `cluster_by` columns to the configs for incremental models.
   - For Databricks All Purpose Cluster destinations, updated incremental model file formats to `parquet` for compatibility with the `insert_overwrite` strategy.

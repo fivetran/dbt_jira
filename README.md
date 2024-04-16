@@ -141,7 +141,7 @@ vars:
     jira_<default_source_table_name>_identifier: your_table_name 
 ```
 
-#### Lookback Window
+### Lookback Window
 Records from the source can sometimes arrive late. Since several of the models in this package are incremental, by default we look back 3 days to ensure late arrivals are captured while avoiding the need for frequent full refreshes. While the frequency can be reduced, we still recommend running `dbt --full-refresh` periodically to maintain data quality of the models.
 
 To change the default lookback window, add the following variable to your `dbt_project.yml` file:
