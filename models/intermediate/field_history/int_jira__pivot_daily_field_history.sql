@@ -1,12 +1,12 @@
 {{
     config(
-        materialized='table' if jira_source.is_databricks_sql_warehouse(target) else 'incremental',
+        materialized='table' if jira.is_databricks_sql_warehouse(target) else 'incremental',
         partition_by = {'field': 'valid_starting_on', 'data_type': 'date'}
             if target.type not in ['spark','databricks'] else ['valid_starting_on'],
         cluster_by = ['valid_starting_on', 'issue_id'],
         unique_key='issue_day_id',
         incremental_strategy = 'insert_overwrite' if target.type in ('bigquery', 'databricks', 'spark') else 'delete+insert',
-        file_format='delta' if jira_source.is_databricks_sql_warehouse(target) else 'parquet'
+        file_format='delta' if jira.is_databricks_sql_warehouse(target) else 'parquet'
     )
 }}
 
@@ -20,7 +20,7 @@ with issue_field_history as (
     from {{ ref('int_jira__issue_field_history') }}
 
     {% if is_incremental() %}
-    {% set max_valid_starting_on = jira.jira_lookback(from_date='max(valid_starting_on)', datepart='day', interval=var('lookback_window', 3)) %}
+    {% set max_valid_starting_on = fivetran_utils.fivetran_lookback(from_date='max(valid_starting_on)', datepart='day', interval=var('lookback_window', 3)) %}
     where cast(updated_at as date) >= {{ max_valid_starting_on }}
     {% endif %}
 ),

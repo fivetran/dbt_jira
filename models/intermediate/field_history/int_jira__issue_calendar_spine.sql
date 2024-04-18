@@ -1,12 +1,12 @@
 {{
     config(
-        materialized='table' if jira_source.is_databricks_sql_warehouse(target) else 'incremental',
+        materialized='table' if jira.is_databricks_sql_warehouse(target) else 'incremental',
         partition_by = {'field': 'date_day', 'data_type': 'date'}
             if target.type not in ['spark', 'databricks'] else ['date_day'],
         cluster_by = ['date_day', 'issue_id'],
         unique_key='issue_day_id',
         incremental_strategy = 'insert_overwrite' if target.type in ('bigquery', 'databricks', 'spark') else 'delete+insert',
-        file_format='delta' if jira_source.is_databricks_sql_warehouse(target) else 'parquet'
+        file_format='delta' if jira.is_databricks_sql_warehouse(target) else 'parquet'
     )
 }}
 
@@ -76,7 +76,7 @@ issue_spine as (
     {% if is_incremental() %}
     -- This is necessary to insert only new rows during an incremental run. The above operations require more rows for backfilling purposes.
     where spine.date_day >= 
-        {{ jira.jira_lookback(from_date='max(date_day)', datepart='day', interval=var('lookback_window', 3)) }}
+        {{ fivetran_utils.fivetran_lookback(from_date='max(date_day)', datepart='day', interval=var('lookback_window', 3)) }}
     {% endif %}
 
     group by 1,2

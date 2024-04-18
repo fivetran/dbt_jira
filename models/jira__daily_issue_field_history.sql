@@ -1,17 +1,20 @@
 {{
     config(
-        materialized='table' if jira_source.is_databricks_sql_warehouse(target) else 'incremental',
+        materialized='table' if jira.is_databricks_sql_warehouse(target) else 'incremental',
         partition_by = {'field': 'date_day', 'data_type': 'date'}
             if target.type not in ['spark', 'databricks'] else ['date_day'],
         cluster_by = ['date_day', 'issue_id'],
         unique_key='issue_day_id',
         incremental_strategy = 'insert_overwrite' if target.type in ('bigquery', 'databricks', 'spark') else 'delete+insert',
-        file_format='delta' if jira_source.is_databricks_sql_warehouse(target) else 'parquet'
+        file_format='delta' if jira.is_databricks_sql_warehouse(target) else 'parquet'
     )
 }}
 
 -- grab column names that were pivoted out
 {%- set pivot_data_columns = adapter.get_columns_in_relation(ref('int_jira__field_history_scd')) -%}
+
+-- set max date_day with lookback as a variable for multiple uses
+{% set max_date_day = fivetran_utils.fivetran_lookback(from_date='max(date_day)', datepart='day', interval=var('lookback_window', 3)) %}
 
 -- in intermediate/field_history/
 with pivoted_daily_history as (
@@ -21,7 +24,6 @@ with pivoted_daily_history as (
 
     {% if is_incremental() %}
 
-    {% set max_date_day = jira.jira_lookback(from_date='max(date_day)', datepart='day', interval=var('lookback_window', 3)) %}
     where valid_starting_on >= {{ max_date_day }}
 
 -- If no issue fields have been updated since the last incremental run, the pivoted_daily_history CTE will return no record/rows.
