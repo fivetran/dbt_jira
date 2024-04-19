@@ -13,8 +13,10 @@
 -- grab column names that were pivoted out
 {%- set pivot_data_columns = adapter.get_columns_in_relation(ref('int_jira__field_history_scd')) -%}
 
+{% if is_incremental() %}
 -- set max date_day with lookback as a variable for multiple uses
 {% set max_date_day = fivetran_utils.fivetran_lookback(from_date='max(date_day)', datepart='day', interval=var('lookback_window', 3)) %}
+{% endif %}
 
 -- in intermediate/field_history/
 with pivoted_daily_history as (
@@ -23,7 +25,6 @@ with pivoted_daily_history as (
     from {{ ref('int_jira__field_history_scd') }}
 
     {% if is_incremental() %}
-
     where valid_starting_on >= {{ max_date_day }}
 
 -- If no issue fields have been updated since the last incremental run, the pivoted_daily_history CTE will return no record/rows.
