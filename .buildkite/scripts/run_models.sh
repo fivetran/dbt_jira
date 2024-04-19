@@ -25,15 +25,17 @@ dbt run --vars '{jira_schema: jira_integrations_tests_sqlw}' --target "$db"
 dbt test --vars '{jira_schema: jira_integrations_tests_sqlw}' --target "$db"
 dbt run --vars '{jira_schema: jira_integrations_tests_sqlw, jira_using_priorities: false, jira_using_sprints: false, jira_using_components: false, jira_using_versions: false, jira_field_grain: 'field_name'}' --target "$db" --full-refresh
 dbt run --vars '{jira_schema: jira_integrations_tests_sqlw, jira_using_priorities: false, jira_using_sprints: false, jira_using_components: false, jira_using_versions: false, jira_field_grain: 'field_name'}' --target "$db"
-dbt test --vars '{jira_schema: jira_integrations_tests_sqlw, jira_using_priorities: false, jira_using_sprints: false, jira_using_components: false, jira_using_versions: false, jira_field_grain: 'field_name'}' --target "$db"
+dbt test --vars '{jira_schema: jira_integrations_tests_sqlw}' --target "$db"
 
 else
 dbt seed --target "$db" --full-refresh
+dbt compile --target "$db"
 dbt run --target "$db" --full-refresh
 dbt run --target "$db"
 dbt test --target "$db"
 dbt run --vars "{jira_using_priorities: false, jira_using_sprints: false, jira_using_components: false, jira_using_versions: false, jira_field_grain: 'field_name'}" --target "$db" --full-refresh
-dbt test --vars "{jira_using_priorities: false, jira_using_sprints: false, jira_using_components: false, jira_using_versions: false, jira_field_grain: 'field_name'}" --target "$db"
+dbt run --vars "{jira_using_priorities: false, jira_using_sprints: false, jira_using_components: false, jira_using_versions: false, jira_field_grain: 'field_name'}" --target "$db"
+dbt test --target "$db"
 fi
 
 dbt run-operation fivetran_utils.drop_schemas_automation --target "$db"
