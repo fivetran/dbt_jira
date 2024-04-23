@@ -1,12 +1,12 @@
 {{
     config(
-        materialized='table' if jira.is_databricks_sql_warehouse(target) else 'incremental',
+        materialized='table' if fivetran_utils.fivetran_is_databricks_sql_warehouse() else 'incremental',
         partition_by = {'field': 'date_day', 'data_type': 'date'}
             if target.type not in ['spark', 'databricks'] else ['date_day'],
         cluster_by = ['date_day', 'issue_id'],
         unique_key='issue_day_id',
         incremental_strategy = 'insert_overwrite' if target.type in ('bigquery', 'databricks', 'spark') else 'delete+insert',
-        file_format='delta' if jira.is_databricks_sql_warehouse(target) else 'parquet'
+        file_format='delta' if fivetran_utils.fivetran_is_databricks_sql_warehouse() else 'parquet'
     )
 }}
 
