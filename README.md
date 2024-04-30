@@ -50,13 +50,23 @@ dispatch:
     search_order: ['spark_utils', 'dbt_utils']
 ```
 
+### Database Incremental Strategies 
+Models in this package that are materialized incrementally are configured to work with the different strategies available to each supported warehouse.
+
+For **BigQuery** and **Databricks All Purpose Cluster runtime** destinations, we have chosen `insert_overwrite` as the default strategy, which benefits from the partitioning capability. 
+> For Databricks SQL Warehouse destinations, models are materialized as tables without support for incremental runs.
+
+For **Snowflake**, **Redshift**, and **Postgres** databases, we have chosen `delete+insert` as the default strategy.  
+
+> Regardless of strategy, we recommend that users periodically run a `--full-refresh` to ensure a high level of data quality.
+
 ## Step 2: Install the package
 Include the following jira package version in your `packages.yml` file:
 > TIP: Check [dbt Hub](https://hub.getdbt.com/) for the latest installation instructions or [read the dbt docs](https://docs.getdbt.com/docs/package-management) for more information on installing packages.
 ```yaml
 packages:
   - package: fivetran/jira
-    version: [">=0.16.0", "<0.17.0"]
+    version: [">=0.17.0", "<0.18.0"]
 
 ```
 ## Step 3: Define database and schema variables
@@ -131,6 +141,17 @@ vars:
     jira_<default_source_table_name>_identifier: your_table_name 
 ```
 
+### Lookback Window
+Records from the source can sometimes arrive late. Since several of the models in this package are incremental, by default we look back 3 days to ensure late arrivals are captured while avoiding the need for frequent full refreshes. While the frequency can be reduced, we still recommend running `dbt --full-refresh` periodically to maintain data quality of the models.
+
+To change the default lookback window, add the following variable to your `dbt_project.yml` file:
+
+```yml
+vars:
+  jira:
+    lookback_window: number_of_days # default is 3
+```
+
 ## (Optional) Step 6: Orchestrate your models with Fivetran Transformations for dbt Core™
 <details><summary>Expand for details</summary>
 <br>
@@ -145,7 +166,7 @@ This dbt package is dependent on the following dbt packages. Please be aware tha
 ```yml
 packages:
     - package: fivetran/jira_source
-      version: [">=0.6.0", "<0.7.0"]
+      version: [">=0.7.0", "<0.8.0"]
 
     - package: fivetran/fivetran_utils
       version: [">=0.4.0", "<0.5.0"]

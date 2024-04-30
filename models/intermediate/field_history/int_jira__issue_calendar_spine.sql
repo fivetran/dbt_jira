@@ -1,11 +1,12 @@
 {{
     config(
-        materialized='incremental',
+        materialized='table' if jira.jira_is_databricks_sql_warehouse() else 'incremental',
         partition_by = {'field': 'date_day', 'data_type': 'date'}
             if target.type not in ['spark', 'databricks'] else ['date_day'],
+        cluster_by = ['date_day', 'issue_id'],
         unique_key='issue_day_id',
-        incremental_strategy = 'merge' if target.type not in ('snowflake', 'postgres', 'redshift') else 'delete+insert',
-        file_format = 'delta'
+        incremental_strategy = 'insert_overwrite' if target.type in ('bigquery', 'databricks', 'spark') else 'delete+insert',
+        file_format='delta' if jira.jira_is_databricks_sql_warehouse() else 'parquet'
     )
 }}
 
@@ -20,7 +21,6 @@ with spine as (
     
     {% else %} {% set first_date = "2016-01-01" %}
     {% endif %}
-
 
     select * 
     from (
@@ -73,6 +73,12 @@ issue_spine as (
         and {{ dbt.dateadd('month', var('jira_issue_history_buffer', 1), 'issue_dates.open_until') }} >= spine.date_day
         -- if we cut off issues, we're going to have to do a full refresh to catch issues that have been un-resolved
 
+    {% if is_incremental() %}
+    -- This is necessary to insert only new rows during an incremental run. The above operations require more rows for backfilling purposes.
+    where spine.date_day >= 
+        {{ jira.jira_lookback(from_date='max(date_day)', datepart='day', interval=var('lookback_window', 3)) }}
+    {% endif %}
+
     group by 1,2
 ),
 
@@ -88,4 +94,6 @@ surrogate_key as (
 
     where date_day <= cast( {{ dbt.date_trunc('day',dbt.current_timestamp_in_utc_backcompat()) }} as date)
 )
-select * from surrogate_key 
+
+select *
+from surrogate_key 

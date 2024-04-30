@@ -13,8 +13,6 @@ with issue as (
         {{ dbt_utils.star(from=ref('int_jira__issue_type_parents'), 
                             except=except_columns) }}
 
-
-    
     from {{ ref('int_jira__issue_type_parents') }}
 
 ),
@@ -36,8 +34,7 @@ issue_user_join as (
         reporter.email as reporter_email,
         reporter.user_display_name as reporter_name,
         reporter.time_zone as reporter_timezone
-        
-        
+
     from issue
     left join jira_user as assignee on issue.assignee_user_id = assignee.user_id 
     left join jira_user as reporter on issue.reporter_user_id = reporter.user_id

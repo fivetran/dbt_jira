@@ -19,7 +19,8 @@ joined as (
     lower(fields.field_name) as field_name
 
   from field_history
-  join fields using (field_id)
+  join fields
+    on fields.field_id = field_history.field_id
 
 )
 

@@ -1,16 +1,22 @@
 {{
     config(
-        materialized='incremental',
+        materialized='table' if jira.jira_is_databricks_sql_warehouse() else 'incremental',
         partition_by = {'field': 'date_day', 'data_type': 'date'}
             if target.type not in ['spark', 'databricks'] else ['date_day'],
+        cluster_by = ['date_day', 'issue_id'],
         unique_key='issue_day_id',
-        incremental_strategy = 'merge' if target.type not in ('snowflake', 'postgres', 'redshift') else 'delete+insert',
-        file_format = 'delta'
+        incremental_strategy = 'insert_overwrite' if target.type in ('bigquery', 'databricks', 'spark') else 'delete+insert',
+        file_format='delta' if jira.jira_is_databricks_sql_warehouse() else 'parquet'
     )
 }}
 
 -- grab column names that were pivoted out
 {%- set pivot_data_columns = adapter.get_columns_in_relation(ref('int_jira__field_history_scd')) -%}
+
+{% if is_incremental() %}
+-- set max date_day with lookback as a variable for multiple uses
+{% set max_date_day = jira.jira_lookback(from_date='max(date_day)', datepart='day', interval=var('lookback_window', 3)) %}
+{% endif %}
 
 -- in intermediate/field_history/
 with pivoted_daily_history as (
@@ -19,8 +25,7 @@ with pivoted_daily_history as (
     from {{ ref('int_jira__field_history_scd') }}
 
     {% if is_incremental() %}
-    
-    where valid_starting_on >= (select max(date_day) from {{ this }} )
+    where valid_starting_on >= {{ max_date_day }}
 
 -- If no issue fields have been updated since the last incremental run, the pivoted_daily_history CTE will return no record/rows.
 -- When this is the case, we need to grab the most recent day's records from the previously built table so that we can persist 
@@ -30,7 +35,7 @@ with pivoted_daily_history as (
     select 
         *
     from {{ this }}
-    where date_day = (select max(date_day) from {{ this }} )
+    where date_day >= {{ max_date_day }}
 
 {% endif %}
 
@@ -67,7 +72,7 @@ calendar as (
     from {{ ref('int_jira__issue_calendar_spine') }}
 
     {% if is_incremental() %}
-    where date_day >= (select max(date_day) from {{ this }} )
+    where date_day >= {{ max_date_day }}
     {% endif %}
 ),
 

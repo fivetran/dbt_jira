@@ -1,3 +1,35 @@
+# dbt_jira v0.17.0
+[PR #127](https://github.com/fivetran/dbt_jira/pull/127) contains the following updates:
+
+## 🚨 Breaking Changes 🚨
+> ⚠️ Since the following changes are breaking, a `--full-refresh` after upgrading will be required.
+- To reduce storage, updated the default materialization of the upstream staging models to views. (See the [dbt_jira_source CHANGELOG](https://github.com/fivetran/dbt_jira_source/blob/main/CHANGELOG.md#dbt_jira_source-v070) for more details.)
+
+## Performance improvements (🚨 Breaking Changes 🚨)
+  - Updated the incremental strategy of the following models to `insert_overwrite` for BigQuery and Databricks All Purpose Cluster destinations and `delete+insert` for all other supported destinations. 
+    - `int_jira__issue_calendar_spine`
+    - `int_jira__pivot_daily_field_history`
+    - `jira__daily_issue_field_history`
+    > At this time, models for Databricks SQL Warehouse destinations are materialized as tables without support for incremental runs.
+
+  - Removed intermediate models `int_jira__agg_multiselect_history`, `int_jira__combine_field_histories`, and `int_jira__daily_field_history` by combining them with `int_jira__pivot_daily_field_history`. This is to reduce the redundancy of the data stored in tables, the number of full scans, and the volume of write operations.
+    - Note that if you have previously run this package, these models may still exist in your destination schema, however they will no longer be updated. 
+  - Updated the default materialization of `int_jira__issue_type_parents` from a table to a view. This model is called only in `int_jira__issue_users`, so a view will reduce storage requirements while not significantly hindering performance.
+  - For Snowflake and BigQuery destinations, added the following `cluster_by` columns to the configs for incremental models:
+    - `int_jira__issue_calendar_spine` clustering on columns `['date_day', 'issue_id']`
+    - `int_jira__pivot_daily_field_history` clustering on columns `['valid_starting_on', 'issue_id']`
+    - `jira__daily_issue_field_history` clustering on columns `['date_day', 'issue_id']`
+  - For Databricks All Purpose Cluster destinations, updated incremental model file formats to `parquet` for compatibility with the `insert_overwrite` strategy.
+
+## Features
+- Added a default 3-day look-back to incremental models to accommodate late arriving records. The number of days can be changed by setting the var `lookback_window` in your dbt_project.yml. See the [Lookback Window section of the README](https://github.com/fivetran/dbt_jira/blob/main/README.md#lookback-window) for more details.
+- Added macro `jira_lookback` to streamline the lookback window calculation.
+
+## Under the Hood:
+- Added integration testing pipeline for Databricks SQL Warehouse.
+- Added macro `jira_is_databricks_sql_warehouse` for detecting if a Databricks target is an All Purpose Cluster or a SQL Warehouse.
+- Updated the maintainer pull request template.
+
 # dbt_jira v0.16.0
 [PR #122](https://github.com/fivetran/dbt_jira/pull/122) contains the following updates:
 

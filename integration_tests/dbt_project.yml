@@ -1,5 +1,5 @@
 name: 'jira_integration_tests'
-version: '0.16.0'
+version: '0.17.0'
 config-version: 2
 profile: 'integration_tests'
 
@@ -30,6 +30,10 @@ vars:
 
   issue_field_history_columns: ['summary', 'story points', 'components']
 
+models:
+  jira:
+    +schema: "{{ 'jira_integrations_tests_sqlw' if target.name == 'databricks-sql' else 'jira' }}"
+
 seeds:
   jira_integration_tests:
     +column_types:
@@ -57,17 +61,17 @@ seeds:
         work_ratio: float
         resolved: timestamp
         updated: timestamp
-        assignee: "{{ 'string' if target.name in ('bigquery', 'spark', 'databricks') else 'varchar' }}"
+        assignee: "{{ 'string' if target.name in ('bigquery', 'spark', 'databricks', 'databricks-sql') else 'varchar' }}"
     issue_multiselect_history:
       +column_types:
         time: timestamp
         issue_id: "{{ 'int64' if target.name == 'bigquery' else 'bigint' }}"
-        value: "{{ 'string' if target.name in ('bigquery', 'spark', 'databricks') else 'varchar' }}"
+        value: "{{ 'string' if target.name in ('bigquery', 'spark', 'databricks', 'databricks-sql') else 'varchar' }}"
     issue_field_history:
       +column_types:
         time: timestamp
         issue_id: "{{ 'int64' if target.name == 'bigquery' else 'bigint' }}"
-        value: "{{ 'string' if target.name in ('bigquery', 'spark', 'databricks') else 'varchar' }}"
+        value: "{{ 'string' if target.name in ('bigquery', 'spark', 'databricks', 'databricks-sql') else 'varchar' }}"
     sprint: 
       +column_types:
         id: "{{ 'int64' if target.name == 'bigquery' else 'bigint' }}"
@@ -76,7 +80,7 @@ seeds:
         start_date: timestamp
     field: 
       +column_types:
-        id: "{{ 'string' if target.name in ('bigquery', 'spark', 'databricks') else 'varchar' }}"
+        id: "{{ 'string' if target.name in ('bigquery', 'spark', 'databricks', 'databricks-sql') else 'varchar' }}"
 
 dispatch:
   - macro_namespace: dbt_utils
