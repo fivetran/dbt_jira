@@ -3,7 +3,7 @@
 
 ## 🚨 Breaking Changes 🚨
 > ⚠️ Since the following changes are breaking, a `--full-refresh` after upgrading will be required.
-- To reduce storage, updated the default materialization of the upstream staging models to views. (See the [dbt_jira_source CHANGELOG](https://github.com/fivetran/dbt_jira_source/blob/main/CHANGELOG.md) for more details.)
+- To reduce storage, updated the default materialization of the upstream staging models to views. (See the [dbt_jira_source CHANGELOG](https://github.com/fivetran/dbt_jira_source/blob/main/CHANGELOG.md#dbt_jira_source-v070) for more details.)
 
 ## Performance improvements (🚨 Breaking Changes 🚨)
   - Updated the incremental strategy of the following models to `insert_overwrite` for BigQuery and Databricks All Purpose Cluster destinations and `delete+insert` for all other supported destinations. 
