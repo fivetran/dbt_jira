@@ -18,3 +18,10 @@ destination_configurations:
     dispatch:
       - macro_namespace: dbt_utils
         search_order: [ 'spark_utils', 'dbt_utils' ]
+
+public_models: [
+  "jira__daily_issue_field_history",
+  "jira__user_enhanced",
+  "jira__issue_enhanced",
+  "jira__project_enhanced"
+]
