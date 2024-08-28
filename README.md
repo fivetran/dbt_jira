@@ -17,16 +17,16 @@
 ## What does this dbt package do?
 - Produces modeled tables that leverage Jira data from [Fivetran's connector](https://fivetran.com/docs/applications/jira) in the format described by [this ERD](https://fivetran.com/docs/applications/jira#schemainformation) and builds off the output of our [Jira source package](https://github.com/fivetran/dbt_jira_source).
 - Enables you to better understand the workload, performance, and velocity of your team's work using Jira issues. It performs the following actions:
-- Creates a daily issue history table so you can quickly create agile reports, such as burndown charts, along any issue field.
-- Enriches the core issue table with relevant data regarding its workflow and current state.
-- Aggregates bandwidth and issue velocity metrics along projects and users.
+  - Creates a daily issue history table so you can quickly create agile reports, such as burndown charts, along any issue field.
+  - Enriches the core issue table with relevant data regarding its workflow and current state.
+  - Aggregates bandwidth and issue velocity metrics along projects and users.
 - Generates a comprehensive data dictionary of your source and modeled Jira data through the [dbt docs site](https://fivetran.github.io/dbt_jira/).
 
 <!--section="jira_transformation_model"-->
-The following table provides a detailed list of all models materialized within this package by default.
-> TIP: See more details about these models in the package's [dbt docs site](https://fivetran.github.io/dbt_jira/#!/overview?g_v=1&g_e=seeds).
+The following table provides a detailed list of all tables materialized within this package by default.
+> TIP: See more details about these tables in the package's [dbt docs site](https://fivetran.github.io/dbt_jira/#!/overview?g_v=1&g_e=seeds).
 
-| **Model**                | **Description**                                                                                                                                |
+| **Table**                | **Description**                                                                                                                                |
 | ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------- |
 | [jira__daily_issue_field_history](https://fivetran.github.io/dbt_jira/#!/model/model.jira.jira__daily_issue_field_history)             | Each record represents a day in which an issue remained open, enriched with data about the issue's sprint, its status, and the values of any fields specified by the `issue_field_history_columns` variable. |
 | [jira__issue_enhanced](https://fivetran.github.io/dbt_jira/#!/model/model.jira.jira__issue_enhanced)            | Each record represents a Jira issue, enriched with data about its current assignee, reporter, sprint, epic, project, resolution, issue type, priority, and status. It also includes metrics reflecting assignments, sprint rollovers, and re-openings of the issue. Note that all epics are considered `issues` in Jira and are therefore included in this model (where `issue_type='epic'`). |
