@@ -1,23 +1,26 @@
+-- depends_on: {{ var('issue') }}
 {{
     config(
         materialized='table' if jira.jira_is_databricks_sql_warehouse() else 'incremental',
-        partition_by = {'field': 'date_day', 'data_type': 'date'}
-            if target.type not in ['spark', 'databricks'] else ['date_day'],
-        cluster_by = ['date_day', 'issue_id'],
+        partition_by = {'field': 'earliest_open_until_week', 'data_type': 'date'}
+            if target.type not in ['spark', 'databricks'] else ['earliest_open_until_week'],
+        cluster_by = ['earliest_open_until_week'],
         unique_key='issue_day_id',
         incremental_strategy = 'insert_overwrite' if target.type in ('bigquery', 'databricks', 'spark') else 'delete+insert',
-        file_format='delta' if jira.jira_is_databricks_sql_warehouse() else 'parquet'
+        file_format='delta'
     )
 }}
 
 with spine as (
 
-    {% if execute %}
+    {% if execute and flags.WHICH in ('run', 'build') %}
     {% set first_date_query %}
     -- start at the first created issue
-        select  min( created ) as min_date from {{ source('jira','issue') }}
+        select  min(cast(created_at as date)) as min_date
+        from {{ var('issue') }}
     {% endset %}
-    {% set first_date = run_query(first_date_query).columns[0][0]|string %}
+
+    {%- set first_date = dbt_utils.get_single_value(first_date_query) %}
     
     {% else %} {% set first_date = "2016-01-01" %}
     {% endif %}
@@ -27,7 +30,7 @@ with spine as (
         {{
             dbt_utils.date_spine(
                 datepart = "day", 
-                start_date =  "cast('" ~ first_date[0:10] ~ "' as date)", 
+                start_date = "cast('" ~ first_date ~ "' as date)",
                 end_date = dbt.dateadd("week", 1, dbt.current_timestamp_in_utc_backcompat())
             )   
         }} 
@@ -36,7 +39,7 @@ with spine as (
     {% if is_incremental() %}
     -- compare to the earliest possible open_until date so that if a resolved issue is updated after a long period of inactivity, we don't need a full refresh
     -- essentially we need to be able to backfill
-    where cast( date_day as date) >= (select min(earliest_open_until_date) from {{ this }} )
+    where cast( date_day as date) >= (select min(earliest_open_until_week) from {{ this }} )
     {% endif %}
 ),
 
@@ -88,11 +91,12 @@ surrogate_key as (
         date_day,
         issue_id,
         {{ dbt_utils.generate_surrogate_key(['date_day','issue_id']) }} as issue_day_id,
-        earliest_open_until_date
+        earliest_open_until_date,
+        cast({{ dbt.date_trunc('week', 'earliest_open_until_date') }} as date) as earliest_open_until_week
 
     from issue_spine
 
-    where date_day <= cast( {{ dbt.date_trunc('day',dbt.current_timestamp_in_utc_backcompat()) }} as date)
+    where date_day <= cast( {{ dbt.current_timestamp_in_utc_backcompat() }} as date)
 )
 
 select *

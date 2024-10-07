@@ -1,3 +1,19 @@
+# dbt_jira v0.18.0
+[PR #131](https://github.com/fivetran/dbt_jira/pull/131) contains the following updates:
+## Breaking Changes
+> Since the following changes are breaking, a `--full-refresh` after upgrading will be required.
+
+- Changed the partitioning from days to weeks in the following models for BigQuery and Databricks All Purpose Cluster destinations:
+  - `int_jira__issue_calendar_spine`
+  - `int_jira__pivot_daily_field_history`
+  - `jira__daily_issue_field_history`
+- This adjustment reduces the total number of partitions, helping avoid partition limit issues in certain warehouses.
+
+- For Databricks All Purpose Cluster destinations, updated the `file_format` to `delta` for improved performance.
+
+## Under the Hood
+- Updated model `int_jira__issue_calendar_spine` to prevent errors during compilation.
+
 # dbt_jira v0.17.0
 [PR #127](https://github.com/fivetran/dbt_jira/pull/127) contains the following updates:
 
