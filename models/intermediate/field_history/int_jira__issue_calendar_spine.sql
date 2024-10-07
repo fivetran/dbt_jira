@@ -97,6 +97,8 @@ surrogate_key as (
     from issue_spine
 
     where date_day <= cast( {{ dbt.current_timestamp_in_utc_backcompat() }} as date)
+    -- For an incremental run, the result will select rows between (a week before earliest_open_until_week) and today's date.
+    -- For insert_overwrite, this means the corresponding partitions will be overwritten with the result.
 )
 
 select *

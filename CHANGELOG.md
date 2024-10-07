@@ -8,11 +8,11 @@
   - `int_jira__pivot_daily_field_history`
   - `jira__daily_issue_field_history`
 - This adjustment reduces the total number of partitions, helping avoid partition limit issues in certain warehouses.
-
 - For Databricks All Purpose Cluster destinations, updated the `file_format` to `delta` for improved performance.
 
 ## Under the Hood
 - Updated model `int_jira__issue_calendar_spine` to prevent errors during compilation.
+- Added consistency and integrity tests for model `jira__daily_issue_field_history`.
 
 # dbt_jira v0.17.0
 [PR #127](https://github.com/fivetran/dbt_jira/pull/127) contains the following updates:
