@@ -5,12 +5,24 @@
 ) }}
 
 with prod as (
-    select *
+    select
+        date_day,
+        issue_id,
+        status,
+        status_id,
+        sprint,
+        issue_day_id
     from {{ target.schema }}_jira_prod.jira__daily_issue_field_history
 ),
 
 dev as (
-    select *
+    select
+        date_day,
+        issue_id,
+        status,
+        status_id,
+        sprint,
+        issue_day_id
     from {{ target.schema }}_jira_dev.jira__daily_issue_field_history
 ),
 

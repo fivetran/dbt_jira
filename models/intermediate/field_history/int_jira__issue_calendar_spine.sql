@@ -2,9 +2,9 @@
 {{
     config(
         materialized='table' if jira.jira_is_databricks_sql_warehouse() else 'incremental',
-        partition_by = {'field': 'earliest_open_until_week', 'data_type': 'date'}
-            if target.type not in ['spark', 'databricks'] else ['earliest_open_until_week'],
-        cluster_by = ['earliest_open_until_week'],
+        partition_by = {'field': 'date_week', 'data_type': 'date'}
+            if target.type not in ['spark', 'databricks'] else ['date_week'],
+        cluster_by = ['date_week'],
         unique_key='issue_day_id',
         incremental_strategy = 'insert_overwrite' if target.type in ('bigquery', 'databricks', 'spark') else 'delete+insert',
         file_format='delta'
@@ -31,15 +31,15 @@ with spine as (
             dbt_utils.date_spine(
                 datepart = "day", 
                 start_date = "cast('" ~ first_date ~ "' as date)",
-                end_date = dbt.dateadd("week", 1, dbt.current_timestamp_in_utc_backcompat())
+                end_date = dbt.dateadd("week", 1, dbt.current_timestamp())
             )   
-        }} 
+        }}
     ) as date_spine
 
     {% if is_incremental() %}
     -- compare to the earliest possible open_until date so that if a resolved issue is updated after a long period of inactivity, we don't need a full refresh
     -- essentially we need to be able to backfill
-    where cast( date_day as date) >= (select min(earliest_open_until_week) from {{ this }} )
+    where cast(date_day as date) >= (select min(earliest_open_until_week) from {{ this }})
     {% endif %}
 ),
 
@@ -66,6 +66,7 @@ issue_spine as (
 
     select 
         cast(spine.date_day as date) as date_day,
+        cast({{ dbt.date_trunc('week', 'spine.date_day') }} as date) as date_week,
         issue_dates.issue_id,
         -- will take the table-wide min of this in the incremental block at the top of this model
         min(issue_dates.open_until) as earliest_open_until_date
@@ -79,16 +80,17 @@ issue_spine as (
     {% if is_incremental() %}
     -- This is necessary to insert only new rows during an incremental run. The above operations require more rows for backfilling purposes.
     where spine.date_day >= 
-        {{ jira.jira_lookback(from_date='max(date_day)', datepart='day', interval=var('lookback_window', 3)) }}
+        {{ jira.jira_lookback(from_date='max(date_week)', datepart='week', interval=var('lookback_window', 1)) }}
     {% endif %}
 
-    group by 1,2
+    group by 1,2,3
 ),
 
 surrogate_key as (
 
     select 
         date_day,
+        date_week,
         issue_id,
         {{ dbt_utils.generate_surrogate_key(['date_day','issue_id']) }} as issue_day_id,
         earliest_open_until_date,
@@ -96,7 +98,7 @@ surrogate_key as (
 
     from issue_spine
 
-    where date_day <= cast( {{ dbt.current_timestamp_in_utc_backcompat() }} as date)
+    where date_day <= cast( {{ dbt.current_timestamp() }} as date)
     -- For an incremental run, the result will select rows between (a week before earliest_open_until_week) and today's date.
     -- For insert_overwrite, this means the corresponding partitions will be overwritten with the result.
 )
