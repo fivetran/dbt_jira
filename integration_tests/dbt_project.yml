@@ -5,7 +5,7 @@ profile: 'integration_tests'
 
 vars:
   jira_source:
-    jira_schema: zz_jira #jira_integrations_tests_41
+    jira_schema: jira_integrations_tests_41
     jira_comment_identifier: "comment"
     jira_component_identifier: "component"
     jira_epic_identifier: "epic"
@@ -28,7 +28,8 @@ vars:
     jira_user_identifier: "user"
     jira_version_identifier: "version"
 
-  # issue_field_history_columns: ['summary', 'story points', 'components']
+  # Comment out the below when generating docs
+  issue_field_history_columns: ['summary', 'story points', 'components']
 
 models:
   jira:
