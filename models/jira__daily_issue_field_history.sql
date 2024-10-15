@@ -29,7 +29,7 @@ with pivoted_daily_history as (
 ), 
 
 -- If no issue fields have been updated since the last incremental run, the pivoted_daily_history CTE will return no record/rows.
--- When this is the case, we need to grab the most recent day's records from the previously built table so that we can persist 
+-- When this is the case, we need to grab the most recent week's records from the previously built table so that we can persist 
 -- those values into the future.
 
 most_recent_data as ( 
@@ -88,7 +88,7 @@ joined as (
                 {% if col.name|lower == 'components' and var('jira_using_components', True) %}
                 , coalesce(pivoted_daily_history.components, most_recent_data.components) as components
 
-                {% elif col.name|lower not in ['issue_day_id', 'issue_id', 'valid_starting_on', 'components'] %} 
+                {% elif col.name|lower not in ['issue_day_id', 'issue_id', 'valid_starting_on', 'valid_starting_at_week', 'components'] %} 
                 , coalesce(pivoted_daily_history.{{ col.name }}, most_recent_data.{{ col.name }}) as {{ col.name }}
 
                 {% endif %}
@@ -99,7 +99,7 @@ joined as (
                 {% if col.name|lower == 'components' and var('jira_using_components', True) %}
                 , pivoted_daily_history.components   
 
-                {% elif col.name|lower not in ['issue_day_id', 'issue_id', 'valid_starting_on', 'components'] %} 
+                {% elif col.name|lower not in ['issue_day_id', 'issue_id', 'valid_starting_on', 'valid_starting_at_week', 'components'] %} 
                 , pivoted_daily_history.{{ col.name }}
 
                 {% endif %}
@@ -127,7 +127,7 @@ set_values as (
             order by date_day rows unbounded preceding) as status_id_field_partition
 
         -- list of exception columns
-        {% set exception_cols = ['issue_id', 'issue_day_id', 'valid_starting_on', 'status', 'status_id', 'components', 'issue_type'] %}
+        {% set exception_cols = ['issue_id', 'issue_day_id', 'valid_starting_on', 'valid_starting_at_week', 'status', 'status_id', 'components', 'issue_type'] %}
 
         {% for col in pivot_data_columns %}
             {% if col.name|lower == 'components' and var('jira_using_components', True) %}
@@ -181,7 +181,7 @@ fill_values as (
                 partition by issue_id, component_field_partition 
                 order by date_day asc rows between unbounded preceding and current row) as components
 
-            {% elif col.name|lower not in ['issue_id', 'issue_day_id', 'valid_starting_on', 'status', 'status_id', 'components'] %}
+            {% elif col.name|lower not in ['issue_id', 'issue_day_id', 'valid_starting_on', 'valid_starting_at_week', 'status', 'status_id', 'components'] %}
             -- grab the value that started this batch/partition
             , first_value( {{ col.name }} ) over (
                 partition by issue_id, {{ col.name }}_field_partition 
@@ -203,7 +203,7 @@ fix_null_values as (
             {% if col.name|lower == 'components' and var('jira_using_components', True) %}
             , case when components = 'is_null' then null else components end as components
 
-            {% elif col.name|lower not in ['issue_id','issue_day_id','valid_starting_on', 'status', 'components'] %}
+            {% elif col.name|lower not in ['issue_id','issue_day_id','valid_starting_on', 'valid_starting_at_week', 'status', 'components'] %}
             -- we de-nulled the true null values earlier in order to differentiate them from nulls that just needed to be backfilled
             , case when {{ col.name }} = 'is_null' then null else {{ col.name }} end as {{ col.name }}
 
@@ -226,7 +226,7 @@ surrogate_key as (
             {% if col.name|lower == 'components' and var('jira_using_components', True) %}
             , fix_null_values.components as components
 
-            {% elif col.name|lower not in ['issue_id','issue_day_id','valid_starting_on', 'status', 'components'] %} 
+            {% elif col.name|lower not in ['issue_id','issue_day_id','valid_starting_on', 'valid_starting_at_week', 'status', 'components'] %} 
             , fix_null_values.{{ col.name }} as {{ col.name }}
 
             {% endif %}
