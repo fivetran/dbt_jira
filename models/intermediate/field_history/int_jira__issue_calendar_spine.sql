@@ -6,7 +6,7 @@ with spine as (
         select  
             coalesce(
                 min(cast(created as date)),
-                "2016-01-01"
+                cast({{ dbt.dateadd("month", -1, "current_date") }} as date)
             ) as min_date
         from {{ source('jira','issue') }}
     {% endset %}
