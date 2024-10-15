@@ -45,7 +45,7 @@ final as (
         {{ dbt.datediff('last_assigned_at', "coalesce(resolved_at, " ~ dbt.current_timestamp() ~ ')', 'second') }} last_assignment_duration_seconds 
 
         {% for col in pivot_data_columns if col.name|lower not in issue_data_columns_clean %} 
-            {%- if col.name|lower not in ['issue_day_id','issue_id','latest_record', 'date_day'] -%}
+            {%- if col.name|lower not in ['issue_day_id','issue_id','latest_record', 'date_day', 'date_week'] -%}
                 , {{ col.name }}
             {%- endif -%}
         {% endfor %}

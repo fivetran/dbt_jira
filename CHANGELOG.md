@@ -4,15 +4,21 @@
 > Since the following changes are breaking, a `--full-refresh` after upgrading will be required.
 
 - Changed the partitioning from days to weeks in the following models for BigQuery and Databricks All Purpose Cluster destinations:
-  - `int_jira__issue_calendar_spine`
   - `int_jira__pivot_daily_field_history`
+    - Added field `valid_starting_at_week` for use with the new weekly partition logic.
   - `jira__daily_issue_field_history`
+    - Added field `date_week` for use with the new weekly partition logic.
 - This adjustment reduces the total number of partitions, helping avoid partition limit issues in certain warehouses.
 - For Databricks All Purpose Cluster destinations, updated the `file_format` to `delta` for improved performance.
+- Updated the default materialization of `int_jira__issue_calendar_spine` from incremental to ephemeral to improve performance and maintainability.
 
 ## Under the Hood
+- Replaced the deprecated `dbt.current_timestamp_backcompat()` function with `dbt.current_timestamp()` to ensure all timestamps are captured in UTC for the following models:
+  - `int_jira__issue_calendar_spine`
+  - `int_jira__issue_join`
+  - `jira__issue_enhanced`
 - Updated model `int_jira__issue_calendar_spine` to prevent errors during compilation.
-- Added consistency and integrity tests for model `jira__daily_issue_field_history`.
+- Added consistency test for model `jira__daily_issue_field_history`.
 
 # dbt_jira v0.17.0
 [PR #127](https://github.com/fivetran/dbt_jira/pull/127) contains the following updates:
