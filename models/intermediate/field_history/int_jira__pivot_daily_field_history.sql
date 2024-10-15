@@ -1,14 +1,4 @@
-{{
-    config(
-        materialized='table' if jira.jira_is_databricks_sql_warehouse() else 'incremental',
-        partition_by = {'field': 'updated_at_week', 'data_type': 'date'}
-            if target.type not in ['spark','databricks'] else ['updated_at_week'],
-        cluster_by = ['updated_at_week'],
-        unique_key='issue_day_id',
-        incremental_strategy = 'insert_overwrite' if target.type in ('bigquery', 'databricks', 'spark') else 'delete+insert',
-        file_format='delta'
-    )
-}}
+{{ config( materialized='table') }}
 
 -- issue_multiselect_history splits out an array-type field into multiple rows with unique individual values
 -- to combine with issue_field_history we need to aggregate the multiselect field values.
@@ -16,24 +6,13 @@
 with issue_field_history as (
 
     select *
-
     from {{ ref('int_jira__issue_field_history') }}
-
-    {% if is_incremental() %}
-    {% set max_updated_at_week = jira.jira_lookback(from_date='max(valid_starting_on)', datepart='week', interval=var('lookback_window', 1)) %}
-    where cast(updated_at as date) >= {{ max_updated_at_week }}
-    {% endif %}
 ),
 
 issue_multiselect_history as (
 
     select *
-
     from {{ ref('int_jira__issue_multiselect_history') }}
-
-    {% if is_incremental() %}
-    where cast(updated_at as date) >= {{ max_updated_at_week }}
-    {% endif %}
 ),
 
 issue_multiselect_batch_history as (
@@ -43,7 +22,6 @@ issue_multiselect_batch_history as (
         field_name,
         issue_id,
         updated_at,
-        cast( {{ dbt.date_trunc('day', 'updated_at') }} as date) as date_day,
 
         -- if the field refers to an object captured in a table elsewhere (ie sprint, users, field_option for custom fields),
         -- the value is actually a foreign key to that table. 
@@ -51,7 +29,7 @@ issue_multiselect_batch_history as (
 
     from issue_multiselect_history
 
-    {{ dbt_utils.group_by(5) }}
+    {{ dbt_utils.group_by(4) }}
 ),
 
 combine_field_history as (

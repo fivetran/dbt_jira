@@ -16,7 +16,11 @@ with spine as (
     {% if execute and flags.WHICH in ('run', 'build') %}
     {% set first_date_query %}
     -- start at the first created issue
-        select  min(cast(created_at as date)) as min_date
+        select  
+            coalesce(
+                min(cast(created_at as date)),
+                "2016-01-01"
+            ) as min_date
         from {{ var('issue') }}
     {% endset %}
 
@@ -25,7 +29,9 @@ with spine as (
     {% else %} {% set first_date = "2016-01-01" %}
     {% endif %}
 
-    select * 
+    select
+        cast(date_day as date) as date_day,
+        cast({{ dbt.date_trunc('week', 'date_day') }} as date) as date_week
     from (
         {{
             dbt_utils.date_spine(
@@ -56,7 +62,9 @@ issue_dates as (
         cast( {{ dbt.date_trunc('day', 'issue.created_at') }} as date) as created_on,
         -- resolved_at will become null if an issue is marked as un-resolved. if this sorta thing happens often, you may want to run full-refreshes of the field_history models often
         -- if it's not resolved include everything up to today. if it is, look at the last time it was updated 
-        cast({{ dbt.date_trunc('day', 'case when issue.resolved_at is null then ' ~ dbt.current_timestamp_in_utc_backcompat() ~ ' else cast(issue_history_scd.valid_starting_on as ' ~ dbt.type_timestamp() ~ ') end') }} as date) as open_until
+        cast({{ dbt.date_trunc('day',
+            'case when issue.resolved_at is null then ' ~ dbt.current_timestamp() ~ ' else cast(issue_history_scd.valid_starting_on as ' ~ dbt.type_timestamp() ~ ') end') }}
+            as date) as open_until
     from issue_history_scd
     left join {{ var('issue') }} as issue
         on issue_history_scd.issue_id = issue.issue_id
@@ -65,8 +73,8 @@ issue_dates as (
 issue_spine as (
 
     select 
-        cast(spine.date_day as date) as date_day,
-        cast({{ dbt.date_trunc('week', 'spine.date_day') }} as date) as date_week,
+        spine.date_day,
+        spine.date_week,
         issue_dates.issue_id,
         -- will take the table-wide min of this in the incremental block at the top of this model
         min(issue_dates.open_until) as earliest_open_until_date
@@ -74,7 +82,7 @@ issue_spine as (
     from spine 
     join issue_dates on
         issue_dates.created_on <= spine.date_day
-        and {{ dbt.dateadd('month', var('jira_issue_history_buffer', 1), 'issue_dates.open_until') }} >= spine.date_day
+        and {{ dbt.dateadd('month', var('jira_issue_history_buffer', 1), 'issue_dates.open_until') }} >= spine.date_week
         -- if we cut off issues, we're going to have to do a full refresh to catch issues that have been un-resolved
 
     {% if is_incremental() %}
