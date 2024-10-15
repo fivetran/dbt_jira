@@ -131,7 +131,6 @@ pivot_out as (
     select 
         valid_starting_on,
         issue_id,
-        cast({{ dbt.date_trunc('week', 'valid_starting_at') }} as date) as updated_at_week,
         max(case when lower(field_id) = 'status' then field_value end) as status,
         max(case when lower(field_name) = 'sprint' then field_value end) as sprint
 
@@ -142,7 +141,7 @@ pivot_out as (
 
     from int_jira__daily_field_history
 
-    {{ dbt_utils.group_by(3) }}
+    {{ dbt_utils.group_by(2) }}
 ),
 
 final as (
