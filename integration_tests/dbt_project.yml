@@ -1,5 +1,5 @@
 name: 'jira_integration_tests'
-version: '0.17.0'
+version: '0.18.0'
 config-version: 2
 profile: 'integration_tests'
 
@@ -28,11 +28,13 @@ vars:
     jira_user_identifier: "user"
     jira_version_identifier: "version"
 
+  # Comment out the below when generating docs
   issue_field_history_columns: ['summary', 'story points', 'components']
 
 models:
   jira:
     +schema: "{{ 'jira_integrations_tests_sqlw' if target.name == 'databricks-sql' else 'jira' }}"
+    # +schema: "jira_{{ var('directed_schema','dev') }}"
 
 seeds:
   jira_integration_tests:

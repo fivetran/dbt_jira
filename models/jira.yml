@@ -13,6 +13,8 @@ models:
     columns:
       - name: date_day
         description: Date on which the issue had these field values.
+      - name: date_week
+        description: The start date of the week corresponding to `date_day`.
       - name: issue_id
         description: Foreign key referencing the ID of the `issue` with these values.
       - name: issue_day_id
