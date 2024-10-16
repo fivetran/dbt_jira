@@ -18,7 +18,7 @@
   - `int_jira__issue_join`
   - `jira__issue_enhanced`
 - Updated model `int_jira__issue_calendar_spine` to prevent errors during compilation.
-- Added consistency test for model `jira__daily_issue_field_history`.
+- Added consistency tests for the `jira__daily_issue_field_history` and `jira__issue_enhanced` models.
 
 # dbt_jira v0.17.0
 [PR #127](https://github.com/fivetran/dbt_jira/pull/127) contains the following updates:
