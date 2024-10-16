@@ -142,14 +142,14 @@ vars:
 ```
 
 #### Lookback Window
-Records from the source can sometimes arrive late. Since several of the models in this package are incremental, by default we look back 3 days to ensure late arrivals are captured while avoiding the need for frequent full refreshes. While the frequency can be reduced, we still recommend running `dbt --full-refresh` periodically to maintain data quality of the models.
+Records from the source may occasionally arrive late. To handle this, we implement a one-week lookback in our incremental models to capture late arrivals without requiring frequent full refreshes. The lookback is structured in weekly increments, as the incremental logic is based on weekly periods. While the frequency of full refreshes can be reduced, we still recommend running `dbt --full-refresh` periodically to maintain data quality of the models. 
 
 To change the default lookback window, add the following variable to your `dbt_project.yml` file:
 
 ```yml
 vars:
   jira:
-    lookback_window: number_of_days # default is 3
+    lookback_window: number_of_weeks # default is 1
 ```
 
 ### (Optional) Step 6: Orchestrate your models with Fivetran Transformations for dbt Core™
