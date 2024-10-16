@@ -13,7 +13,7 @@
 - Updated the default materialization of `int_jira__issue_calendar_spine` from incremental to ephemeral to improve performance and maintainability.
 
 ## Documentation Update
-- Updated README with new defaults for the `lookback_window` variable.
+- Updated [README](https://github.com/fivetran/dbt_jira/blob/main/README.md#lookback-window) with the new default of 1 week for the `lookback_window` variable.
 
 ## Under the Hood
 - Replaced the deprecated `dbt.current_timestamp_backcompat()` function with `dbt.current_timestamp()` to ensure all timestamps are captured in UTC for the following models:
