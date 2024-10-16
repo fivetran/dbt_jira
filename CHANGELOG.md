@@ -12,6 +12,9 @@
 - For Databricks All Purpose Cluster destinations, updated the `file_format` to `delta` for improved performance.
 - Updated the default materialization of `int_jira__issue_calendar_spine` from incremental to ephemeral to improve performance and maintainability.
 
+## Documentation Update
+- Updated README with new defaults for the `lookback_window` variable.
+
 ## Under the Hood
 - Replaced the deprecated `dbt.current_timestamp_backcompat()` function with `dbt.current_timestamp()` to ensure all timestamps are captured in UTC for the following models:
   - `int_jira__issue_calendar_spine`
