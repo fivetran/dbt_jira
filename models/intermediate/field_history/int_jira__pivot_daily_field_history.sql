@@ -47,7 +47,7 @@ issue_multiselect_batch_history as (
 
         -- if the field refers to an object captured in a table elsewhere (ie sprint, users, field_option for custom fields),
         -- the value is actually a foreign key to that table. 
-        {{ fivetran_utils.string_agg('field_value', "', '") }} as field_values
+        {{ fivetran_utils.string_agg('field_value', "', '") }} as field_values 
 
     from issue_multiselect_history
 
