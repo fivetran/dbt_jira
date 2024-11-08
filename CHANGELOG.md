@@ -6,6 +6,9 @@
 - For Redshift users, comment data aggregated under the `conversations` field in the `jira__issue_enhanced` table is now disabled by default to prevent consistent errors related to Redshift's varchar length limits. 
   - If you wish to re-enable comments on Redshift, set the `jira_include_comments` variable to `true` in your `dbt_project.yml`.
 
+## Under the Hood
+- Updated the `comment` seed data to ensure comments are correctly disabled for Redshift by default.
+
 # dbt_jira v0.18.0
 [PR #131](https://github.com/fivetran/dbt_jira/pull/131) contains the following updates:
 ## Breaking Changes
