@@ -1,3 +1,11 @@
+# dbt_jira v0.19.0
+[PR #133](https://github.com/fivetran/dbt_jira/pull/133) contains the following updates:
+
+## Breaking Changes
+- This change is marked as breaking due to its impact on Redshift configurations.
+- For Redshift users, comment data aggregated under the `conversations` field in the `jira__issue_enhanced` table is now disabled by default to prevent consistent errors related to Redshift's varchar length limits. 
+  - If you wish to re-enable comments on Redshift, set the `jira_include_comments` variable to `true` in your `dbt_project.yml`.
+
 # dbt_jira v0.18.0
 [PR #131](https://github.com/fivetran/dbt_jira/pull/131) contains the following updates:
 ## Breaking Changes

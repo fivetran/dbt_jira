@@ -66,7 +66,7 @@ Include the following jira package version in your `packages.yml` file:
 ```yaml
 packages:
   - package: fivetran/jira
-    version: [">=0.18.0", "<0.19.0"]
+    version: [">=0.19.0", "<0.20.0"]
 
 ```
 ### Step 3: Define database and schema variables
@@ -82,11 +82,11 @@ vars:
 Your Jira connector may not sync every table that this package expects. If you do not have the `SPRINT`, `COMPONENT`, or `VERSION` tables synced, add the respective variables to your root `dbt_project.yml` file. Additionally, if you want to remove comment aggregations from your `jira__issue_enhanced` model,  add the `jira_include_comments` variable to your root `dbt_project.yml`:
 ```yml
 vars:
-    jira_using_sprints: false   # Disable if you do not have the sprint table or do not want sprint-related metrics reported
-    jira_using_components: false # Disable if you do not have the component table or do not want component-related metrics reported
-    jira_using_versions: false # Disable if you do not have the versions table or do not want versions-related metrics reported
-    jira_using_priorities: false # disable if you are not using priorities in Jira
-    jira_include_comments: false # This package aggregates issue comments so that you have a single view of all your comments in the jira__issue_enhanced table. This can cause limit errors if you have a large dataset. Disable to remove this functionality.
+    jira_using_sprints: false    # Enabled by default. Disable if you do not have the sprint table or do not want sprint-related metrics reported.
+    jira_using_components: false # Enabled by default. Disable if you do not have the component table or do not want component-related metrics reported.
+    jira_using_versions: false   # Enabled by default. Disable if you do not have the versions table or do not want versions-related metrics reported.
+    jira_using_priorities: false # Enabled by default. Disable if you are not using priorities in Jira.
+    jira_include_comments: false # Disabled by default for Redshift, enabled by default for other supported warehouses. This package aggregates issue comments so that you have a single view of all your comments in the jira__issue_enhanced table. This can cause limit errors if you have a large dataset. Disable to remove this functionality.
 ```
 ### (Optional) Step 5: Additional configurations
 
