@@ -4,16 +4,16 @@
     enabled=var('fivetran_validation_tests_enabled', false)
 ) }}
 
-{% set exclude_columns = ['open_duration_seconds', 'any_assignment_duration_seconds', 'last_assignment_duration_seconds'] %}
+{% set exclude_columns = ['avg_age_currently_open_seconds', 'avg_age_currently_open_assigned_seconds', 'median_age_currently_open_seconds', 'median_age_currently_open_assigned_seconds', 'epics', 'components'] %}
 
 with prod as (
-    select {{ dbt_utils.star(from=ref('jira__issue_enhanced'), except=exclude_columns) }}
-    from {{ target.schema }}_jira_prod.jira__issue_enhanced
+    select {{ dbt_utils.star(from=ref('jira__project_enhanced'), except=exclude_columns) }}
+    from {{ target.schema }}_jira_prod.jira__project_enhanced
 ),
 
 dev as (
-    select {{ dbt_utils.star(from=ref('jira__issue_enhanced'), except=exclude_columns) }}
-    from {{ target.schema }}_jira_dev.jira__issue_enhanced
+    select {{ dbt_utils.star(from=ref('jira__project_enhanced'), except=exclude_columns) }}
+    from {{ target.schema }}_jira_dev.jira__project_enhanced
 ),
 
 prod_not_in_dev as (

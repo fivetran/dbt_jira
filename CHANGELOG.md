@@ -11,6 +11,7 @@
 - Updated the `jira_is_databricks_sql_warehouse` macro to `jira_is_incremental_compatible`. This macro now returns `true` if the Databricks runtime is an all-purpose cluster (previously it checked only for a SQL warehouse runtime) or if the target is any other non-Databricks-supported destination.
   - This update addresses Databricks runtimes (e.g., endpoints and external runtimes) that do not support the `insert_overwrite` incremental strategy used in the `jira__daily_issue_field_history` and `int_jira__pivot_daily_field_history` models.
 - For Databricks users, the `jira__daily_issue_field_history` and `int_jira__pivot_daily_field_history` models will now apply the incremental strategy only if running on an all-purpose cluster. All other Databricks runtimes will not utilize an incremental strategy.
+- Added consistency tests for the `jira__project_enhanced` and `jira__user_enhanced` models.
 
 # dbt_jira v0.18.0
 [PR #131](https://github.com/fivetran/dbt_jira/pull/131) contains the following updates:
