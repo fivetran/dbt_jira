@@ -1,5 +1,4 @@
-{{ config(enabled=var('jira_include_comments', False if target.type == 'redshift' else True),
-materialized='table') }}
+{{ config(enabled=var('jira_include_comments', False if target.type == 'redshift' else True)) }}
 
 with comment as (
 
