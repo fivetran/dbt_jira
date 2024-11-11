@@ -86,7 +86,9 @@ vars:
     jira_using_components: false # Enabled by default. Disable if you do not have the component table or do not want component-related metrics reported.
     jira_using_versions: false   # Enabled by default. Disable if you do not have the versions table or do not want versions-related metrics reported.
     jira_using_priorities: false # Enabled by default. Disable if you are not using priorities in Jira.
-    jira_include_comments: false # Disabled by default for Redshift, enabled by default for other supported warehouses. This package aggregates issue comments so that you have a single view of all your comments in the jira__issue_enhanced table. This can cause limit errors if you have a large dataset. Disable to remove this functionality.
+    jira_include_comments: false # Enabled by default. Disabling will remove the aggregation of comments via the `count_comments` and `conversations` columns in the `jira__issue_enhanced` table.
+    jira_include_conversations: false # Disabled by default for Redshift, enabled by default for other supported warehouses. Controls only the `conversation` column in the `jira__issue_enhanced` table.  Disabling removes `conversation` columns but keeps the `count_comments` field if `jira_include_comments` is still enabled, which can help avoid limit errors with large datasets.
+
 ```
 ### (Optional) Step 5: Additional configurations
 

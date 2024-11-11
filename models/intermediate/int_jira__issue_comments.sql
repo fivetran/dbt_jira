@@ -28,8 +28,7 @@ agg_comments as (
         "'\\n'" ) }} as conversation
     {% endif %}
     
-    from
-    comment 
+    from comment 
     join jira_user on comment.author_user_id = jira_user.user_id
 
     group by 1
