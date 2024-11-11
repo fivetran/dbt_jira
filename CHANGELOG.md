@@ -4,10 +4,10 @@
 ## Breaking Changes
 - This change is marked as breaking due to its impact on Redshift configurations.
 - For Redshift users, comment data aggregated under the `conversations` field in the `jira__issue_enhanced` table is now disabled by default to prevent consistent errors related to Redshift's varchar length limits. 
-  - If you wish to re-enable comments on Redshift, set the `jira_include_comments` variable to `true` in your `dbt_project.yml`.
+  - If you wish to re-enable `conversations` on Redshift, set the `jira_include_conversations` variable to `true` in your `dbt_project.yml`.
 
 ## Under the Hood
-- Updated the `comment` seed data to ensure comments are correctly disabled for Redshift by default.
+- Updated the `comment` seed data to ensure conversations are correctly disabled for Redshift by default.
 - Updated the `jira_is_databricks_sql_warehouse` macro to `jira_is_incremental_compatible`. This macro now returns `true` if the Databricks runtime is an all-purpose cluster (previously it checked only for a SQL warehouse runtime) or if the target is any other non-Databricks-supported destination.
   - This update addresses Databricks runtimes (e.g., endpoints and external runtimes) that do not support the `insert_overwrite` incremental strategy used in the `jira__daily_issue_field_history` and `int_jira__pivot_daily_field_history` models.
 - For Databricks users, the `jira__daily_issue_field_history` and `int_jira__pivot_daily_field_history` models will now apply the incremental strategy only if running on an all-purpose cluster. All other Databricks runtimes will not utilize an incremental strategy.

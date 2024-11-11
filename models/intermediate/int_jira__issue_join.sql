@@ -51,7 +51,7 @@ issue_sprint as (
 ),
 {% endif %}
 
-{% if var('jira_include_comments', False if target.type == 'redshift' else True) %}
+{% if var('jira_include_comments', True) %}
 issue_comments as (
 
     select * 
@@ -109,8 +109,8 @@ join_issue as (
         ,issue_versions.affects_versions
         {% endif %}
 
-        {% if var('jira_include_comments', False if target.type == 'redshift' else True) %}
-        ,issue_comments.conversation
+        {% if var('jira_include_comments', True) %}
+        {{ ',issue_comments.conversation' if var('jira_include_conversations', False if target.type == 'redshift' else True) }}
         ,coalesce(issue_comments.count_comments, 0) as count_comments
         {% endif %}
     
@@ -132,7 +132,7 @@ join_issue as (
     left join issue_sprint on issue_sprint.issue_id = issue.issue_id
     {% endif %}
 
-    {% if var('jira_include_comments', False if target.type == 'redshift' else True) %}
+    {% if var('jira_include_comments', True) %}
     left join issue_comments on issue_comments.issue_id = issue.issue_id
     {% endif %}
 )
