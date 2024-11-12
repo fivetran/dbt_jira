@@ -91,7 +91,7 @@ vars:
 
 ### (Optional) Step 5: Additional configurations
 
-### Controlling Conversation Aggregations in `jira__issue_enhanced`
+#### Controlling conversation aggregations in `jira__issue_enhanced`
 
 The `dbt_jira` package offers variables to enable or disable conversation aggregations in the `jira__issue_enhanced` table. These settings allow you to manage the amount of data processed and avoid potential performance or limit issues with large datasets.
 
