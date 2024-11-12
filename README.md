@@ -95,9 +95,9 @@ vars:
 
 The `dbt_jira` package offers variables to enable or disable conversation aggregations in the `jira__issue_enhanced` table. These settings allow you to manage the amount of data processed and avoid potential performance or limit issues with large datasets.
 
-- `jira_include_conversations`: Controls only the `conversation` columns in the `jira__issue_enhanced` table. 
-  - Default: Disabled for Redshift; enabled for other supported warehouses.
-  - Setting this to `false` removes the `conversation` columns but retains the `count_comments` field if `jira_include_comments` is still enabled. This is useful if you want a comment count without the full conversation details.
+- `jira_include_conversations`: Controls only the `conversation` [column](https://github.com/fivetran/dbt_jira/blob/main/models/jira.yml#L125-L127) in the `jira__issue_enhanced` table. 
+  - Default: Disabled for Redshift due to string size constraints; enabled for other supported warehouses.
+  - Setting this to `false` removes the `conversation` column but retains the `count_comments` field if `jira_include_comments` is still enabled. This is useful if you want a comment count without the full conversation details.
 
 In your `dbt_project.yml` file:
 
