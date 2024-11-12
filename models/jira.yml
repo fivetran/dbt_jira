@@ -125,6 +125,7 @@ models:
       - name: conversation
         description: >
           Line-separated list of comments made on this issue, including the timestamp and author name of each comment.
+          (Disabled by default for Redshift.)
       - name: count_comments
         description: The number of comments made on this issues. 
       - name: first_assigned_at

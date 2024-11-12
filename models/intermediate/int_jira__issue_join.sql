@@ -110,7 +110,7 @@ join_issue as (
         {% endif %}
 
         {% if var('jira_include_comments', True) %}
-        ,issue_comments.conversation
+        {{ ',issue_comments.conversation' if var('jira_include_conversations', False if target.type == 'redshift' else True) }}
         ,coalesce(issue_comments.count_comments, 0) as count_comments
         {% endif %}
     

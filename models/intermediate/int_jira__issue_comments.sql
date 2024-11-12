@@ -20,11 +20,15 @@ agg_comments as (
 
     select 
     comment.issue_id,
-    {{ fivetran_utils.string_agg( "comment.created_at || '  -  ' || jira_user.user_display_name || ':  ' || comment.body", "'\\n'" ) }} as conversation,
     count(comment.comment_id) as count_comments
 
-    from
-    comment 
+    {%- if var('jira_include_conversations', False if target.type == 'redshift' else True) %}
+    ,{{ fivetran_utils.string_agg(
+        "comment.created_at || '  -  ' || jira_user.user_display_name || ':  ' || comment.body",
+        "'\\n'" ) }} as conversation
+    {% endif %}
+    
+    from comment 
     join jira_user on comment.author_user_id = jira_user.user_id
 
     group by 1

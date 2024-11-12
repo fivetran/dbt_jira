@@ -1,6 +1,6 @@
 {{
     config(
-        materialized='table' if jira.jira_is_databricks_sql_warehouse() else 'incremental',
+        materialized='incremental' if jira_is_incremental_compatible() else 'table',
         partition_by = {'field': 'date_week', 'data_type': 'date'}
             if target.type not in ['spark', 'databricks'] else ['date_week'],
         cluster_by = ['date_week'],

@@ -1,9 +1,11 @@
 name: 'jira_integration_tests'
-version: '0.18.0'
+version: '0.19.0'
 config-version: 2
 profile: 'integration_tests'
 
 vars:
+  # Comment out the below when generating docs
+  issue_field_history_columns: ['summary', 'story points', 'components']
   jira_source:
     jira_schema: jira_integrations_tests_41
     jira_comment_identifier: "comment"
@@ -27,9 +29,6 @@ vars:
     jira_user_group_identifier: "user_group"
     jira_user_identifier: "user"
     jira_version_identifier: "version"
-
-  # Comment out the below when generating docs
-  issue_field_history_columns: ['summary', 'story points', 'components']
 
 models:
   jira:
