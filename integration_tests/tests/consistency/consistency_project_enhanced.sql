@@ -4,6 +4,7 @@
     enabled=var('fivetran_validation_tests_enabled', false)
 ) }}
 
+{# Exclude columns that depend on calculations involving the current time in seconds or aggregate strings in a random order, as they will differ between runs. #}
 {% set exclude_columns = ['avg_age_currently_open_seconds', 'avg_age_currently_open_assigned_seconds', 'median_age_currently_open_seconds', 'median_age_currently_open_assigned_seconds', 'epics', 'components'] %}
 
 with prod as (

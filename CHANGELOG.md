@@ -8,7 +8,7 @@
 
 ## Under the Hood
 - Updated the `comment` seed data to ensure conversations are correctly disabled for Redshift by default.
-- Updated the `jira_is_databricks_sql_warehouse` macro to `jira_is_incremental_compatible`. This macro now returns `true` if the Databricks runtime is an all-purpose cluster (previously it checked only for a SQL warehouse runtime) or if the target is any other non-Databricks-supported destination.
+- Renamed the `jira_is_databricks_sql_warehouse` macro to `jira_is_incremental_compatible`, which was updated to return `true` if the Databricks runtime is an all-purpose cluster (previously it checked only for a SQL warehouse runtime) or if the target is any other non-Databricks-supported destination.
   - This update addresses Databricks runtimes (e.g., endpoints and external runtimes) that do not support the `insert_overwrite` incremental strategy used in the `jira__daily_issue_field_history` and `int_jira__pivot_daily_field_history` models.
 - For Databricks users, the `jira__daily_issue_field_history` and `int_jira__pivot_daily_field_history` models will now apply the incremental strategy only if running on an all-purpose cluster. All other Databricks runtimes will not utilize an incremental strategy.
 - Added consistency tests for the `jira__project_enhanced` and `jira__user_enhanced` models.

@@ -87,10 +87,24 @@ vars:
     jira_using_versions: false   # Enabled by default. Disable if you do not have the versions table or do not want versions-related metrics reported.
     jira_using_priorities: false # Enabled by default. Disable if you are not using priorities in Jira.
     jira_include_comments: false # Enabled by default. Disabling will remove the aggregation of comments via the `count_comments` and `conversations` columns in the `jira__issue_enhanced` table.
-    jira_include_conversations: false # Disabled by default for Redshift, enabled by default for other supported warehouses. Controls only the `conversation` column in the `jira__issue_enhanced` table.  Disabling removes `conversation` columns but keeps the `count_comments` field if `jira_include_comments` is still enabled, which can help avoid limit errors with large datasets.
-
 ```
+
 ### (Optional) Step 5: Additional configurations
+
+### Controlling Conversation Aggregations in `jira__issue_enhanced`
+
+The `dbt_jira` package offers variables to enable or disable conversation aggregations in the `jira__issue_enhanced` table. These settings allow you to manage the amount of data processed and avoid potential performance or limit issues with large datasets.
+
+- `jira_include_conversations`: Controls only the `conversation` columns in the `jira__issue_enhanced` table. 
+  - Default: Disabled for Redshift; enabled for other supported warehouses.
+  - Setting this to `false` removes the `conversation` columns but retains the `count_comments` field if `jira_include_comments` is still enabled. This is useful if you want a comment count without the full conversation details.
+
+In your `dbt_project.yml` file:
+
+```yml
+vars:
+  jira_include_conversations: false/true # Disabled by default for Redshift; enabled for other supported warehouses.
+```
 
 #### Define daily issue field history columns
 The `jira__daily_issue_field_history` model generates historical data for the columns specified by the `issue_field_history_columns` variable. By default, the only columns tracked are `status`, `status_id`, and `sprint`, but all fields found in the Jira `FIELD` table's `field_name` column can be included in this model. The most recent value of any tracked column is also captured in `jira__issue_enhanced`.

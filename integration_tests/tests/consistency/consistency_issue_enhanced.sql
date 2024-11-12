@@ -4,8 +4,8 @@
     enabled=var('fivetran_validation_tests_enabled', false)
 ) }}
 
+{# Exclude columns that depend on calculations involving the current time in seconds or aggregate strings in a random order, as they will differ between runs. #}
 {% set exclude_columns = ['open_duration_seconds', 'any_assignment_duration_seconds', 'last_assignment_duration_seconds'] %}
-
 with prod as (
     select {{ dbt_utils.star(from=ref('jira__issue_enhanced'), except=exclude_columns) }}
     from {{ target.schema }}_jira_prod.jira__issue_enhanced
