@@ -1,3 +1,9 @@
+# dbt_jira version.version
+
+## Documentation
+- Added Quickstart model counts to README. ([#135](https://github.com/fivetran/dbt_jira/pull/135))
+- Corrected references to connectors and connections in the README. ([#135](https://github.com/fivetran/dbt_jira/pull/135))
+
 # dbt_jira v0.19.0
 [PR #133](https://github.com/fivetran/dbt_jira/pull/133) contains the following updates:
 
