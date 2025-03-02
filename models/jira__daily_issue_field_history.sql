@@ -1,12 +1,12 @@
 {{
     config(
-        materialized='table' if jira.jira_is_databricks_sql_warehouse() else 'incremental',
-        partition_by = {'field': 'date_day', 'data_type': 'date'}
-            if target.type not in ['spark', 'databricks'] else ['date_day'],
-        cluster_by = ['date_day', 'issue_id'],
+        materialized='incremental' if jira_is_incremental_compatible() else 'table',
+        partition_by = {'field': 'date_week', 'data_type': 'date'}
+            if target.type not in ['spark', 'databricks'] else ['date_week'],
+        cluster_by = ['date_week'],
         unique_key='issue_day_id',
         incremental_strategy = 'insert_overwrite' if target.type in ('bigquery', 'databricks', 'spark') else 'delete+insert',
-        file_format='delta' if jira.jira_is_databricks_sql_warehouse() else 'parquet'
+        file_format='delta'
     )
 }}
 
@@ -15,7 +15,7 @@
 
 {% if is_incremental() %}
 -- set max date_day with lookback as a variable for multiple uses
-{% set max_date_day = jira.jira_lookback(from_date='max(date_day)', datepart='day', interval=var('lookback_window', 3)) %}
+{% set max_date_week = jira.jira_lookback(from_date='max(date_week)', datepart='week', interval=var('lookback_window', 1)) %}
 {% endif %}
 
 -- in intermediate/field_history/
@@ -25,21 +25,33 @@ with pivoted_daily_history as (
     from {{ ref('int_jira__field_history_scd') }}
 
     {% if is_incremental() %}
-    where valid_starting_on >= {{ max_date_day }}
+    where valid_starting_on >= {{ max_date_week }}
+), 
 
 -- If no issue fields have been updated since the last incremental run, the pivoted_daily_history CTE will return no record/rows.
--- When this is the case, we need to grab the most recent day's records from the previously built table so that we can persist 
+-- When this is the case, we need to grab the most recent week's records from the previously built table so that we can persist 
 -- those values into the future.
 
-), most_recent_data as ( 
+most_recent_data as ( 
     select 
         *
     from {{ this }}
-    where date_day >= {{ max_date_day }}
-
+    where date_day >= {{ max_date_week }}
 {% endif %}
+), 
 
-), field_option as (
+-- in intermediate/field_history/
+calendar as (
+
+    select *
+    from {{ ref('int_jira__issue_calendar_spine') }}
+
+    {% if is_incremental() %}
+    where date_day >= {{ max_date_week }}
+    {% endif %}
+), 
+
+field_option as (
     
     select *
     from {{ var('field_option') }}
@@ -65,17 +77,6 @@ components as (
 ),
 {% endif %}
 
--- in intermediate/field_history/
-calendar as (
-
-    select *
-    from {{ ref('int_jira__issue_calendar_spine') }}
-
-    {% if is_incremental() %}
-    where date_day >= {{ max_date_day }}
-    {% endif %}
-),
-
 joined as (
 
     select
@@ -87,7 +88,7 @@ joined as (
                 {% if col.name|lower == 'components' and var('jira_using_components', True) %}
                 , coalesce(pivoted_daily_history.components, most_recent_data.components) as components
 
-                {% elif col.name|lower not in ['issue_day_id', 'issue_id', 'valid_starting_on', 'components'] %} 
+                {% elif col.name|lower not in ['issue_day_id', 'issue_id', 'valid_starting_on', 'valid_starting_at_week', 'components'] %} 
                 , coalesce(pivoted_daily_history.{{ col.name }}, most_recent_data.{{ col.name }}) as {{ col.name }}
 
                 {% endif %}
@@ -98,18 +99,18 @@ joined as (
                 {% if col.name|lower == 'components' and var('jira_using_components', True) %}
                 , pivoted_daily_history.components   
 
-                {% elif col.name|lower not in ['issue_day_id', 'issue_id', 'valid_starting_on', 'components'] %} 
+                {% elif col.name|lower not in ['issue_day_id', 'issue_id', 'valid_starting_on', 'valid_starting_at_week', 'components'] %} 
                 , pivoted_daily_history.{{ col.name }}
 
                 {% endif %}
             {% endfor %} 
-        {% endif %}
+        {% endif %} 
     
     from calendar
     left join pivoted_daily_history 
         on calendar.issue_id = pivoted_daily_history.issue_id
         and calendar.date_day = pivoted_daily_history.valid_starting_on
-    
+
     {% if is_incremental() %}
     left join most_recent_data
         on calendar.issue_id = most_recent_data.issue_id
@@ -126,7 +127,7 @@ set_values as (
             order by date_day rows unbounded preceding) as status_id_field_partition
 
         -- list of exception columns
-        {% set exception_cols = ['issue_id', 'issue_day_id', 'valid_starting_on', 'status', 'status_id', 'components', 'issue_type'] %}
+        {% set exception_cols = ['issue_id', 'issue_day_id', 'valid_starting_on', 'valid_starting_at_week', 'status', 'status_id', 'components', 'issue_type'] %}
 
         {% for col in pivot_data_columns %}
             {% if col.name|lower == 'components' and var('jira_using_components', True) %}
@@ -180,7 +181,7 @@ fill_values as (
                 partition by issue_id, component_field_partition 
                 order by date_day asc rows between unbounded preceding and current row) as components
 
-            {% elif col.name|lower not in ['issue_id', 'issue_day_id', 'valid_starting_on', 'status', 'status_id', 'components'] %}
+            {% elif col.name|lower not in ['issue_id', 'issue_day_id', 'valid_starting_on', 'valid_starting_at_week', 'status', 'status_id', 'components'] %}
             -- grab the value that started this batch/partition
             , first_value( {{ col.name }} ) over (
                 partition by issue_id, {{ col.name }}_field_partition 
@@ -202,7 +203,7 @@ fix_null_values as (
             {% if col.name|lower == 'components' and var('jira_using_components', True) %}
             , case when components = 'is_null' then null else components end as components
 
-            {% elif col.name|lower not in ['issue_id','issue_day_id','valid_starting_on', 'status', 'components'] %}
+            {% elif col.name|lower not in ['issue_id','issue_day_id','valid_starting_on', 'valid_starting_at_week', 'status', 'components'] %}
             -- we de-nulled the true null values earlier in order to differentiate them from nulls that just needed to be backfilled
             , case when {{ col.name }} = 'is_null' then null else {{ col.name }} end as {{ col.name }}
 
@@ -217,6 +218,7 @@ surrogate_key as (
 
     select
         fix_null_values.date_day,
+        cast({{ dbt.date_trunc('week', 'fix_null_values.date_day') }} as date) as date_week,
         fix_null_values.issue_id,
         statuses.status_name as status
 
@@ -224,7 +226,7 @@ surrogate_key as (
             {% if col.name|lower == 'components' and var('jira_using_components', True) %}
             , fix_null_values.components as components
 
-            {% elif col.name|lower not in ['issue_id','issue_day_id','valid_starting_on', 'status', 'components'] %} 
+            {% elif col.name|lower not in ['issue_id','issue_day_id','valid_starting_on', 'valid_starting_at_week', 'status', 'components'] %} 
             , fix_null_values.{{ col.name }} as {{ col.name }}
 
             {% endif %}

@@ -32,6 +32,8 @@ The following table provides a detailed list of all tables materialized within t
 | [jira__issue_enhanced](https://fivetran.github.io/dbt_jira/#!/model/model.jira.jira__issue_enhanced)            | Each record represents a Jira issue, enriched with data about its current assignee, reporter, sprint, epic, project, resolution, issue type, priority, and status. It also includes metrics reflecting assignments, sprint rollovers, and re-openings of the issue. Note that all epics are considered `issues` in Jira and are therefore included in this model (where `issue_type='epic'`). |
 | [jira__project_enhanced](https://fivetran.github.io/dbt_jira/#!/model/model.jira.jira__project_enhanced)            | Each record represents a project, enriched with data about the users involved, how many issues have been opened or closed, the velocity of work, and the breadth of the project (i.e., its components and epics). |
 | [jira__user_enhanced](https://fivetran.github.io/dbt_jira/#!/model/model.jira.jira__user_enhanced)            | Each record represents a user, enriched with metrics regarding their open issues, completed issues, the projects they work on, and the velocity of their work. |
+### Materialized Models
+Each Quickstart transformation job run materializes 43 models if all components of this data model are enabled. This count includes all staging, intermediate, and final models materialized as `view`, `table`, or `incremental`.
 <!--section-end-->
 
 ## How do I use the dbt package?
@@ -39,7 +41,7 @@ The following table provides a detailed list of all tables materialized within t
 ### Step 1: Prerequisites
 To use this dbt package, you must have the following:
 
-- At least one Fivetran Jira connector syncing data into your destination.
+- At least one Fivetran Jira connection syncing data into your destination.
 - A **BigQuery**, **Snowflake**, **Redshift**, **Databricks**, or **PostgreSQL** destination.
 
 #### Databricks Dispatch Configuration
@@ -66,7 +68,7 @@ Include the following jira package version in your `packages.yml` file:
 ```yaml
 packages:
   - package: fivetran/jira
-    version: [">=0.17.0", "<0.18.0"]
+    version: [">=0.19.0", "<0.20.0"]
 
 ```
 ### Step 3: Define database and schema variables
@@ -79,16 +81,32 @@ vars:
 ```
 
 ### Step 4: Disable models for non-existent sources
-Your Jira connector may not sync every table that this package expects. If you do not have the `SPRINT`, `COMPONENT`, or `VERSION` tables synced, add the respective variables to your root `dbt_project.yml` file. Additionally, if you want to remove comment aggregations from your `jira__issue_enhanced` model,  add the `jira_include_comments` variable to your root `dbt_project.yml`:
+Your Jira connection may not sync every table that this package expects. If you do not have the `SPRINT`, `COMPONENT`, or `VERSION` tables synced, add the respective variables to your root `dbt_project.yml` file. Additionally, if you want to remove comment aggregations from your `jira__issue_enhanced` model,  add the `jira_include_comments` variable to your root `dbt_project.yml`:
 ```yml
 vars:
-    jira_using_sprints: false   # Disable if you do not have the sprint table or do not want sprint-related metrics reported
-    jira_using_components: false # Disable if you do not have the component table or do not want component-related metrics reported
-    jira_using_versions: false # Disable if you do not have the versions table or do not want versions-related metrics reported
-    jira_using_priorities: false # disable if you are not using priorities in Jira
-    jira_include_comments: false # This package aggregates issue comments so that you have a single view of all your comments in the jira__issue_enhanced table. This can cause limit errors if you have a large dataset. Disable to remove this functionality.
+    jira_using_sprints: false    # Enabled by default. Disable if you do not have the sprint table or do not want sprint-related metrics reported.
+    jira_using_components: false # Enabled by default. Disable if you do not have the component table or do not want component-related metrics reported.
+    jira_using_versions: false   # Enabled by default. Disable if you do not have the versions table or do not want versions-related metrics reported.
+    jira_using_priorities: false # Enabled by default. Disable if you are not using priorities in Jira.
+    jira_include_comments: false # Enabled by default. Disabling will remove the aggregation of comments via the `count_comments` and `conversations` columns in the `jira__issue_enhanced` table.
 ```
+
 ### (Optional) Step 5: Additional configurations
+
+#### Controlling conversation aggregations in `jira__issue_enhanced`
+
+The `dbt_jira` package offers variables to enable or disable conversation aggregations in the `jira__issue_enhanced` table. These settings allow you to manage the amount of data processed and avoid potential performance or limit issues with large datasets.
+
+- `jira_include_conversations`: Controls only the `conversation` [column](https://github.com/fivetran/dbt_jira/blob/main/models/jira.yml#L125-L127) in the `jira__issue_enhanced` table. 
+  - Default: Disabled for Redshift due to string size constraints; enabled for other supported warehouses.
+  - Setting this to `false` removes the `conversation` column but retains the `count_comments` field if `jira_include_comments` is still enabled. This is useful if you want a comment count without the full conversation details.
+
+In your `dbt_project.yml` file:
+
+```yml
+vars:
+  jira_include_conversations: false/true # Disabled by default for Redshift; enabled for other supported warehouses.
+```
 
 #### Define daily issue field history columns
 The `jira__daily_issue_field_history` model generates historical data for the columns specified by the `issue_field_history_columns` variable. By default, the only columns tracked are `status`, `status_id`, and `sprint`, but all fields found in the Jira `FIELD` table's `field_name` column can be included in this model. The most recent value of any tracked column is also captured in `jira__issue_enhanced`.
@@ -142,14 +160,14 @@ vars:
 ```
 
 #### Lookback Window
-Records from the source can sometimes arrive late. Since several of the models in this package are incremental, by default we look back 3 days to ensure late arrivals are captured while avoiding the need for frequent full refreshes. While the frequency can be reduced, we still recommend running `dbt --full-refresh` periodically to maintain data quality of the models.
+Records from the source may occasionally arrive late. To handle this, we implement a one-week lookback in our incremental models to capture late arrivals without requiring frequent full refreshes. The lookback is structured in weekly increments, as the incremental logic is based on weekly periods. While the frequency of full refreshes can be reduced, we still recommend running `dbt --full-refresh` periodically to maintain data quality of the models. 
 
 To change the default lookback window, add the following variable to your `dbt_project.yml` file:
 
 ```yml
 vars:
   jira:
-    lookback_window: number_of_days # default is 3
+    lookback_window: number_of_weeks # default is 1
 ```
 
 ### (Optional) Step 6: Orchestrate your models with Fivetran Transformations for dbt Core™

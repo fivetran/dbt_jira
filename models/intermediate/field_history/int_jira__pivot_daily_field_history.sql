@@ -1,12 +1,12 @@
 {{
     config(
-        materialized='table' if jira.jira_is_databricks_sql_warehouse() else 'incremental',
-        partition_by = {'field': 'valid_starting_on', 'data_type': 'date'}
-            if target.type not in ['spark','databricks'] else ['valid_starting_on'],
-        cluster_by = ['valid_starting_on', 'issue_id'],
+        materialized='incremental' if jira_is_incremental_compatible() else 'table',
+        partition_by = {'field': 'valid_starting_at_week', 'data_type': 'date'}
+            if target.type not in ['spark','databricks'] else ['valid_starting_at_week'],
+        cluster_by = ['valid_starting_at_week'],
         unique_key='issue_day_id',
         incremental_strategy = 'insert_overwrite' if target.type in ('bigquery', 'databricks', 'spark') else 'delete+insert',
-        file_format='delta' if jira.jira_is_databricks_sql_warehouse() else 'parquet'
+        file_format='delta'
     )
 }}
 
@@ -20,8 +20,8 @@ with issue_field_history as (
     from {{ ref('int_jira__issue_field_history') }}
 
     {% if is_incremental() %}
-    {% set max_valid_starting_on = jira.jira_lookback(from_date='max(valid_starting_on)', datepart='day', interval=var('lookback_window', 3)) %}
-    where cast(updated_at as date) >= {{ max_valid_starting_on }}
+    {% set max_valid_starting_at_week = jira.jira_lookback(from_date='max(valid_starting_on)', datepart='week', interval=var('lookback_window', 1)) %}
+    where cast(updated_at as date) >= {{ max_valid_starting_at_week }}
     {% endif %}
 ),
 
@@ -32,7 +32,7 @@ issue_multiselect_history as (
     from {{ ref('int_jira__issue_multiselect_history') }}
 
     {% if is_incremental() %}
-    where cast(updated_at as date) >= {{ max_valid_starting_on }}
+    where cast(updated_at as date) >= {{ max_valid_starting_at_week }}
     {% endif %}
 ),
 
@@ -151,8 +151,9 @@ pivot_out as (
     -- only days on which a field value was actively changed will have a non-null value. the nulls will need to 
     -- be backfilled in the final jira__daily_issue_field_history model
     select 
-        valid_starting_on, 
+        valid_starting_on,
         issue_id,
+        cast({{ dbt.date_trunc('week', 'valid_starting_at') }} as date) as valid_starting_at_week,
         max(case when lower(field_id) = 'status' then field_value end) as status,
         max(case when lower(field_name) = 'sprint' then field_value end) as sprint
 
@@ -163,7 +164,7 @@ pivot_out as (
 
     from int_jira__daily_field_history
 
-    group by 1,2
+    {{ dbt_utils.group_by(3) }}
 ),
 
 final as (
