@@ -1,7 +1,7 @@
 {{
     config(
         materialized='table' if jira.jira_is_databricks_sql_warehouse() else 'incremental',
-        partition_by = {'field': 'date_day', 'data_type': 'date'}
+        partition_by = {'field': 'date_day', 'data_type': 'date', 'granularity': 'month'}
             if target.type not in ['spark', 'databricks'] else ['date_day'],
         cluster_by = ['date_day', 'issue_id'],
         unique_key='issue_day_id',
@@ -19,7 +19,7 @@ with spine as (
     {% endset %}
     {% set first_date = run_query(first_date_query).columns[0][0]|string %}
     
-    {% else %} {% set first_date = "2016-01-01" %}
+    {% else %} {% set first_date = "2020-01-01" %}
     {% endif %}
 
     select * 

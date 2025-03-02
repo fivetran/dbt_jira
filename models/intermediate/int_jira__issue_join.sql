@@ -74,6 +74,12 @@ issue_versions as (
 ),
 {% endif %}
 
+issue_story_points as (
+
+    select *
+    from {{ ref('int_jira__issue_story_points' ) }}
+),
+
 join_issue as (
 
     select
@@ -86,7 +92,7 @@ join_issue as (
         ,resolution.resolution_name as resolution_type
         {% if var('jira_using_priorities', True) %}
         ,priority.priority_name as current_priority
-	{% endif %}
+	    {% endif %}
 
         {% if var('jira_using_sprints', True) %}
         ,issue_sprint.current_sprint_id
@@ -95,8 +101,8 @@ join_issue as (
         ,issue_sprint.sprint_started_at
         ,issue_sprint.sprint_ended_at
         ,issue_sprint.sprint_completed_at
-        ,coalesce(issue_sprint.sprint_started_at <= {{ dbt.current_timestamp_backcompat() }}
-          and coalesce(issue_sprint.sprint_completed_at, {{ dbt.current_timestamp_backcompat() }}) >= {{ dbt.current_timestamp_backcompat() }}  
+        ,coalesce(issue_sprint.sprint_started_at <= {{ dbt.current_timestamp() }}
+          and coalesce(issue_sprint.sprint_completed_at, {{ dbt.current_timestamp() }}) >= {{ dbt.current_timestamp() }}  
           , false) as is_active_sprint -- If sprint doesn't have a start date, default to false. If it does have a start date, but no completed date, this means that the sprint is active. The ended_at timestamp is irrelevant here.
         {% endif %}
 
@@ -113,7 +119,12 @@ join_issue as (
         ,issue_comments.conversation
         ,coalesce(issue_comments.count_comments, 0) as count_comments
         {% endif %}
-    
+
+        ,issue_story_points.current_story_points
+        ,issue_story_points.current_estimated_story_points
+        ,issue_story_points.count_sp_changes
+        ,issue_story_points.count_estimated_sp_changes
+
     from issue
     left join project on project.project_id = issue.project_id
     left join status on status.status_id = issue.status_id
@@ -135,6 +146,8 @@ join_issue as (
     {% if var('jira_include_comments', True) %}
     left join issue_comments on issue_comments.issue_id = issue.issue_id
     {% endif %}
+
+    left join issue_story_points on issue_story_points.issue_id = issue.issue_id
 )
 
 select * 
