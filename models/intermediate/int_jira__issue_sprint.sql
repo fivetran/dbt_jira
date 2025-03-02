@@ -34,9 +34,7 @@ last_sprint as (
 
     select *
     from sprint_field_history
-    
     where row_num = 1
-
 ), 
 
 sprint_rollovers as (
@@ -44,7 +42,6 @@ sprint_rollovers as (
     select 
         issue_id,
         count(distinct case when field_value is not null then field_value end) as count_sprint_changes
-    
     from sprint_field_history
     group by 1
 
@@ -61,11 +58,9 @@ issue_sprint as (
         last_sprint.ended_at as sprint_ended_at,
         last_sprint.completed_at as sprint_completed_at,
         coalesce(sprint_rollovers.count_sprint_changes, 0) as count_sprint_changes
-
-    from 
-    last_sprint 
+    from last_sprint 
     left join sprint_rollovers on sprint_rollovers.issue_id = last_sprint.issue_id
-    
 )
 
-select * from issue_sprint
+select * 
+from issue_sprint

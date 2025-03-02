@@ -5,7 +5,6 @@ with issue as (
 
     select * 
     from {{ var('issue') }}
-    
 ),
 
 issue_type as (
@@ -20,7 +19,6 @@ issues_w_epics as (
 
     select * 
     from {{ ref('int_jira__issue_epic')}}
-
 ), 
 
 issue_enriched_with_epics as (
@@ -30,7 +28,8 @@ issue_enriched_with_epics as (
         coalesce(cast(parent_issue_id as {{ dbt.type_string() }}), cast(epic_issue_id as {{ dbt.type_string() }})) as revised_parent_issue_id
 
     from issue
-    left join issues_w_epics on issues_w_epics.issue_id = issue.issue_id
+    left join issues_w_epics 
+        on issues_w_epics.issue_id = issue.issue_id
 
 ), 
 
@@ -41,7 +40,8 @@ issue_w_types as (
         issue_type.issue_type_name as issue_type
         
     from issue_enriched_with_epics 
-    left join issue_type on issue_type.issue_type_id = issue_enriched_with_epics.issue_type_id
+    left join issue_type 
+        on issue_type.issue_type_id = issue_enriched_with_epics.issue_type_id
 ),
 
 add_parent_info as (

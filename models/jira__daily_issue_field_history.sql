@@ -33,8 +33,8 @@ with pivoted_daily_history as (
 -- those values into the future.
 
 most_recent_data as ( 
-    select 
-        *
+
+    select *
     from {{ this }}
     where date_day >= {{ max_date_week }}
 {% endif %}
@@ -125,7 +125,6 @@ set_values as (
         joined.status_id,
         sum( case when joined.status_id is null then 0 else 1 end) over ( partition by issue_id
             order by date_day rows unbounded preceding) as status_id_field_partition
-
         -- list of exception columns
         {% set exception_cols = ['issue_id', 'issue_day_id', 'valid_starting_on', 'valid_starting_at_week', 'status', 'status_id', 'components', 'issue_type'] %}
 
@@ -153,7 +152,7 @@ set_values as (
         {% if col.name|lower == 'components' and var('jira_using_components', True) %}
         left join components   
             on cast(components.component_id as {{ dbt.type_string() }}) = joined.components
-        
+
         {% elif col.name|lower == 'issue_type' %}
         left join issue_types   
             on cast(issue_types.issue_type_id as {{ dbt.type_string() }}) = joined.issue_type

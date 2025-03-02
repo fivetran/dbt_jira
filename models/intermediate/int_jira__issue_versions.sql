@@ -10,7 +10,6 @@ version_history as (
 
     select *
     from {{ ref('int_jira__issue_multiselect_history') }}
-
     where field_id = 'versions'
         or field_id = 'fixVersions'
 ),
@@ -20,11 +19,7 @@ order_versions as (
     select
         *,
         -- using rank so batches stick together
-        rank() over (
-            partition by field_id, issue_id
-            order by updated_at desc
-            ) as row_num
-
+        rank() over (partition by field_id, issue_id order by updated_at desc) as row_num
     from version_history
 ),
 

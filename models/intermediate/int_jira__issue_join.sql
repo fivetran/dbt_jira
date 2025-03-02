@@ -84,12 +84,11 @@ join_issue as (
 
     select
         issue.* 
-
         ,project.project_name as project_name
-
         ,status.status_name as current_status
         ,status_category.status_category_name as current_status_category   
         ,resolution.resolution_name as resolution_type
+
         {% if var('jira_using_priorities', True) %}
         ,priority.priority_name as current_priority
 	    {% endif %}
@@ -102,8 +101,8 @@ join_issue as (
         ,issue_sprint.sprint_ended_at
         ,issue_sprint.sprint_completed_at
         ,coalesce(issue_sprint.sprint_started_at <= {{ dbt.current_timestamp() }}
-          and coalesce(issue_sprint.sprint_completed_at, {{ dbt.current_timestamp() }}) >= {{ dbt.current_timestamp() }}  
-          , false) as is_active_sprint -- If sprint doesn't have a start date, default to false. If it does have a start date, but no completed date, this means that the sprint is active. The ended_at timestamp is irrelevant here.
+            and coalesce(issue_sprint.sprint_completed_at, {{ dbt.current_timestamp() }}) >= {{ dbt.current_timestamp() }}  
+            , false) as is_active_sprint -- If sprint doesn't have a start date, default to false. If it does have a start date, but no completed date, this means that the sprint is active. The ended_at timestamp is irrelevant here.
         {% endif %}
 
         ,issue_assignments_and_resolutions.first_assigned_at
@@ -126,28 +125,39 @@ join_issue as (
         ,issue_story_points.count_estimated_sp_changes
 
     from issue
-    left join project on project.project_id = issue.project_id
-    left join status on status.status_id = issue.status_id
-    left join status_category on status.status_category_id = status_category.status_category_id
-    left join resolution on resolution.resolution_id = issue.resolution_id
+    left join project 
+        on project.project_id = issue.project_id
+    left join status 
+        on status.status_id = issue.status_id
+    left join status_category 
+        on status.status_category_id = status_category.status_category_id
+    left join resolution 
+        on resolution.resolution_id = issue.resolution_id
+
 	{% if var('jira_using_priorities', True) %}
-    left join priority on priority.priority_id = issue.priority_id
+    left join priority
+        on priority.priority_id = issue.priority_id
 	{% endif %}
-    left join issue_assignments_and_resolutions on issue_assignments_and_resolutions.issue_id = issue.issue_id
+    left join issue_assignments_and_resolutions 
+        on issue_assignments_and_resolutions.issue_id = issue.issue_id
 
     {% if var('jira_using_versions', True) %}
-    left join issue_versions on issue_versions.issue_id = issue.issue_id
+    left join issue_versions 
+        on issue_versions.issue_id = issue.issue_id
     {% endif %}
     
     {% if var('jira_using_sprints', True) %}
-    left join issue_sprint on issue_sprint.issue_id = issue.issue_id
+    left join issue_sprint 
+        on issue_sprint.issue_id = issue.issue_id
     {% endif %}
 
     {% if var('jira_include_comments', True) %}
-    left join issue_comments on issue_comments.issue_id = issue.issue_id
+    left join issue_comments 
+        on issue_comments.issue_id = issue.issue_id
     {% endif %}
 
-    left join issue_story_points on issue_story_points.issue_id = issue.issue_id
+    left join issue_story_points 
+        on issue_story_points.issue_id = issue.issue_id
 )
 
 select * 
