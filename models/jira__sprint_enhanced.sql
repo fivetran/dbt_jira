@@ -51,7 +51,7 @@ sprint_time_metrics as (
         count(distinct issue_enhanced.issue_id) as current_issues_per_sprint,
         count(distinct issue_enhanced.assignee_user_id) as current_assignees_per_sprint,
         sum(case when issue_enhanced.first_assigned_at >= sprint.started_at
-            and issue_enhanced.first_assigned_at <= sprint.ended_at then 1 else 0 end) as issues_assigned_in_sprint,
+            and issue_enhanced.first_assigned_at <= sprint.ended_at then 1 else 0 end) as issues_assigned_during_sprint,
         sum(case when issue_enhanced.first_resolved_at >= sprint.started_at
             and issue_enhanced.first_resolved_at <= sprint.ended_at then 1 else 0 end) as issues_resolved_in_sprint,
         sum(case when issue_enhanced.first_assigned_at >= sprint.started_at

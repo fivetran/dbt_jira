@@ -3,9 +3,12 @@ version: '0.20.0'
 config-version: 2
 profile: 'integration_tests'
 
-vars:
+vars: 
+  
+  # jira_database: digital-arbor-400
+  # jira_schema: jira
   # Comment out the below when generating docs
-  issue_field_history_columns: ['summary', 'story points', 'components']
+  # issue_field_history_columns: ['summary', 'story points', 'components']
   jira_source:
     jira_schema: jira_integrations_tests_42
     jira_comment_identifier: "comment"

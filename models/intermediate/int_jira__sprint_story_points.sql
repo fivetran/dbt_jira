@@ -98,11 +98,12 @@ ranked_start_story_point_estimate as (
 ),
 
 ranked_end_story_point_estimate as (
+
     select
         issue_sprint_history.issue_id,
         issue_sprint_history.sprint_id,
         issue_sprint_history.sprint_ended_at,
-        cast(field_history.field_value as {{ dbt.type_int() }}) as story_point_estimate_end,
+        cast(field_history.field_value as {{ dbt.type_float() }}) as story_point_estimate_end,
         row_number() over (
             partition by issue_sprint_history.issue_id, issue_sprint_history.sprint_id
             order by field_history.updated_at desc
@@ -115,6 +116,7 @@ ranked_end_story_point_estimate as (
 ),
 
 first_story_point_estimate as (
+
     select 
         issue_id,
         sprint_id, 
@@ -124,6 +126,7 @@ first_story_point_estimate as (
 ),
 
 last_story_point_estimate as (
+
     select 
         issue_id,
         sprint_id, 

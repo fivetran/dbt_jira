@@ -279,7 +279,7 @@ models:
         description: The total number of issues currently associated with the sprint.
       - name: current_assignees_per_sprint
         description: The total number of distinct assignees for issues in this sprint.
-      - name: issues_assigned_in_sprint
+      - name: issues_assigned_during_sprint
         description: The number of issues assigned during the sprint's active period.
       - name: issues_resolved_in_sprint
         description: The number of issues resolved during the sprint's active period.
