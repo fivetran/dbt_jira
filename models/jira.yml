@@ -237,6 +237,8 @@ models:
     description: >
       This model provides enhanced sprint-level metrics in Jira, incorporating data from sprints,
       sprint-related issue history, and sprint-based story points tracking.
+    config:
+      enabled: "{{ var('jira_using_sprints', true) }}"
     columns:
       - name: sprint_id
         description: Unique ID of the sprint.

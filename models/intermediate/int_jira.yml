@@ -182,6 +182,8 @@ models:
 
   - name: int_jira__sprint_metrics
     description: Table calculating issue-related metrics per sprint.
+    config:
+      enabled: "{{ var('jira_using_sprints', true) }}"
     columns:
       - name: current_sprint_id
         description: Unique ID of the most current sprint belonging to an issue.
@@ -229,6 +231,8 @@ models:
 
   - name: int_jira__sprint_story_points
     description: Table calculating issues and story points assigned to a sprint historically.
+    config:
+      enabled: "{{ var('jira_using_sprints', true) }}"
     columns: 
       - name: sprint_id
         description: Unique ID of the sprint.
@@ -308,6 +312,8 @@ models:
 
   - name: int_jira__issue_sprint
     description: Table relating issues to the sprints they currently belong to.
+    config:
+      enabled: "{{ var('jira_using_sprints', true) }}"
     tests:
       - dbt_utils.unique_combination_of_columns:
           combination_of_columns: 
