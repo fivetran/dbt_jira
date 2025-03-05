@@ -312,13 +312,13 @@ models:
       - dbt_utils.unique_combination_of_columns:
           combination_of_columns: 
             - issue_id  
-            - current_sprint_id
+            - sprint_id
     columns:
       - name: issue_id
         description: Unique ID of the issue. 
-      - name: current_sprint_id
+      - name: sprint_id
         description: Unique ID of the sprint.
-      - name: current_sprint_name
+      - name: sprint_name
         description: Title of the sprint.
       - name: board_id
         description: Foreign key referencing the ID of the `board` that the sprint lives in.
@@ -328,6 +328,8 @@ models:
         description: Timestamp of when the sprint is planned to end.
       - name: sprint_completed_at 
         description: Timestamp of when the sprint was completed.
+      - name: row_num
+        description: Row number designating updates to an issue, ordered by the most recent to bring in the most current issue to a sprint
       - name: count_sprint_changes
         description: The total number of sprints that the issue has belonged to.
 
