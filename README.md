@@ -19,7 +19,7 @@
 - Enables you to better understand the workload, performance, and velocity of your team's work using Jira issues. It performs the following actions:
   - Creates a daily issue history table so you can quickly create agile reports, such as burndown charts, along any issue field.
   - Enriches the core issue table with relevant data regarding its workflow and current state.
-  - Aggregates bandwidth and issue velocity metrics along projects and users.
+  - Aggregates bandwidth and issue velocity metrics along projects, users and sprints.
 - Generates a comprehensive data dictionary of your source and modeled Jira data through the [dbt docs site](https://fivetran.github.io/dbt_jira/).
 
 <!--section="jira_transformation_model"-->
@@ -32,8 +32,10 @@ The following table provides a detailed list of all tables materialized within t
 | [jira__issue_enhanced](https://fivetran.github.io/dbt_jira/#!/model/model.jira.jira__issue_enhanced)            | Each record represents a Jira issue, enriched with data about its current assignee, reporter, sprint, epic, project, resolution, issue type, priority, and status. It also includes metrics reflecting assignments, sprint rollovers, and re-openings of the issue. Note that all epics are considered `issues` in Jira and are therefore included in this model (where `issue_type='epic'`). |
 | [jira__project_enhanced](https://fivetran.github.io/dbt_jira/#!/model/model.jira.jira__project_enhanced)            | Each record represents a project, enriched with data about the users involved, how many issues have been opened or closed, the velocity of work, and the breadth of the project (i.e., its components and epics). |
 | [jira__user_enhanced](https://fivetran.github.io/dbt_jira/#!/model/model.jira.jira__user_enhanced)            | Each record represents a user, enriched with metrics regarding their open issues, completed issues, the projects they work on, and the velocity of their work. |
+| [jira__sprint_enhanced](https://fivetran.github.io/dbt_jira/#!/model/model.jira.jira__sprint_enhanced)            | Each record represents a sprint, enriched with metrics regarding issues created, brought into, and resolved in the sprint, the story points estimated and worked, and the velocity of work completed. |
+
 ### Materialized Models
-Each Quickstart transformation job run materializes 43 models if all components of this data model are enabled. This count includes all staging, intermediate, and final models materialized as `view`, `table`, or `incremental`.
+Each Quickstart transformation job run materializes 47 models if all components of this data model are enabled. This count includes all staging, intermediate, and final models materialized as `view`, `table`, or `incremental`.
 <!--section-end-->
 
 ## How do I use the dbt package?
@@ -68,7 +70,7 @@ Include the following jira package version in your `packages.yml` file:
 ```yaml
 packages:
   - package: fivetran/jira
-    version: [">=0.19.0", "<0.20.0"]
+    version: [">=0.20.0", "<0.21.0"]
 
 ```
 ### Step 3: Define database and schema variables
@@ -184,7 +186,7 @@ This dbt package is dependent on the following dbt packages. These dependencies 
 ```yml
 packages:
     - package: fivetran/jira_source
-      version: [">=0.7.0", "<0.8.0"]
+      version: [">=0.8.0", "<0.9.0"]
 
     - package: fivetran/fivetran_utils
       version: [">=0.4.0", "<0.5.0"]

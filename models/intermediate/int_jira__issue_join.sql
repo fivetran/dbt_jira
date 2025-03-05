@@ -46,8 +46,17 @@ priority as (
 {% if var('jira_using_sprints', True) %}
 issue_sprint as (
 
-    select *
+    select 
+        issue_id,
+        sprint_id as current_sprint_id,
+        sprint_field_history.sprint_name as current_sprint_name,
+        board_id,
+        sprint_started_at,
+        sprint_ended_at,
+        sprint_completed_at,
+        count_sprint_changes
     from {{ ref('int_jira__issue_sprint') }}
+    where row_num = 1
 ),
 {% endif %}
 
@@ -63,7 +72,6 @@ issue_assignments_and_resolutions as (
 
     select *
     from {{ ref('int_jira__issue_assign_resolution')}}
-
 ),
 
 {% if var('jira_using_versions', True) %}
@@ -77,7 +85,7 @@ issue_versions as (
 issue_story_points as (
 
     select *
-    from {{ ref('int_jira__issue_story_points' ) }}
+    from {{ ref('int_jira__issue_story_points') }}
 ),
 
 join_issue as (

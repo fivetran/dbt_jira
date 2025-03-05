@@ -23,5 +23,6 @@ public_models: [
   "jira__daily_issue_field_history",
   "jira__user_enhanced",
   "jira__issue_enhanced",
-  "jira__project_enhanced"
+  "jira__project_enhanced",
+  "jira__sprint_enhanced"
 ]

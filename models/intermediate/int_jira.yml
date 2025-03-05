@@ -124,7 +124,15 @@ models:
         description: Comma-separated list of the names of project versions that this issue fixes.
       - name: current_status_category
         description: Title of the umbrella status category that the issue is currently in. 
-        
+      - name: current_story_points
+        description: The most recently recorded story points value for the issue.
+      - name: current_estimated_story_points
+        description: The most recently recorded estimated story points value for the issue.
+      - name: count_sp_changes
+        description: The number of times the issue's story points value has changed over time. 
+      - name: count_estimated_sp_changes
+        description: The number of times the issue's estimated story points value has changed over time.
+
   - name: int_jira__project_metrics
     description: Table calculating issue-related metrics per project.
     columns:
@@ -172,6 +180,71 @@ models:
       - name: median_age_currently_open_assigned_days
         description: The median age of any currently-open issues, from their first assignment. 
 
+  - name: int_jira__sprint_metrics
+    description: Table calculating issue-related metrics per sprint.
+    columns:
+      - name: current_sprint_id
+        description: Unique ID of the most current sprint belonging to an issue.
+        tests:
+          - unique
+          - not_null
+      - name: count_closed_issues
+        description: The number of issues closed in their current sprints.
+      - name: count_open_issues
+        description: The number of currently un-resolved issues in their current sprints.
+      - name: count_open_assigned_issues
+        description: The number of currently open and currently assigned issues in their current sprints.
+      - name: avg_close_time_seconds
+        description: The average time taken to close issues in their current sprints, in seconds.
+      - name: avg_assigned_close_time_seconds
+        description: The average time taken to close issues from their first assignment in their current sprints, in seconds.
+      - name: avg_age_currently_open_seconds
+        description: The average age of any currently-open issues in their current sprints.
+      - name: avg_age_currently_open_assigned_seconds
+        description: The average age of any currently-open issues in their current sprints, from their first assignment.
+      - name: median_close_time_seconds
+        description: The median time taken to close issues in their current sprints, in seconds.
+      - name: median_age_currently_open_seconds
+        description: The median age of any currently-open issues in their current sprints.
+      - name: median_assigned_close_time_seconds
+        description: The median time taken to close issues from their first assignment in their current sprints, in seconds.
+      - name: median_age_currently_open_assigned_seconds
+        description: The median age of any currently-open issues in their current sprints, from their first assignment.
+      - name: avg_close_time_days
+        description: The average time taken to close issues in their current sprints, in days.
+      - name: avg_assigned_close_time_days
+        description: The average time taken to close issues from their first assignment to their current sprints, in days.
+      - name: avg_age_currently_open_days
+        description: The average age of any currently-open issues in their current sprints, in days.
+      - name: avg_age_currently_open_assigned_days
+        description: The average age of any currently-open issues in their current sprints, from their first assignment, in days.
+      - name: median_close_time_days
+        description: The median time taken to close issues in their current sprints, in days.
+      - name: median_age_currently_open_days
+        description: The median age of any currently-open issues in their current sprints, in days.
+      - name: median_assigned_close_time_days
+        description: The median time taken to close issues from their first assignment in their current sprints, in days.
+      - name: median_age_currently_open_assigned_days
+        description: The median age of any currently-open issues, from their first assignment in their current sprints, in days.
+
+  - name: int_jira__sprint_story_points
+    description: Table calculating issues and story points assigned to a sprint historically.
+    columns: 
+      - name: sprint_id
+        description: Unique ID of the sprint.
+        tests:
+          - unique
+          - not_null
+      - name: issues_assigned_to_sprint
+        description: The number of issues assigned to this sprint.
+      - name: initial_story_points
+        description: The total number of story points assessed at the start of the sprint.
+      - name: initial_story_points_estimate
+        description: The total estimated story points assessed at the start of the sprint.
+      - name: final_story_points
+        description: The total number of story points assessed at the end of the sprint.
+      - name: final_story_points_estimate
+        description: The total estimated story points assessed at the end of the sprint.      
 
   - name: int_jira__user_metrics
     description: Table calculating issue-related metrics per user.
@@ -257,6 +330,23 @@ models:
         description: Timestamp of when the sprint was completed.
       - name: count_sprint_changes
         description: The total number of sprints that the issue has belonged to.
+
+  - name: int_jira__issue_story_points
+    description: Table tracking the latest story points and story point estimates for each Jira issue, along with the count of changes made to these values,
+    columns:
+      - name: issue_id
+        description: Unique identifier for the Jira issue.
+        tests:
+          - unique
+          - not_null
+      - name: current_story_points
+        description: The most recently recorded story points value for the issue.
+      - name: current_estimated_story_points
+        description: The most recently recorded estimated story points value for the issue.
+      - name: count_sp_changes
+        description: The number of times the issue's story points value has changed over time. 
+      - name: count_estimated_sp_changes
+        description: The number of times the issue's estimated story points value has changed over time.
 
   - name: int_jira__issue_type_parents
     description: >

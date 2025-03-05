@@ -2,6 +2,6 @@ target/
 dbt_modules/
 logs/
 .DS_Store
-models/intermediate/int_jira__all_field_options.sql
+env/
 dbt_packages/
 package-lock.yml
