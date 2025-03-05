@@ -1,23 +1,23 @@
 # dbt_jira v0.20.0
 This release includes the following updates.
 
-## Feature Update: New Sprint Report
-- Introduced the new model `jira__sprint_enhanced` to examine high level sprint metrics like velocity, time tracking and story point completion. Customers should now be able to build valuable sprint visualizations, like their own velocity reports, estimation tracking, and goal metrics.
-  - Feeding into these models are three new intermediate models:
+## Feature Updates: New Sprint Report
+- Introduced the new model `jira__sprint_enhanced` to examine high level sprint metrics, such as velocity, time tracking and story point completion. Customers should now be able to build valuable sprint visualizations, like their own velocity reports, estimation tracking, and goal metrics. ([#136](https://github.com/fivetran/dbt_jira/pull/136))
+  - Feeding into this end model are three new intermediate models:
     - Created `int_jira__sprint_metrics` model to bring in sprint metrics data based on what sprint an issue is currently assigned. These models closely mirror the beahvior of `int_jira__user_metrics` and `int_jira__project_metrics`, which pull their metrics from the `jira__issue_enhanced` model. 
     - Created `int_jira__issue_story_points` model to bring in current issue story point and story point estimate values to then aggregate onto `jira__sprint_enhanced`.
     - Created `int_jira__sprint_story_points` model to track all issues historically assigned to a sprint. Also looked at historical story point values in case the current story point value does not align with expected reporting.
-- Updated logic in `int_jira__issue_sprint` to bring in all sprints tied to an issue. This is then brought downstream to `int_jira__issue_story_points` to then assess historical story point information. We now filter by most current sprints for an issue in the `int_jira__issue_join` CTE . 
-- If users are not utilizing the `sprint` source, these models can be disabled by setting the variable `jira_using_sprints` to `false`. More instructions [are available in the README](https://github.com/fivetran/dbt_jira?tab=readme-ov-file#step-4-disable-models-for-non-existent-sources). 
+- Updated logic in `int_jira__issue_sprint` to bring in all sprints tied to an issue. This is then brought downstream to `int_jira__issue_story_points` to then assess historical story point information. We now filter by most current sprints for an issue in the `int_jira__issue_join` CTE. ([#136](https://github.com/fivetran/dbt_jira/pull/136))
+- If users are not utilizing the `sprint` source, these models can be disabled by setting the variable `jira_using_sprints` to `false`. More instructions [are available in the README](https://github.com/fivetran/dbt_jira?tab=readme-ov-file#step-4-disable-models-for-non-existent-sources). ([#136](https://github.com/fivetran/dbt_jira/pull/136))
 
 ## Under the Hood
-- Added consistency and integrity tests for the `jira__sprint_enhanced` model.
-- Added new `jira__sprint_enhanced` to public models in the `quickstart.yml` configuration.
-- Corrected formatting on intermediate and end models to conform with best practices and improve readability. 
+- Added consistency and integrity tests for the `jira__sprint_enhanced` model. ([#136](https://github.com/fivetran/dbt_jira/pull/136))
+- Added new `jira__sprint_enhanced` to public models in the `quickstart.yml` configuration. ([#136](https://github.com/fivetran/dbt_jira/pull/136))
+- Corrected formatting on intermediate and end models to conform with best practices and improve readability. ([#136](https://github.com/fivetran/dbt_jira/pull/136))
 
 ## Documentation
-- Updated yml documentation and README with new models and descriptions.
-- [Created a DECISIONLOG](https://github.com/fivetran/dbt_jira/blob/main/DECISIONLOG.md#enhancing-jira-sprint-reporting-with-flexible-metrics) to explain why we bring in multiple metrics from current sprint data as well as historical sprint data for the `jira__sprint_enhanced` model. 
+- Updated yml documentation and README with new models, fields and descriptions. ([#136](https://github.com/fivetran/dbt_jira/pull/136))
+- [Created a DECISIONLOG](https://github.com/fivetran/dbt_jira/blob/main/DECISIONLOG.md#enhancing-jira-sprint-reporting-with-flexible-metrics) to explain why we bring in multiple metrics from current sprint data as well as historical sprint data for the `jira__sprint_enhanced` model. ([#136](https://github.com/fivetran/dbt_jira/pull/136))
 - Added Quickstart model counts to README. ([#135](https://github.com/fivetran/dbt_jira/pull/135))
 - Corrected references to connectors and connections in the README. ([#135](https://github.com/fivetran/dbt_jira/pull/135))
 
