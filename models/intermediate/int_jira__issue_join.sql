@@ -49,7 +49,7 @@ issue_sprint as (
     select 
         issue_id,
         sprint_id as current_sprint_id,
-        sprint_field_history.sprint_name as current_sprint_name,
+        sprint_name as current_sprint_name,
         board_id,
         sprint_started_at,
         sprint_ended_at,
