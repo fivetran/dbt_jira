@@ -62,7 +62,7 @@ sprint_time_metrics as (
             then 1 else 0 end) as issues_injected_in_sprint,
         sum(issue_enhanced.count_sp_changes) as count_sp_changes,
         sum(issue_enhanced.count_estimated_sp_changes) as count_estimated_sp_changes, 
-        sum(issue_enhanced.count_sprint_changes) as count_sprint_issue_changes,
+        sum(issue_enhanced.count_sprint_changes) as count_sprint_issue_changes
     from sprint
     left join issue_enhanced 
         on cast(sprint.sprint_id as {{ dbt.type_string() }}) = issue_enhanced.current_sprint_id
