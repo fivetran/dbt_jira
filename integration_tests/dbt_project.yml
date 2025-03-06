@@ -4,9 +4,6 @@ config-version: 2
 profile: 'integration_tests'
 
 vars: 
-  
-  # jira_database: digital-arbor-400
-  # jira_schema: jira
   # Comment out the below when generating docs
   # issue_field_history_columns: ['summary', 'story points', 'components']
   jira_source:
