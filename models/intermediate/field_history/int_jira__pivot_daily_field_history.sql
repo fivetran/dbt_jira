@@ -101,6 +101,7 @@ limit_to_relevant_fields as (
     from get_valid_dates
 
     where lower(field_id) = 'status' 
+        or lower(field_name) like '%story point%'
         or lower(field_name) in ('sprint'
         {%- for col in var('issue_field_history_columns', []) -%}
             ,'{{ (col|lower) }}'
@@ -155,7 +156,9 @@ pivot_out as (
         issue_id,
         cast({{ dbt.date_trunc('week', 'valid_starting_at') }} as date) as valid_starting_at_week,
         max(case when lower(field_id) = 'status' then field_value end) as status,
-        max(case when lower(field_name) = 'sprint' then field_value end) as sprint
+        max(case when lower(field_name) = 'sprint' then field_value end) as sprint,
+        max(case when lower(field_name) like '%story points%' then field_value end) as story_points,
+        max(case when lower(field_name) like '%story point estimate%' then field_value end) as story_point_estimate
 
         {% for col in var('issue_field_history_columns', []) -%}
         ,

@@ -30,6 +30,16 @@ models:
         description: The name of the status that an issue has on a given day.
         # other fields included in var(issue_history_columns)
 
+  - name: jira__daily_sprint_issue_history
+    description: >
+      Each record represents a snapshot of a sprint and its assorted issueson a given day.
+    columns:
+      - name: sprint_issue_day_id
+        description: Surrogate key hashed on `date_day`, `sprint_id`, and `issue_id`
+        tests:
+          - unique
+          - not_null    
+
   - name: jira__issue_enhanced
     description: >
       The core issue table, enhanced with current-status attributes from foreign-key-related tables,
@@ -233,7 +243,22 @@ models:
       - name: median_age_currently_open_assigned_days
         description: The median age of any currently-open issues, from their first assignment. 
 
+
+
+
   - name: jira__sprint_enhanced
+    description: >
+      This model provides enhanced sprint-level metrics in Jira, incorporating data from sprints,
+      sprint-related issue history, and sprint-based story points tracking.
+    columns:
+      - name: sprint_id
+        description: Unique ID of the sprint.
+        tests:
+          - unique
+          - not_null
+
+
+  - name: jira__sprint_enhanced_old
     description: >
       This model provides enhanced sprint-level metrics in Jira, incorporating data from sprints,
       sprint-related issue history, and sprint-based story points tracking.

@@ -1,98 +1,97 @@
 {{ config(enabled=var('jira_using_sprints', True)) }}
 
-with sprint as (
+with daily_sprint_issue_history as (
 
     select *
-    from {{ var('sprint') }}
+    from {{ ref('jira__daily_sprint_issue_history') }}
 ),
 
-sprint_metrics as (
+sprint_metrics_grouped as (
 
-    select * 
-    from {{ ref('int_jira__sprint_metrics') }}
+    select
+        sprint_id, 
+        sprint_started_at,
+        sprint_ended_at,
+        sprint_completed_at,
+        board_id,
+        original_estimate_seconds,
+        remaining_estimate_seconds,
+        time_spent_seconds
+    from daily_sprint_issue_history
+    {{ dbt_utils.group_by(8) }}
 ),
 
-sprint_story_points as (
-
-    select *
-    from {{ ref('int_jira__sprint_story_points') }}
-),
-
-issue_enhanced as (
-
-    select *
-    from {{ ref('jira__issue_enhanced') }}
-),
-
-sprint_time_metrics as (
+sprint_issue_metrics as (
 
     select 
-        sprint.sprint_id,
-        sprint.sprint_name, 
-        sprint.board_id,
-        sprint.started_at as sprint_started_at,
-        sprint.ended_at as sprint_ended_at,
-        sprint.completed_at as sprint_completed_at,
-        coalesce(
-            sprint.started_at <= {{ dbt.current_timestamp() }}
-            and coalesce(sprint.completed_at, {{ dbt.current_timestamp() }}) >= {{ dbt.current_timestamp() }},
-            false
-        ) as is_active_sprint, -- If sprint doesn't have a start date, default to false. If it does have a start date, but no completed date, this means that the sprint is active. The ended_at timestamp is irrelevant here.
-        issues_assigned_to_sprint,
-        initial_story_points,
-        initial_story_points_estimate,
-        final_story_points,
-        final_story_points_estimate,
-        sum(case when issue_enhanced.current_story_points is null then 0 else issue_enhanced.current_story_points end) as current_story_points,
-        sum(case when issue_enhanced.current_estimated_story_points is null then 0 else issue_enhanced.current_estimated_story_points end) as current_estimated_story_points,
-        sum(case when issue_enhanced.original_estimate_seconds is null then 0 else issue_enhanced.original_estimate_seconds end) as sprint_original_estimate_seconds,
-        sum(case when issue_enhanced.remaining_estimate_seconds is null then 0 else issue_enhanced.remaining_estimate_seconds end) as sprint_remaining_estimate_seconds,
-        sum(case when issue_enhanced.time_spent_seconds is null then 0 else issue_enhanced.time_spent_seconds end) as sprint_time_spent_seconds,
-        count(distinct issue_enhanced.issue_id) as current_issues_per_sprint,
-        count(distinct issue_enhanced.assignee_user_id) as current_assignees_per_sprint,
-        sum(case when issue_enhanced.first_assigned_at >= sprint.started_at
-            and issue_enhanced.first_assigned_at <= sprint.ended_at then 1 else 0 end) as issues_assigned_during_sprint,
-        sum(case when issue_enhanced.first_resolved_at >= sprint.started_at
-            and issue_enhanced.first_resolved_at <= sprint.ended_at then 1 else 0 end) as issues_resolved_in_sprint,
-        sum(case when issue_enhanced.first_assigned_at >= sprint.started_at
-            and issue_enhanced.first_assigned_at <= sprint.ended_at
-            and issue_enhanced.first_resolved_at >= sprint.ended_at then 1 else 0 end) as issues_rolled_over_in_sprint,
-        sum(case when cast( {{ dbt.date_trunc('day', 'issue_enhanced.created_at') }} as date) > cast( {{ dbt.date_trunc('day', 'sprint_started_at') }} as date)
-            and cast( {{ dbt.date_trunc('day', 'issue_enhanced.created_at') }} as date) < cast( {{ dbt.date_trunc('day', 'sprint_ended_at') }} as date)
-            then 1 else 0 end) as issues_injected_in_sprint,
-        sum(issue_enhanced.count_sp_changes) as count_sp_changes,
-        sum(issue_enhanced.count_estimated_sp_changes) as count_estimated_sp_changes, 
-        sum(issue_enhanced.count_sprint_changes) as count_sprint_issue_changes
-    from sprint
-    left join issue_enhanced 
-        on cast(sprint.sprint_id as {{ dbt.type_string() }}) = issue_enhanced.current_sprint_id
-    left join sprint_story_points
-        on cast(sprint.sprint_id as {{ dbt.type_string() }}) = sprint_story_points.sprint_id
-    {{ dbt_utils.group_by(12) }}
+        sprint_id,
+        count(distinct issue_id) as sprint_issues,
+        count(distinct assignee_user_id) as sprint_assignees,
+        count(distinct (case when is_sprint_active and is_issue_open then issue_id end)) as open_sprint_issues,
+        count(distinct (case when is_issue_resolved_in_sprint then issue_id end)) as resolved_sprint_issues,
+        count(distinct (case when cast(issue_assigned_to_sprint_at as date) > cast(sprint_started_at as date)
+            and cast(issue_assigned_to_sprint_at as date) < cast(sprint_ended_at as date)
+            then issue_id else 0 end)) as injected_sprint_issues
+    from daily_sprint_issue_history
+    {{ dbt_utils.group_by(1) }}
+),
+
+sprint_start_metrics as (
+
+    select 
+        sprint_id,
+        sum(story_points) as story_points_committed,
+        sum(story_point_estimate) as story_point_estimate_committed,
+        count(distinct issue_id) as issues_committed
+    from daily_sprint_issue_history
+    where date_day = cast(sprint_started_at as date)
+    {{ dbt_utils.group_by(1) }}
+),
+
+sprint_end_metrics as (
+
+    select 
+        sprint_id,
+        sum(story_points) as story_points_end,
+        sum(story_point_estimate) as story_point_estimate_end,
+        sum(case when is_issue_resolved_in_sprint then story_points else 0 end) as story_points_completed,
+        sum(case when is_issue_resolved_in_sprint then story_point_estimate else 0 end) as story_point_estimate_completed
+    from daily_sprint_issue_history
+    where date_day = cast(sprint_ended_at as date)
+    {{ dbt_utils.group_by(1) }}
 ),
 
 final as (
-
+    
     select 
-        sprint_time_metrics.*,
-        sprint_metrics.count_closed_issues,
-        sprint_metrics.count_open_issues,
-        sprint_metrics.count_open_assigned_issues, 
-        sprint_metrics.avg_close_time_days,
-        sprint_metrics.avg_assigned_close_time_days,
-        sprint_metrics.avg_age_currently_open_days,
-        sprint_metrics.avg_age_currently_open_assigned_days,
-        sprint_metrics.median_close_time_seconds,
-        sprint_metrics.median_age_currently_open_seconds,
-        sprint_metrics.median_assigned_close_time_seconds,
-        sprint_metrics.median_age_currently_open_assigned_seconds,
-        sprint_metrics.median_close_time_days,
-        sprint_metrics.median_age_currently_open_days,
-        sprint_metrics.median_assigned_close_time_days,
-        sprint_metrics.median_age_currently_open_assigned_days
-    from sprint_time_metrics
-    left join sprint_metrics    
-        on cast(sprint_time_metrics.sprint_id as {{ dbt.type_string() }}) = sprint_metrics.current_sprint_id
+        sprint_metrics_grouped.sprint_id, 
+        sprint_metrics_grouped.sprint_started_at,
+        sprint_metrics_grouped.sprint_ended_at,
+        sprint_metrics_grouped.sprint_completed_at,
+        sprint_metrics_grouped.board_id,
+        sprint_start_metrics.story_points_committed,
+        sprint_start_metrics.story_point_estimate_committed,
+        sprint_end_metrics.story_points_end,
+        sprint_end_metrics.story_point_estimate_end,
+        sprint_end_metrics.story_points_completed,
+        sprint_end_metrics.story_point_estimate_completed,
+        sprint_issue_metrics.sprint_assignees,
+        sprint_issue_metrics.sprint_issues,
+        sprint_start_metrics.issues_committed,
+        sprint_issue_metrics.open_sprint_issues,
+        sprint_issue_metrics.resolved_sprint_issues,
+        sprint_issue_metrics.injected_sprint_issues,
+        sum(sprint_metrics_grouped.original_estimate_seconds) as original_estimate_seconds,
+        sum(sprint_metrics_grouped.remaining_estimate_seconds) as remaining_estimate_seconds,
+        sum(sprint_metrics_grouped.time_spent_seconds) as time_spent_seconds
+    from sprint_metrics_grouped
+    left join sprint_issue_metrics
+        on sprint_metrics_grouped.sprint_id = sprint_issue_metrics.sprint_id
+    left join sprint_start_metrics
+        on sprint_metrics_grouped.sprint_id = sprint_start_metrics.sprint_id
+    left join sprint_end_metrics
+        on sprint_metrics_grouped.sprint_id = sprint_end_metrics.sprint_id
+    {{ dbt_utils.group_by(17) }}
 )
 
 select * 
