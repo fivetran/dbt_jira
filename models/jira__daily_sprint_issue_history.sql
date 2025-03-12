@@ -1,15 +1,34 @@
-{{ config(enabled=var('jira_using_sprints', True)) }}
+{{
+    config(
+        enabled=var('jira_using_sprints', True),
+        materialized='incremental' if jira_is_incremental_compatible() else 'table',
+        partition_by = {'field': 'date_week', 'data_type': 'date'}
+            if target.type not in ['spark', 'databricks'] else ['date_week'],
+        cluster_by = ['date_week'],
+        unique_key='sprint_issue_day_id',
+        incremental_strategy = 'insert_overwrite' if target.type in ('bigquery', 'databricks', 'spark') else 'delete+insert',
+        file_format='delta'
+    )
+}}
 
-with issue_multiselect_history as (
-
-    select *
-    from {{ ref('int_jira__issue_multiselect_history') }}
-),
-
-daily_issue_field_history as (
+with daily_issue_field_history as (
 
     select *
     from {{ ref('jira__daily_issue_field_history') }}
+
+    {% if is_incremental() %}
+    {% set max_date_week = jira.jira_lookback(from_date='max(date_day)', datepart='week', interval=var('lookback_window', 1)) %}
+    where cast(date_day as date) >= {{ max_date_week }}
+    {% endif %}
+),
+
+issue_multiselect_history as (
+
+    select *
+    from {{ ref('int_jira__issue_multiselect_history') }}
+    {% if is_incremental() %}
+    where cast(updated_at as date) >= {{ max_date_week }}
+    {% endif %}
 ),
 
 sprint as (
@@ -41,6 +60,7 @@ issue_sprint_history as (
         issue.remaining_estimate_seconds,
         issue.time_spent_seconds
     from issue_multiselect_history
+    --Since we are only concerned with sprint data, thought it best to avoid issues not tied to sprints, hence the inner join.
     inner join issue
         on issue.issue_id = issue_multiselect_history.issue_id
     inner join sprint
@@ -56,6 +76,7 @@ issue_sprint_daily_history as (
         issue_sprint_history.sprint_id,
         issue_sprint_history.issue_id,
         daily_issue_field_history.date_day,
+        daily_issue_field_history.date_week,
         issue_sprint_history.issue_assigned_to_sprint_at,
         issue_sprint_history.sprint_started_at,
         issue_sprint_history.sprint_ended_at,
@@ -84,7 +105,6 @@ issue_sprint_statuses as (
         case when date_day >= cast(sprint_completed_at as date) then true else false end as is_sprint_completed,
         case when date_day >= cast(issue_created_at as date) and issue_resolved_at is null then true else false end as is_issue_open,
         case when date_day >= cast(issue_resolved_at as date) and issue_resolved_at <= sprint_ended_at then true else false end as is_issue_resolved_in_sprint,
-        case when date_day >= cast(issue_created_at as date) and issue_created_at >= sprint_ended_at then true else false end as is_issue_backlogged,
         case when date_day >= cast(sprint_started_at as date) and date_day <= cast(sprint_ended_at as date)
             then {{ dbt.datediff('date_day', 'sprint_ended_at', 'day') }} else null end as days_left_in_sprint
     from issue_sprint_daily_history
