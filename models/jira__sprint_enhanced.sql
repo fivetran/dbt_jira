@@ -10,6 +10,7 @@ sprint_metrics_grouped as (
 
     select
         sprint_id, 
+        sprint_name,
         sprint_started_at,
         sprint_ended_at,
         sprint_completed_at,
@@ -18,7 +19,7 @@ sprint_metrics_grouped as (
         remaining_estimate_seconds,
         time_spent_seconds
     from daily_sprint_issue_history
-    {{ dbt_utils.group_by(8) }}
+    {{ dbt_utils.group_by(9) }}
 ),
 
 sprint_issue_metrics as (
@@ -71,6 +72,7 @@ final as (
     
     select 
         sprint_metrics_grouped.sprint_id, 
+        sprint_metrics_grouped.sprint_name, 
         sprint_metrics_grouped.sprint_started_at,
         sprint_metrics_grouped.sprint_ended_at,
         sprint_metrics_grouped.sprint_completed_at,
@@ -97,7 +99,7 @@ final as (
         on sprint_metrics_grouped.sprint_id = sprint_start_metrics.sprint_id
     left join sprint_end_metrics
         on sprint_metrics_grouped.sprint_id = sprint_end_metrics.sprint_id
-    {{ dbt_utils.group_by(17) }}
+    {{ dbt_utils.group_by(18) }}
 )
 
 select * 

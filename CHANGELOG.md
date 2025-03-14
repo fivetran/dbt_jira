@@ -12,7 +12,7 @@ This release includes the following updates.
 
 ## Under the Hood
 - Added consistency and integrity tests for the `jira__sprint_enhanced` model. ([#136](https://github.com/fivetran/dbt_jira/pull/136))
-- Added new `jira__sprint_enhanced` to public models in the `quickstart.yml` configuration. ([#136](https://github.com/fivetran/dbt_jira/pull/136))
+- Added new `jira__daily_sprint_issue_history` and `jira__sprint_enhanced`  to public models in the `quickstart.yml` configuration. ([#136](https://github.com/fivetran/dbt_jira/pull/136))
 - Corrected formatting on intermediate and end models to conform with best practices and improve readability. ([#136](https://github.com/fivetran/dbt_jira/pull/136))
 
 ## Documentation

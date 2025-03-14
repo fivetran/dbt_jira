@@ -21,6 +21,7 @@ destination_configurations:
 
 public_models: [
   "jira__daily_issue_field_history",
+  "jira__daily_sprint_issue_history",
   "jira__user_enhanced",
   "jira__issue_enhanced",
   "jira__project_enhanced",

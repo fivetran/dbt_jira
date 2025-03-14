@@ -7,7 +7,7 @@ with end_model as (
 
     select 
         sprint_id, 
-        issues_assigned_to_sprint as issues_in_sprint_end
+        sprint_issues as sprint_issues_end
     from {{ ref('jira__sprint_enhanced') }}
 ),
 
@@ -46,7 +46,7 @@ source_model as (
 
     select 
         sprint.sprint_id, 
-        count(distinct issue_id) as issues_in_sprint_source
+        count(distinct issue_id) as sprint_issues_source
     from issue_sprint_fields
     inner join sprint
         on issue_sprint_fields.field_value = cast(sprint.sprint_id as string)
@@ -55,9 +55,9 @@ source_model as (
 
 select 
     end_model.sprint_id,
-    issues_in_sprint_end,
-    issues_in_sprint_source
+    sprint_issues_source,
+    sprint_issues_end
 from end_model
 join source_model
     on end_model.sprint_id = source_model.sprint_id
-where issues_in_sprint_end != issues_in_sprint_source 
+where sprint_issues_source != sprint_issues_end 

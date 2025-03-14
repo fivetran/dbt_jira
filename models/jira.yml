@@ -28,6 +28,10 @@ models:
         description: The ID of the status that an issue has on a given day.
       - name: status
         description: The name of the status that an issue has on a given day.
+      - name: story_points
+        description: The story points that an issue has on a given day. 
+      - name: story_point_estimate
+        description: The story point estimate that an issue has on a given day.  
         # other fields included in var(issue_history_columns)
 
   - name: jira__daily_sprint_issue_history
@@ -38,7 +42,45 @@ models:
         description: Surrogate key hashed on `date_day`, `sprint_id`, and `issue_id`
         tests:
           - unique
-          - not_null    
+          - not_null
+      - name: sprint_id
+        description: Foreign key referencing the ID of the `sprint` with these values.
+      - name: issue_id
+        description: The ID of the issue that 
+      - name: date_day
+        description: Date on which the sprint and issue had these field values.
+      - name: date_week
+        description: The start date of the week corresponding to `date_day`.
+      - name: issue_assigned_to_sprint_at
+        description: Date the issue was assigned to the sprint.
+      - name: sprint_name
+        description: Title of the sprint. 
+      - name: sprint_started_at
+        description: Timestamp of when the sprint began.
+      - name: sprint_ended_at
+        description: Timestamp of when the sprint is planned to end.
+      - name: sprint_completed_at
+        description: Timestamp of when the sprint was completed.
+      - name: board_id
+        description: Foreign key referencing the ID of the `board` that the sprint belongs to.
+      - name: issue_created_at
+        description: Timestamp of when the issue was created (in UTC).
+      - name: issue_resolved_at
+        description: Timestamp of when the issue was resolved (in UTC).
+      - name: assignee_user_id
+        description: Foreign key referencing the ID of the `user` currently assigned to this task.
+      - name: original_estimate_seconds
+        description: The original estimate of how long working on this issue would take, in seconds.
+      - name: remaining_estimate_seconds
+        description: The estimate of how much longer working on this issue will take, in seconds.
+      - name: time_spent_seconds
+        description: The time that was spent working on this issue, in seconds.
+      - name: status
+        description: The name of the status that an issue has on a given day. 
+      - name: story_points
+        description: The story points that an issue has on a given day.
+      - name: story_point_estimate
+        description: The story point estimate that an issue has on a given day.
 
   - name: jira__issue_enhanced
     description: >
@@ -243,22 +285,7 @@ models:
       - name: median_age_currently_open_assigned_days
         description: The median age of any currently-open issues, from their first assignment. 
 
-
-
-
   - name: jira__sprint_enhanced
-    description: >
-      This model provides enhanced sprint-level metrics in Jira, incorporating data from sprints,
-      sprint-related issue history, and sprint-based story points tracking.
-    columns:
-      - name: sprint_id
-        description: Unique ID of the sprint.
-        tests:
-          - unique
-          - not_null
-
-
-  - name: jira__sprint_enhanced_old
     description: >
       This model provides enhanced sprint-level metrics in Jira, incorporating data from sprints,
       sprint-related issue history, and sprint-based story points tracking.
@@ -278,76 +305,36 @@ models:
         description: Timestamp of when the sprint is planned to end.
       - name: sprint_completed_at
         description: Timestamp of when the sprint was completed.
-      - name: is_active_sprint
-        description: Boolean flag indicating whether the sprint is currently active.
-      - name: issues_assigned_to_sprint
-        description: The number of issues assigned to this sprint.
-      - name: initial_story_points
-        description: The total number of story points assessed at the start of the sprint.
-      - name: initial_story_points_estimate
-        description: The total estimated story points assessed at the start of the sprint.
-      - name: final_story_points
-        description: The total number of story points assessed at the end of the sprint.
-      - name: final_story_points_estimate
-        description: The total estimated story points assessed at the end of the sprint.
-      - name: current_story_points
-        description: The sum of the most recently recorded story points for all issues in the sprint.
-      - name: current_estimated_story_points
-        description: The sum of the most recently recorded estimated story points for all issues in the sprint.
-      - name: sprint_original_estimate_seconds
-        description: The total original estimate of work time for issues in this sprint, in seconds.
-      - name: sprint_remaining_estimate_seconds
-        description: The total remaining estimate of work time for issues in this sprint, in seconds.
-      - name: sprint_time_spent_seconds
-        description: The total time spent working on issues in this sprint, in seconds.
-      - name: current_issues_per_sprint
-        description: The total number of issues currently associated with the sprint.
-      - name: current_assignees_per_sprint
-        description: The total number of distinct assignees for issues in this sprint.
-      - name: issues_assigned_during_sprint
-        description: The number of issues assigned during the sprint's active period.
-      - name: issues_resolved_in_sprint
-        description: The number of issues resolved during the sprint's active period.
-      - name: issues_rolled_over_in_sprint
-        description: The number of issues assigned within the sprint but resolved after it ended.
-      - name: issues_injected_in_sprint
-        description: The number of issues created during the sprint's active period.
-      - name: count_sp_changes
-        description: The total number of times story points have changed within the sprint.
-      - name: count_estimated_sp_changes
-        description: The total number of times estimated story points have changed within the sprint.
-      - name: count_sprint_issue_changes
-        description: The total number of times issues have changed sprints.
-      - name: count_closed_issues
-        description: The number of issues closed in this sprint.
-      - name: count_open_issues
-        description: The number of currently un-resolved issues in this sprint.
-      - name: count_open_assigned_issues
-        description: The number of currently open and currently assigned issues in this sprint.
-      - name: avg_close_time_days
-        description: The average time taken to close issues in this sprint, in days.
-      - name: avg_assigned_close_time_days
-        description: The average time taken to close issues from their first assignment in this sprint, in days.
-      - name: avg_age_currently_open_days
-        description: The average age of any currently open issues in this sprint, in days.
-      - name: avg_age_currently_open_assigned_days
-        description: The average age of any currently open issues in this sprint, from their first assignment, in days.
-      - name: median_close_time_seconds
-        description: The median time taken to close issues in this sprint, in seconds.
-      - name: median_age_currently_open_seconds
-        description: The median age of any currently open issues in this sprint, in seconds.
-      - name: median_assigned_close_time_seconds
-        description: The median time taken to close issues from their first assignment in this sprint, in seconds.
-      - name: median_age_currently_open_assigned_seconds
-        description: The median age of any currently open issues, from their first assignment in this sprint, in seconds.
-      - name: median_close_time_days
-        description: The median time taken to close issues in this sprint, in days.
-      - name: median_age_currently_open_days
-        description: The median age of any currently open issues in this sprint, in days.
-      - name: median_assigned_close_time_days
-        description: The median time taken to close issues from their first assignment in this sprint, in days.
-      - name: median_age_currently_open_assigned_days
-        description: The median age of any currently open issues, from their first assignment in this sprint, in days.
+      - name: story_points_committed
+        description: Total story points committed to at the start of the sprint.
+      - name: story_point_estimate_committed
+        description: Total story point estimate committed to at the start of the sprint.
+      - name: story_points_end
+        description: Total story points at the end of the sprint.
+      - name: story_point_estimate_end
+        description: Total story point estimate at the end of the sprint.
+      - name: story_points_completed
+        description: Total story points completed at the end of the sprint.
+      - name: story_point_estimate_completed
+        description: Total story point estimate completed at the end of the sprint.
+      - name: sprint_assignees
+        description: Total assignees in a sprint. 
+      - name: sprint_issues
+        description: Total issues in a sprint. 
+      - name: issues_committed
+        description: Issues committed at the start of a sprint.
+      - name: open_sprint_issues
+        description: Issues that were open in a sprint.
+      - name: resolved_sprint_issues
+        description: Issues that were resolved in a sprint.
+      - name: injected_sprint_issues
+        description: Issues that were injected into a sprint.
+      - name: original_estimate_seconds
+        description: The original estimate of how long working on the issues in this sprint would take, in seconds.
+      - name: remaining_estimate_seconds
+        description: The remaining estimate of how long working on the issues in this sprint would take, in seconds.
+      - name: time_spent_seconds
+        description: The time that was spent working on the issues in the sprint in seconds.
 
   - name: jira__user_enhanced
     description: >

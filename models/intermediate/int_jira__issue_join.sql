@@ -46,17 +46,8 @@ priority as (
 {% if var('jira_using_sprints', True) %}
 issue_sprint as (
 
-    select 
-        issue_id,
-        sprint_id as current_sprint_id,
-        sprint_name as current_sprint_name,
-        board_id,
-        sprint_started_at,
-        sprint_ended_at,
-        sprint_completed_at,
-        count_sprint_changes
+    select *
     from {{ ref('int_jira__issue_sprint') }}
-    where row_num = 1
 ),
 {% endif %}
 
@@ -81,12 +72,6 @@ issue_versions as (
     from {{ ref('int_jira__issue_versions') }}
 ),
 {% endif %}
-
-issue_story_points as (
-
-    select *
-    from {{ ref('int_jira__issue_story_points') }}
-),
 
 join_issue as (
 
@@ -127,11 +112,6 @@ join_issue as (
         ,coalesce(issue_comments.count_comments, 0) as count_comments
         {% endif %}
 
-        ,issue_story_points.current_story_points
-        ,issue_story_points.current_estimated_story_points
-        ,issue_story_points.count_sp_changes
-        ,issue_story_points.count_estimated_sp_changes
-
     from issue
     left join project 
         on project.project_id = issue.project_id
@@ -163,9 +143,6 @@ join_issue as (
     left join issue_comments 
         on issue_comments.issue_id = issue.issue_id
     {% endif %}
-
-    left join issue_story_points 
-        on issue_story_points.issue_id = issue.issue_id
 )
 
 select * 

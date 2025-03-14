@@ -27,8 +27,8 @@ agg_comments as (
     {% endif %}
     
     from comment 
-    join jira_user on comment.author_user_id = jira_user.user_id
-
+    inner join jira_user 
+        on comment.author_user_id = jira_user.user_id
     {{ dbt_utils.group_by(1) }}
 )
 

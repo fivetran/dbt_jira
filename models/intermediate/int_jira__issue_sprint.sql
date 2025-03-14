@@ -28,7 +28,6 @@ sprint_field_history as (
     where lower(field_history.field_name) = 'sprint'
 ),
 
-
 last_sprint as (
 
     select *
@@ -48,17 +47,17 @@ sprint_rollovers as (
 issue_sprint as (
 
     select 
-        sprint_field_history.issue_id,
-        sprint_field_history.field_value as sprint_id,
-        sprint_field_history.sprint_name,
-        sprint_field_history.board_id,
-        sprint_field_history.started_at as sprint_started_at,
-        sprint_field_history.ended_at as sprint_ended_at,
-        sprint_field_history.completed_at as sprint_completed_at,
-        sprint_field_history.row_num,
+        last_sprint.issue_id,
+        last_sprint.field_value as current_sprint_id,
+        last_sprint.sprint_name as current_sprint_name,
+        last_sprint.board_id,
+        last_sprint.started_at as sprint_started_at,
+        last_sprint.ended_at as sprint_ended_at,
+        last_sprint.completed_at as sprint_completed_at, 
         coalesce(sprint_rollovers.count_sprint_changes, 0) as count_sprint_changes
-    from sprint_field_history 
-    left join sprint_rollovers on sprint_rollovers.issue_id = sprint_field_history.issue_id
+    from last_sprint
+    left join sprint_rollovers 
+        on sprint_rollovers.issue_id = last_sprint.issue_id
 )
 
 select *
