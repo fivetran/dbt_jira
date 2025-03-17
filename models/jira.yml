@@ -51,8 +51,8 @@ models:
         description: Date on which the sprint and issue had these field values.
       - name: date_week
         description: The start date of the week corresponding to `date_day`.
-      - name: issue_assigned_to_sprint_at
-        description: Date the issue was assigned to the sprint.
+      - name: updated_at
+        description: Timestamp capturing the most recent sprint update to an issue.
       - name: sprint_name
         description: Title of the sprint. 
       - name: sprint_started_at
@@ -327,8 +327,6 @@ models:
         description: Issues that were open in a sprint.
       - name: resolved_sprint_issues
         description: Issues that were resolved in a sprint.
-      - name: injected_sprint_issues
-        description: Issues that were injected into a sprint.
       - name: original_estimate_seconds
         description: The original estimate of how long working on the issues in this sprint would take, in seconds.
       - name: remaining_estimate_seconds

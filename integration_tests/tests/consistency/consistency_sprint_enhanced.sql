@@ -5,7 +5,7 @@
 ) }}
 
 {# Exclude columns that depend on calculations involving the current time in seconds or aggregate strings in a random order, as they will differ between runs. #}
-{% set exclude_columns = ['avg_age_currently_open_seconds', 'avg_age_currently_open_assigned_seconds', 'median_age_currently_open_seconds', 'median_age_currently_open_assigned_seconds'] %}
+{% set exclude_columns = [] %}
 
 with prod as (
     select {{ dbt_utils.star(from=ref('jira__sprint_enhanced'), except=exclude_columns) }}

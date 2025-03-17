@@ -31,12 +31,8 @@ sprint_issue_metrics as (
         count(distinct (case when is_sprint_active and is_issue_open then issue_id end)) as open_sprint_issues,
         count(distinct (case when date_day >= cast(issue_resolved_at as date) 
             and issue_resolved_at <= sprint_ended_at
-            then issue_id end)) as resolved_sprint_issues,
-        count(distinct (case when cast(issue_assigned_to_sprint_at as date) > cast(sprint_started_at as date)
-            and cast(issue_assigned_to_sprint_at as date) < cast(sprint_ended_at as date)
-            then issue_id else 0 end)) as injected_sprint_issues
+            then issue_id end)) as resolved_sprint_issues
     from daily_sprint_issue_history
-    where date_day = cast({{ dbt.current_timestamp() }} as date)
     {{ dbt_utils.group_by(1) }}
 ),
 
@@ -88,7 +84,6 @@ final as (
         sprint_start_metrics.issues_committed,
         sprint_issue_metrics.open_sprint_issues,
         sprint_issue_metrics.resolved_sprint_issues,
-        sprint_issue_metrics.injected_sprint_issues,
         sum(case when sprint_metrics_grouped.original_estimate_seconds is null then 0 else sprint_metrics_grouped.original_estimate_seconds end) as original_estimate_seconds,
         sum(case when sprint_metrics_grouped.remaining_estimate_seconds is null then 0 else sprint_metrics_grouped.remaining_estimate_seconds end) as remaining_estimate_seconds,
         sum(case when sprint_metrics_grouped.time_spent_seconds is null then 0 else sprint_metrics_grouped.time_spent_seconds end) as time_spent_seconds
@@ -99,7 +94,7 @@ final as (
         on sprint_metrics_grouped.sprint_id = sprint_start_metrics.sprint_id
     left join sprint_end_metrics
         on sprint_metrics_grouped.sprint_id = sprint_end_metrics.sprint_id
-    {{ dbt_utils.group_by(18) }}
+    {{ dbt_utils.group_by(17) }}
 )
 
 select * 
