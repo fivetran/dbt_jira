@@ -21,6 +21,7 @@ with daily_issue_field_history as (
 ),
 
 sprint_issue_pairing as (
+
     select
         issue_id,
         cast(field_value as {{ dbt.type_int() }}) as sprint_id,
@@ -36,6 +37,7 @@ sprint_issue_pairing as (
 ),
 
 ranked_sprint_updates as (
+    
     select 
         sprint_issue_pairing.sprint_id,
         sprint_issue_pairing.issue_id,
@@ -51,7 +53,7 @@ ranked_sprint_updates as (
 
         cast(daily_issue_field_history.story_points as {{ dbt.type_float() }}) as story_points,
         cast(daily_issue_field_history.story_point_estimate as {{ dbt.type_float() }}) as story_point_estimate,
-        -- ✅ Rank updates within each `sprint_id, issue_id, date_day`
+        -- Rank updates within each `sprint_id, issue_id, date_day`
         row_number() over (
             partition by sprint_issue_pairing.sprint_id, 
                          sprint_issue_pairing.issue_id, 
@@ -61,7 +63,7 @@ ranked_sprint_updates as (
     from sprint_issue_pairing
     left join daily_issue_field_history 
         on sprint_issue_pairing.issue_id = daily_issue_field_history.issue_id
-        -- ✅ Ensure tracking starts at the correct earliest date
+        -- Ensure tracking starts at the correct earliest date
         and cast(sprint_issue_pairing.updated_at as date) <= daily_issue_field_history.date_day
 ),
 
@@ -84,7 +86,7 @@ filtered_issue_sprint_history as (
         on ranked_sprint_updates.issue_id = issue.issue_id
     inner join {{ var('sprint') }} sprint
         on ranked_sprint_updates.sprint_id = sprint.sprint_id
-    where row_num = 1 -- ✅ Keep only the last update per sprint-issue-date_day
+    where row_num = 1 --Keep only the last update per sprint-issue-date_day
 ),
 
 issue_sprint_daily_history as (
