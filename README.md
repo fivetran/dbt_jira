@@ -33,6 +33,7 @@ The following table provides a detailed list of all tables materialized within t
 | [jira__project_enhanced](https://fivetran.github.io/dbt_jira/#!/model/model.jira.jira__project_enhanced)            | Each record represents a project, enriched with data about the users involved, how many issues have been opened or closed, the velocity of work, and the breadth of the project (i.e., its components and epics). |
 | [jira__user_enhanced](https://fivetran.github.io/dbt_jira/#!/model/model.jira.jira__user_enhanced)            | Each record represents a user, enriched with metrics regarding their open issues, completed issues, the projects they work on, and the velocity of their work. |
 | [jira__sprint_enhanced](https://fivetran.github.io/dbt_jira/#!/model/model.jira.jira__sprint_enhanced)            | Each record represents a sprint, enriched with metrics regarding issues created, brought into, and resolved in the sprint, the story points estimated and worked, and the velocity of work completed. |
+| [jira__daily_sprint_issue_history](https://fivetran.github.io/dbt_jira/#!/model/model.jira.jira__daily_sprint_issue_history)            | Each record represents a snapshot of a sprint and its assorted issues on a given day between the sprint start date and the most recent update to the sprint. |
 
 ### Materialized Models
 Each Quickstart transformation job run materializes 47 models if all components of this data model are enabled. This count includes all staging, intermediate, and final models materialized as `view`, `table`, or `incremental`.

@@ -29,7 +29,7 @@ agg_comments as (
     from comment 
     inner join jira_user 
         on comment.author_user_id = jira_user.user_id
-    {{ dbt_utils.group_by(1) }}
+    group by 1
 )
 
 select * from agg_comments

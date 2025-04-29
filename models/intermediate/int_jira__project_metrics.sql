@@ -55,7 +55,7 @@ project_issues as (
         sum(case when resolved_at is null then any_assignment_duration_seconds else 0 end) as sum_currently_open_assigned_duration_seconds
     from issue
 
-    {{ dbt_utils.group_by(1) }}
+    group by 1
 ),
 
 calculate_avg_metrics as (

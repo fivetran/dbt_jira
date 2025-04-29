@@ -84,7 +84,7 @@ join_issue as (
 
         {% if var('jira_using_priorities', True) %}
         ,priority.priority_name as current_priority
-	    {% endif %}
+	{% endif %}
 
         {% if var('jira_using_sprints', True) %}
         ,issue_sprint.current_sprint_id

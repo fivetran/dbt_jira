@@ -61,7 +61,7 @@ sprint_end_metrics as (
         sum(case when is_issue_resolved_in_sprint then story_point_estimate else 0 end) as story_point_estimate_completed
     from daily_sprint_issue_history
     where date_day = cast(sprint_ended_at as date)
-    {{ dbt_utils.group_by(1) }}
+    group by 1
 ), 
 
 final as (

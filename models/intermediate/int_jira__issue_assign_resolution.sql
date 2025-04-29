@@ -21,7 +21,7 @@ issue_dates as (
         max(case when field_id = 'assignee' then updated_at end) as last_assigned_at,
         min(case when field_id = 'resolutiondate' then updated_at end) as first_resolved_at -- in case it's been re-opened
     from filtered
-    {{ dbt_utils.group_by(1) }}
+    group by 1
 )
 
 select *

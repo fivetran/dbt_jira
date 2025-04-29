@@ -38,7 +38,7 @@ user_issues as (
         sum(case when resolved_at is not null then last_assignment_duration_seconds end) as sum_close_time_seconds,
         sum(case when resolved_at is null then last_assignment_duration_seconds end) as sum_current_open_seconds
     from issue
-    {{ dbt_utils.group_by(1) }}
+    group by 1
 ),
 
 calculate_avg_metrics as (
@@ -66,7 +66,7 @@ join_metrics as (
         round(cast(median_metrics.median_age_currently_open_seconds / 86400.0 as {{ dbt.type_numeric() }} ), 0) as median_age_currently_open_days 
     from calculate_avg_metrics
     left join median_metrics on 
-        calculate_avg_metrics.user_id =median_metrics.user_id
+        calculate_avg_metrics.user_id = median_metrics.user_id
 )
 
 select * 

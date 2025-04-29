@@ -22,7 +22,7 @@ user_project as (
         assignee_user_id,
         project_name
     from issue
-    {{ dbt_utils.group_by(2) }}
+    group by 1, 2
 ),
 
 agg_user_projects as (
@@ -31,7 +31,7 @@ agg_user_projects as (
         assignee_user_id,
         {{ fivetran_utils.string_agg( "project_name", "', '" ) }} as projects
     from user_project
-    {{ dbt_utils.group_by(1) }}
+    group by 1
 ),
 
 user_join as (

@@ -35,6 +35,15 @@ sprint_issue_pairing as (
     where field_name = 'sprint'
         and field_value is not null
 ),
+sprint_activity_window as (
+
+    select
+        sprint_id,
+        min(cast(updated_at as date))  as first_change_date,
+        max(cast(updated_at as date))  as last_change_date
+    from sprint_issue_pairing
+    group by 1
+),
 
 ranked_sprint_updates as (
     
@@ -61,10 +70,13 @@ ranked_sprint_updates as (
             order by sprint_issue_pairing.updated_at desc
         ) as row_num
     from sprint_issue_pairing
+    left join sprint_activity_window
+        on sprint_activity_window.sprint_id = sprint_issue_pairing.sprint_id
     left join daily_issue_field_history 
         on sprint_issue_pairing.issue_id = daily_issue_field_history.issue_id
         -- Ensure tracking starts at the correct earliest date
         and cast(sprint_issue_pairing.updated_at as date) <= daily_issue_field_history.date_day
+    where daily_issue_field_history.date_day <= sprint_activity_window.last_change_date
 ),
 
 filtered_issue_sprint_history as (
@@ -77,12 +89,14 @@ filtered_issue_sprint_history as (
         sprint.board_id,
         issue.created_at as issue_created_at,
         issue.resolved_at as issue_resolved_at,
+        issue.issue_key,
         issue.assignee_user_id,
+        issue.assignee_name,
         issue.original_estimate_seconds,
         issue.remaining_estimate_seconds,
         issue.time_spent_seconds
     from ranked_sprint_updates
-    inner join {{ var('issue') }} issue
+    inner join {{ ref('jira__issue_enhanced') }} issue
         on ranked_sprint_updates.issue_id = issue.issue_id
     inner join {{ var('sprint') }} sprint
         on ranked_sprint_updates.sprint_id = sprint.sprint_id
@@ -93,6 +107,7 @@ issue_sprint_daily_history as (
     select
         filtered_issue_sprint_history.sprint_id,
         filtered_issue_sprint_history.issue_id,
+        filtered_issue_sprint_history.issue_key,
         filtered_issue_sprint_history.date_day,
         filtered_issue_sprint_history.date_week,
         filtered_issue_sprint_history.updated_at,
@@ -104,6 +119,7 @@ issue_sprint_daily_history as (
         filtered_issue_sprint_history.issue_created_at,
         filtered_issue_sprint_history.issue_resolved_at,
         filtered_issue_sprint_history.assignee_user_id,
+        filtered_issue_sprint_history.assignee_name,
         filtered_issue_sprint_history.original_estimate_seconds,
         filtered_issue_sprint_history.remaining_estimate_seconds,
         filtered_issue_sprint_history.time_spent_seconds,

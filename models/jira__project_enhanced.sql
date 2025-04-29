@@ -26,7 +26,7 @@ agg_epics as (
     from {{ ref('jira__issue_enhanced') }}
     where lower(issue_type) = 'epic'
     -- should we limit to active epics?
-    {{ dbt_utils.group_by(1) }}
+    group by 1
 ),
 
 {% if var('jira_using_components', True) %}
@@ -38,7 +38,7 @@ agg_components as (
         project_id,
         {{ fivetran_utils.string_agg( "component_name", "', '" ) }} as components
     from {{ var('component') }}
-    {{ dbt_utils.group_by(1) }}
+    group by 1
 ),
 
 {% endif %}

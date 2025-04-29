@@ -41,7 +41,7 @@ sprint_rollovers as (
         issue_id,
         count(distinct case when field_value is not null then field_value end) as count_sprint_changes
     from sprint_field_history
-    {{ dbt_utils.group_by(1) }}
+    group by 1
 ),
 
 issue_sprint as (
