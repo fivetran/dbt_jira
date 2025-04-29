@@ -1,4 +1,6 @@
-<p align="center">
+# Jira Transformation dbt Package ([Docs](https://fivetran.github.io/dbt_jira/))
+
+<p align="left">
     <a alt="License"
         href="https://github.com/fivetran/dbt_jira/blob/main/LICENSE">
         <img src="https://img.shields.io/badge/License-Apache%202.0-blue.svg" /></a>
@@ -13,7 +15,6 @@
         <img src="https://img.shields.io/badge/Fivetran_Quickstart_Compatible%3F-yes-green.svg" /></a>
 </p>
 
-# Jira Transformation dbt Package ([Docs](https://fivetran.github.io/dbt_jira/))
 ## What does this dbt package do?
 - Produces modeled tables that leverage Jira data from [Fivetran's connector](https://fivetran.com/docs/applications/jira) in the format described by [this ERD](https://fivetran.com/docs/applications/jira#schemainformation) and builds off the output of our [Jira source package](https://github.com/fivetran/dbt_jira_source).
 - Enables you to better understand the workload, performance, and velocity of your team's work using Jira issues. It performs the following actions:

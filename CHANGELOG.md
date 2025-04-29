@@ -1,7 +1,7 @@
 # dbt_jira v0.20.0
 This release includes the following updates.
 
-** 6 total changes • 0 possible breaking changes**
+** 7 total changes • 5 possible breaking changes**
 | Data Model                                    | Change Type | Old Name | New Name                                  | Notes                                                             |
 |---------------------------------------------------|-------------|----------|-------------------------------------------|-------------------------------------------------------------------|
 | [jira__daily_sprint_issue_history](https://fivetran.github.io/dbt_jira/#!/model/model.jira.jira__daily_sprint_issue_history)        | New Model   |     |  | Each record represents a snapshot of a sprint and its assorted issues on a given day between the sprint start date and the most recent update to the sprint.               |
@@ -10,6 +10,7 @@ This release includes the following updates.
 | [jira__issue_enhanced](https://fivetran.github.io/dbt_jira/#!/model/model.jira.jira__issue_enhanced)        | New Columns   |          |  `story_points`, `story_point_estimate`    |    Adding story point fields by default to persist to sprint/issue end models.       |
 | [stg_jira__issue_multiselect_history](https://fivetran.github.io/dbt_jira_source/#!/model/model.jira_source.stg_jira__issue_multiselect_history)        | New Columns   |          |  `is_active`    |    Shows which of the field history values is the current one.       |
 | [stg_jira__issue_field_history](https://fivetran.github.io/dbt_jira_source/#!/model/model.jira_source.stg_jira__issue_field_history)        | New Columns   |          |  `is_active`    |    Shows which of the field history values is the current one.      |
+| [stg_jira__issue_user](https://fivetran.github.io/dbt_jira_source/#!/model/model.jira_source.stg_jira__issue_user)        | New Columns   |          |  `is_active`    |    Shows which of the field history values is the current one.      |
 
 ## Breaking Changes
 - Added `story_points` and `story_point_estimate` as default fields in the `jira__daily_issue_field_history` and `jira__issue_enhanced` models. ([#136](https://github.com/fivetran/dbt_jira/pull/136))
