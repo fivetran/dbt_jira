@@ -1,23 +1,19 @@
 {{
     config(
         enabled=var('jira_using_sprints', True),
-        materialized='incremental' if jira_is_incremental_compatible() else 'table',
+        materialized='table',
         partition_by={'field': 'date_week', 'data_type': 'date'}
             if target.type not in ['spark', 'databricks'] else ['date_week'],
         cluster_by=['date_week'],
         unique_key='sprint_issue_day_id',
-        incremental_strategy='insert_overwrite' if target.type in ('bigquery', 'databricks', 'spark') else 'delete+insert',
         file_format='delta'
     )
 }}
 
 with daily_issue_field_history as (
+
     select *
     from {{ ref('jira__daily_issue_field_history') }}
-    {% if is_incremental() %}
-    {% set max_date_week = jira.jira_lookback(from_date='max(date_day)', datepart='week', interval=var('lookback_window', 1)) %}
-    where cast(date_day as date) >= {{ max_date_week }}
-    {% endif %}
 ),
 
 sprint_issue_pairing as (
@@ -26,11 +22,7 @@ sprint_issue_pairing as (
         issue_id,
         cast(field_value as {{ dbt.type_int() }}) as sprint_id,
         updated_at,
-        is_active,
-        lead(field_value) over (partition by issue_id order by updated_at) as next_sprint,
-        lead(updated_at) over (partition by issue_id order by updated_at) as next_sprint_updated_at,
-        lag(is_active) over (partition by issue_id order by updated_at) as prev_is_active,
-        lag(updated_at) over (partition by issue_id order by updated_at) as prev_updated_at
+        is_active
     from {{ ref('int_jira__issue_multiselect_history') }}
     where field_name = 'sprint'
         and field_value is not null
@@ -39,8 +31,8 @@ sprint_activity_window as (
 
     select
         sprint_id,
-        min(cast(updated_at as date))  as first_change_date,
-        max(cast(updated_at as date))  as last_change_date
+        min(cast(updated_at as date)) as first_change_date,
+        max(cast(updated_at as date)) as last_change_date
     from sprint_issue_pairing
     group by 1
 ),
@@ -52,21 +44,16 @@ ranked_sprint_updates as (
         sprint_issue_pairing.issue_id,
         sprint_issue_pairing.updated_at,
         sprint_issue_pairing.is_active,
-        sprint_issue_pairing.next_sprint,
-        sprint_issue_pairing.next_sprint_updated_at,
-        sprint_issue_pairing.prev_is_active,
-        sprint_issue_pairing.prev_updated_at,
         daily_issue_field_history.date_day,
         daily_issue_field_history.date_week,
         daily_issue_field_history.status,
-
         cast(daily_issue_field_history.story_points as {{ dbt.type_float() }}) as story_points,
         cast(daily_issue_field_history.story_point_estimate as {{ dbt.type_float() }}) as story_point_estimate,
         -- Rank updates within each `sprint_id, issue_id, date_day`
         row_number() over (
             partition by sprint_issue_pairing.sprint_id, 
-                         sprint_issue_pairing.issue_id, 
-                         daily_issue_field_history.date_day
+                        sprint_issue_pairing.issue_id, 
+                        daily_issue_field_history.date_day
             order by sprint_issue_pairing.updated_at desc
         ) as row_num
     from sprint_issue_pairing
@@ -76,10 +63,11 @@ ranked_sprint_updates as (
         on sprint_issue_pairing.issue_id = daily_issue_field_history.issue_id
         -- Ensure tracking starts at the correct earliest date
         and cast(sprint_issue_pairing.updated_at as date) <= daily_issue_field_history.date_day
-    where daily_issue_field_history.date_day <= sprint_activity_window.last_change_date
+    where daily_issue_field_history.date_day <= {{ dbt.dateadd('month', 1, 'sprint_activity_window.last_change_date') }}
 ),
 
 filtered_issue_sprint_history as (
+
     select 
         ranked_sprint_updates.*,
         sprint.sprint_name,
@@ -104,6 +92,7 @@ filtered_issue_sprint_history as (
 ),
 
 issue_sprint_daily_history as (
+
     select
         filtered_issue_sprint_history.sprint_id,
         filtered_issue_sprint_history.issue_id,
@@ -130,6 +119,7 @@ issue_sprint_daily_history as (
 ),
 
 issue_sprint_statuses as (
+
     select 
         issue_sprint_daily_history.*,
         case when date_day >= cast(sprint_started_at as date) 
@@ -156,6 +146,7 @@ issue_sprint_statuses as (
 ),
 
 surrogate_key as (
+    
     select *,
         {{ dbt_utils.generate_surrogate_key(['date_day','sprint_id','issue_id']) }} as sprint_issue_day_id
     from issue_sprint_statuses

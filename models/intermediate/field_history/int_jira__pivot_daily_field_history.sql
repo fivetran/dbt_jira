@@ -161,8 +161,9 @@ pivot_out as (
         max(case when lower(field_name) = 'story point estimate' then field_value end) as story_point_estimate
 
         {% for col in var('issue_field_history_columns', []) -%}
-        ,
-            max(case when lower(field_name) = '{{ col|lower }}' then field_value end) as {{ dbt_utils.slugify(col) | replace(' ', '_') | lower }}
+        {% if col|lower not in ['story points', 'story point estimate'] %}
+            , max(case when lower(field_name) = '{{ col|lower }}' then field_value end) as {{ dbt_utils.slugify(col) | replace(' ', '_') | lower }}
+        {% endif %}
         {% endfor -%}
 
     from int_jira__daily_field_history

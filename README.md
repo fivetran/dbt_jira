@@ -36,7 +36,7 @@ The following table provides a detailed list of all tables materialized within t
 | [jira__daily_sprint_issue_history](https://fivetran.github.io/dbt_jira/#!/model/model.jira.jira__daily_sprint_issue_history)            | Each record represents a snapshot of a sprint and its assorted issues on a given day between the sprint start date and the most recent update to the sprint. |
 
 ### Materialized Models
-Each Quickstart transformation job run materializes 47 models if all components of this data model are enabled. This count includes all staging, intermediate, and final models materialized as `view`, `table`, or `incremental`.
+Each Quickstart transformation job run materializes 44 models if all components of this data model are enabled. This count includes all staging, intermediate, and final models materialized as `view`, `table`, or `incremental`.
 <!--section-end-->
 
 ## How do I use the dbt package?
@@ -112,7 +112,7 @@ vars:
 ```
 
 #### Define daily issue field history columns
-The `jira__daily_issue_field_history` model generates historical data for the columns specified by the `issue_field_history_columns` variable. By default, the only columns tracked are `status`, `status_id`, and `sprint`, but all fields found in the Jira `FIELD` table's `field_name` column can be included in this model. The most recent value of any tracked column is also captured in `jira__issue_enhanced`.
+The `jira__daily_issue_field_history` model generates historical data for the columns specified by the `issue_field_history_columns` variable. By default, the only columns tracked are `status`, `status_id`,`sprint`, `story_points` and `story_point_estimate`, but all fields found in the Jira `FIELD` table's `field_name` column can be included in this model. The most recent value of any tracked column is also captured in `jira__issue_enhanced`.
 
 If you would like to change these columns, add the following configuration to your `dbt_project.yml` file. After adding the columns to your `dbt_project.yml` file, run the `dbt run --full-refresh` command to fully refresh any existing models:
 
