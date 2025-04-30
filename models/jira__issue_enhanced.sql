@@ -24,8 +24,7 @@ daily_issue_field_history as (
 
 latest_issue_field_history as (
     
-    select
-        *
+    select *
     from daily_issue_field_history
     where latest_record
 ),
@@ -35,12 +34,9 @@ final as (
     select 
     
         issue.*,
-
         {{ dbt.datediff('created_at', "coalesce(resolved_at, " ~ dbt.current_timestamp() ~ ')', 'second') }} open_duration_seconds,
-
         -- this will be null if no one has been assigned
         {{ dbt.datediff('first_assigned_at', "coalesce(resolved_at, " ~ dbt.current_timestamp() ~ ')', 'second') }} any_assignment_duration_seconds,
-
         -- if an issue is not currently assigned this will not be null
         {{ dbt.datediff('last_assigned_at', "coalesce(resolved_at, " ~ dbt.current_timestamp() ~ ')', 'second') }} last_assignment_duration_seconds 
 
@@ -51,7 +47,6 @@ final as (
         {% endfor %}
 
     from issue
-    
     left join latest_issue_field_history 
         on issue.issue_id = latest_issue_field_history.issue_id
         

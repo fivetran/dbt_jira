@@ -1,6 +1,35 @@
-# dbt_jira version.version
+# dbt_jira v0.20.0
+This release includes the following updates.
+
+**8 total changes • 6 possible breaking changes (requires a --full-refresh run after upgrading)**
+
+| Data Model                                    | Change Type | Old Name | New Name                                  | Notes                                                             |
+|---------------------------------------------------|-------------|----------|-------------------------------------------|-------------------------------------------------------------------|
+| [jira__daily_sprint_issue_history](https://fivetran.github.io/dbt_jira/#!/model/model.jira.jira__daily_sprint_issue_history)        | New Model   |     |  | Each record represents a snapshot of a sprint and its assorted issues on a given day between the sprint start date and the most recent update to the sprint.               |
+| [jira__sprint_enhanced](https://fivetran.github.io/dbt_jira/#!/model/model.jira.jira__sprint_enhanced)        | New Model   |          |    |       This model provides enhanced sprint-level metrics in Jira, incorporating data from sprints, sprint-related issue history, and sprint-based story points tracking.        |
+| [jira__daily_issue_field_history](https://fivetran.github.io/dbt_jira/#!/model/model.jira.jira__daily_issue_field_history)        | New Columns   |          |  `story_points`, `story_point_estimate`    |    Adding story point fields by default to persist to sprint/issue end models.     |
+| [jira__issue_enhanced](https://fivetran.github.io/dbt_jira/#!/model/model.jira.jira__issue_enhanced)        | New Columns   |          |  `story_points`, `story_point_estimate`    |    Adding story point fields by default to persist to sprint/issue end models.       |
+| [jira__user_enhanced](https://fivetran.github.io/dbt_jira/#!/model/model.jira.jira__user_enhanced)        | New Columns   |          |  `is_active`    |    Helps show the active user records.    |
+| [stg_jira__issue_multiselect_history](https://fivetran.github.io/dbt_jira_source/#!/model/model.jira_source.stg_jira__issue_multiselect_history)        | New Columns   |          |  `is_active`    |    Shows which of the field history values is the current one.       |
+| [stg_jira__issue_field_history](https://fivetran.github.io/dbt_jira_source/#!/model/model.jira_source.stg_jira__issue_field_history)        | New Columns   |          |  `is_active`    |    Shows which of the field history values is the current one.      |
+| [stg_jira__issue_user](https://fivetran.github.io/dbt_jira_source/#!/model/model.jira_source.stg_jira__issue_user)        | New Columns   |          |  `is_active`    |    Shows which of the field history values is the current one.      |
+
+## Breaking Changes
+- Added `story_points` and `story_point_estimate` as default fields in the `jira__daily_issue_field_history` and `jira__issue_enhanced` models. ([#136](https://github.com/fivetran/dbt_jira/pull/136))
+  - **Important**: These fields are now included by default. If your `issue_field_history_columns` variable already includes `story_points` or `story_point_estimate`, you must remove them and run a `--full-refresh` to avoid duplication errors.
+
+## Feature Updates: New Sprint Reports
+- Introduced two new models: `jira__daily_sprint_issue_history` to look at daily sprint issue snapshots, and `jira__sprint_enhanced` to examine high level sprint metrics, such as velocity, time tracking and story point completion. Customers should now be able to build valuable sprint visualizations, like their own velocity reports, estimation tracking, and goal metrics. ([#136](https://github.com/fivetran/dbt_jira/pull/136)) 
+- If users are not utilizing the `sprint` source, these models can be disabled by setting the variable `jira_using_sprints` to `false`. More instructions [are available in the README](https://github.com/fivetran/dbt_jira?tab=readme-ov-file#step-4-disable-models-for-non-existent-sources). ([#136](https://github.com/fivetran/dbt_jira/pull/136))
+
+## Under the Hood
+- Added consistency and integrity tests for the `jira__sprint_enhanced` model. ([#136](https://github.com/fivetran/dbt_jira/pull/136))
+- Added new `jira__daily_sprint_issue_history` and `jira__sprint_enhanced`  to public models in the `quickstart.yml` configuration. ([#136](https://github.com/fivetran/dbt_jira/pull/136))
+- Corrected formatting on intermediate and end models to conform with best practices and improve readability. ([#136](https://github.com/fivetran/dbt_jira/pull/136))
 
 ## Documentation
+- Updated yml documentation and README with new models, fields and descriptions. ([#136](https://github.com/fivetran/dbt_jira/pull/136))
+- [Created a DECISIONLOG](https://github.com/fivetran/dbt_jira/blob/main/DECISIONLOG.md#enhancing-jira-sprint-reporting-with-flexible-metrics) to explain why we bring in multiple metrics from current sprint data as well as historical sprint data for the `jira__sprint_enhanced` model. ([#136](https://github.com/fivetran/dbt_jira/pull/136))
 - Added Quickstart model counts to README. ([#135](https://github.com/fivetran/dbt_jira/pull/135))
 - Corrected references to connectors and connections in the README. ([#135](https://github.com/fivetran/dbt_jira/pull/135))
 

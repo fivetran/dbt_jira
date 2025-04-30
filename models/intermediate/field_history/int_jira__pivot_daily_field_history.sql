@@ -100,8 +100,8 @@ limit_to_relevant_fields as (
 
     from get_valid_dates
 
-    where lower(field_id) = 'status' 
-        or lower(field_name) in ('sprint'
+    where lower(field_id) = 'status'
+        or lower(field_name) in ('sprint', 'story points', 'story point estimate'
         {%- for col in var('issue_field_history_columns', []) -%}
             ,'{{ (col|lower) }}'
         {%- endfor -%} )
@@ -155,11 +155,14 @@ pivot_out as (
         issue_id,
         cast({{ dbt.date_trunc('week', 'valid_starting_at') }} as date) as valid_starting_at_week,
         max(case when lower(field_id) = 'status' then field_value end) as status,
-        max(case when lower(field_name) = 'sprint' then field_value end) as sprint
+        max(case when lower(field_name) = 'sprint' then field_value end) as sprint,
+        max(case when lower(field_name) = 'story points' then field_value end) as story_points,
+        max(case when lower(field_name) = 'story point estimate' then field_value end) as story_point_estimate
 
         {% for col in var('issue_field_history_columns', []) -%}
-        ,
-            max(case when lower(field_name) = '{{ col|lower }}' then field_value end) as {{ dbt_utils.slugify(col) | replace(' ', '_') | lower }}
+        {% if col|lower not in ['story points', 'story point estimate'] %}
+            , max(case when lower(field_name) = '{{ col|lower }}' then field_value end) as {{ dbt_utils.slugify(col) | replace(' ', '_') | lower }}
+        {% endif %}
         {% endfor -%}
 
     from int_jira__daily_field_history

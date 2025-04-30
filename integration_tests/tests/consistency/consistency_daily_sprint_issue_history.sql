@@ -1,19 +1,28 @@
-
 {{ config(
     tags="fivetran_validations",
-    enabled=var('fivetran_validation_tests_enabled', false)
+    enabled=var('fivetran_validation_tests_enabled', false) 
 ) }}
 
-{# Exclude columns that depend on calculations involving the current time in seconds or aggregate strings in a random order, as they will differ between runs. #}
-{% set exclude_columns = [] %}
 with prod as (
-    select {{ dbt_utils.star(from=ref('jira__issue_enhanced'), except=exclude_columns) }}
-    from {{ target.schema }}_jira_prod.jira__issue_enhanced
+    select
+        date_day,
+        issue_id,
+        sprint_id,
+        sprint_issue_day_id,
+        story_point_estimate,
+        story_points
+    from {{ target.schema }}_jira_prod.jira__daily_sprint_issue_history
 ),
 
 dev as (
-    select {{ dbt_utils.star(from=ref('jira__issue_enhanced'), except=exclude_columns) }}
-    from {{ target.schema }}_jira_dev.jira__issue_enhanced
+    select
+        date_day,
+        issue_id,
+        sprint_id,
+        sprint_issue_day_id,
+        story_point_estimate,
+        story_points
+    from {{ target.schema }}_jira_dev.jira__daily_sprint_issue_history
 ),
 
 prod_not_in_dev as (

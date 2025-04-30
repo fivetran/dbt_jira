@@ -1,13 +1,13 @@
 name: 'jira_integration_tests'
-version: '0.19.0'
+version: '0.20.0'
 config-version: 2
 profile: 'integration_tests'
 
-vars:
+vars: 
   # Comment out the below when generating docs
-  issue_field_history_columns: ['summary', 'story points', 'components']
+  # issue_field_history_columns: ['summary', 'components']
   jira_source:
-    jira_schema: jira_integrations_tests_41
+    jira_schema: jira_integrations_tests_42
     jira_comment_identifier: "comment"
     jira_component_identifier: "component"
     jira_epic_identifier: "epic"

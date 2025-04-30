@@ -6,14 +6,15 @@
 
 {# Exclude columns that depend on calculations involving the current time in seconds or aggregate strings in a random order, as they will differ between runs. #}
 {% set exclude_columns = [] %}
+
 with prod as (
-    select {{ dbt_utils.star(from=ref('jira__issue_enhanced'), except=exclude_columns) }}
-    from {{ target.schema }}_jira_prod.jira__issue_enhanced
+    select {{ dbt_utils.star(from=ref('jira__sprint_enhanced'), except=exclude_columns) }}
+    from {{ target.schema }}_jira_prod.jira__sprint_enhanced
 ),
 
 dev as (
-    select {{ dbt_utils.star(from=ref('jira__issue_enhanced'), except=exclude_columns) }}
-    from {{ target.schema }}_jira_dev.jira__issue_enhanced
+    select {{ dbt_utils.star(from=ref('jira__sprint_enhanced'), except=exclude_columns) }}
+    from {{ target.schema }}_jira_dev.jira__sprint_enhanced
 ),
 
 prod_not_in_dev as (

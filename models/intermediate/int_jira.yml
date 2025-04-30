@@ -124,7 +124,7 @@ models:
         description: Comma-separated list of the names of project versions that this issue fixes.
       - name: current_status_category
         description: Title of the umbrella status category that the issue is currently in. 
-        
+
   - name: int_jira__project_metrics
     description: Table calculating issue-related metrics per project.
     columns:
@@ -171,7 +171,6 @@ models:
         description: The median time taken to close issues from their first assignment, in days.
       - name: median_age_currently_open_assigned_days
         description: The median age of any currently-open issues, from their first assignment. 
-
 
   - name: int_jira__user_metrics
     description: Table calculating issue-related metrics per user.
@@ -458,6 +457,10 @@ models:
         description: The ID of the sprint that an issue is slotted into on a given day.
       - name: status
         description: The ID of the status that an issue has on a given day.
+      - name: story_points
+        description: The story points that an issue has on a given day. 
+      - name: story_point_estimate
+        description: The story point estimate that an issue has on a given day.  
       # plus any fields specified by `var('issue_field_history_columns')`
       - name: issue_day_id
         description: Unique ID hashed on `valid_starting_on` and `issue_field_history`.

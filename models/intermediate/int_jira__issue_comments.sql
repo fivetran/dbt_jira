@@ -4,9 +4,7 @@ with comment as (
 
     select *
     from {{ var('comment') }}
-
     order by issue_id, created_at asc
-
 ),
 
 -- user is a reserved keyword in AWS 
@@ -29,8 +27,8 @@ agg_comments as (
     {% endif %}
     
     from comment 
-    join jira_user on comment.author_user_id = jira_user.user_id
-
+    inner join jira_user 
+        on comment.author_user_id = jira_user.user_id
     group by 1
 )
 
