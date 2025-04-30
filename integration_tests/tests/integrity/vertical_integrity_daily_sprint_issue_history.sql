@@ -1,6 +1,7 @@
 {{ config(
     tags="fivetran_validations",
     enabled=var('fivetran_validation_tests_enabled', false)
+    and var('jira_using_sprints', true)
 ) }}
 
 with end_model as (
@@ -61,7 +62,7 @@ select
     first_date_source,
     first_date_end
 from end_model
-join source_model
+full outer join source_model
     on end_model.sprint_id = source_model.sprint_id
     and end_model.issue_id = source_model.issue_id
 where first_date_source != first_date_end 

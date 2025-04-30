@@ -1,6 +1,7 @@
 {{ config(
     tags="fivetran_validations",
     enabled=var('fivetran_validation_tests_enabled', false)
+    and var('jira_using_sprints', true)
 ) }}
 
 with end_model as (
@@ -58,6 +59,6 @@ select
     sprint_issues_source,
     sprint_issues_end
 from end_model
-join source_model
+full outer join source_model
     on end_model.sprint_id = source_model.sprint_id
 where sprint_issues_source != sprint_issues_end 

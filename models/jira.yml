@@ -379,3 +379,6 @@ models:
         description: The median time taken to close issues since assignment, in days.
       - name: median_age_currently_open_days
         description: The median age of a user's currently open issues.
+      - name: is_active
+        description: Boolean showing whether this user is currently active.
+      

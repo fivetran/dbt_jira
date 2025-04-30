@@ -100,9 +100,8 @@ limit_to_relevant_fields as (
 
     from get_valid_dates
 
-    where lower(field_id) = 'status' 
-        or lower(field_name) like '%story point%'
-        or lower(field_name) in ('sprint'
+    where lower(field_id) = 'status'
+        or lower(field_name) in ('sprint', 'story points', 'story point estimate'
         {%- for col in var('issue_field_history_columns', []) -%}
             ,'{{ (col|lower) }}'
         {%- endfor -%} )
