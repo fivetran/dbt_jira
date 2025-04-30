@@ -216,6 +216,10 @@ models:
         description: Comma-separated list of the names of project versions that this issue fixes.
       - name: current_status_category
         description: Title of the umbrella status category that the issue is currently in. 
+      - name: story_points
+        description: The story points that an issue has on a given day. 
+      - name: story_point_estimate
+        description: The story point estimate that an issue has on a given day.
         
   - name: jira__project_enhanced
     description: >

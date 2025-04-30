@@ -1,7 +1,7 @@
 # dbt_jira v0.20.0
 This release includes the following updates.
 
-** 7 total changes • 5 possible breaking changes**
+** 7 total changes • 5 possible breaking changes - requires a `--full-refresh` run after upgrading**
 | Data Model                                    | Change Type | Old Name | New Name                                  | Notes                                                             |
 |---------------------------------------------------|-------------|----------|-------------------------------------------|-------------------------------------------------------------------|
 | [jira__daily_sprint_issue_history](https://fivetran.github.io/dbt_jira/#!/model/model.jira.jira__daily_sprint_issue_history)        | New Model   |     |  | Each record represents a snapshot of a sprint and its assorted issues on a given day between the sprint start date and the most recent update to the sprint.               |
@@ -14,7 +14,7 @@ This release includes the following updates.
 
 ## Breaking Changes
 - Added `story_points` and `story_point_estimate` as default fields in the `jira__daily_issue_field_history` and `jira__issue_enhanced` models. ([#136](https://github.com/fivetran/dbt_jira/pull/136))
-  - **Important**: These fields are now included by default. If your `issue_field_history_columns` variable already includes `story_points` or `story_point_estimate`, you must remove them to avoid duplication errors.
+  - **Important**: These fields are now included by default. If your `issue_field_history_columns` variable already includes `story_points` or `story_point_estimate`, you must remove them and run a `--full-refresh` to avoid duplication errors.
 
 ## Feature Updates: New Sprint Reports
 - Introduced the new models `jira__daily_sprint_issue_history` to look at daily sprint issue snapshots, and `jira__sprint_enhanced` to examine high level sprint metrics, such as velocity, time tracking and story point completion. Customers should now be able to build valuable sprint visualizations, like their own velocity reports, estimation tracking, and goal metrics. ([#136](https://github.com/fivetran/dbt_jira/pull/136)) 

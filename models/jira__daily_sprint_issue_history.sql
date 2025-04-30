@@ -3,10 +3,7 @@
         enabled=var('jira_using_sprints', True),
         materialized='table',
         partition_by={'field': 'date_week', 'data_type': 'date'}
-            if target.type not in ['spark', 'databricks'] else ['date_week'],
-        cluster_by=['date_week'],
-        unique_key='sprint_issue_day_id',
-        file_format='delta'
+            if target.type not in ['spark', 'databricks'] else ['date_week']
     )
 }}
 
