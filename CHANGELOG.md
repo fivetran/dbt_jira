@@ -1,3 +1,13 @@
+# dbt_jira v0.20.1-a1
+[PR #138](https://github.com/fivetran/dbt_jira/pull/138) contains the following updates:
+
+## Bug Fix
+- Moved casting of integer of `sprint_id` in `jira__daily_sprint_issue_history` into a later CTE to avoid casting errors where `field_value` is a string.
+
+## Under the Hood
+- Updated the package maintainer pull request template.
+- Updated `consistency_issue_enhanced` test to exclude columns that depend on calculations involving the current timestamp to remove failures.
+
 # dbt_jira v0.20.0
 This release includes the following updates.
 

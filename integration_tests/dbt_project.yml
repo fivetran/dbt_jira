@@ -1,5 +1,5 @@
 name: 'jira_integration_tests'
-version: '0.20.0'
+version: '0.20.1'
 config-version: 2
 profile: 'integration_tests'
 
@@ -32,8 +32,8 @@ vars:
 
 models:
   jira:
-    +schema: "{{ 'jira_integrations_tests_sqlw' if target.name == 'databricks-sql' else 'jira' }}"
-    # +schema: "jira_{{ var('directed_schema','dev') }}"
+    # +schema: "{{ 'jira_integrations_tests_sqlw' if target.name == 'databricks-sql' else 'jira' }}"
+    +schema: "jira_{{ var('directed_schema','dev') }}"
 
 seeds:
   jira_integration_tests:

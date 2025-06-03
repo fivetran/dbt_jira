@@ -17,17 +17,18 @@ sprint_issue_pairing as (
 
     select
         issue_id,
-        cast(field_value as {{ dbt.type_int() }}) as sprint_id,
+        field_value as sprint_id,
         updated_at,
         is_active
     from {{ ref('int_jira__issue_multiselect_history') }}
     where field_name = 'sprint'
         and field_value is not null
 ),
+
 sprint_activity_window as (
 
     select
-        sprint_id,
+        cast(sprint_id as {{ dbt.type_int() }}) as sprint_id,
         min(cast(updated_at as date)) as first_change_date,
         max(cast(updated_at as date)) as last_change_date
     from sprint_issue_pairing
@@ -37,7 +38,7 @@ sprint_activity_window as (
 ranked_sprint_updates as (
     
     select 
-        sprint_issue_pairing.sprint_id,
+        cast(sprint_issue_pairing.sprint_id as {{ dbt.type_int() }}) as sprint_id,
         sprint_issue_pairing.issue_id,
         sprint_issue_pairing.updated_at,
         sprint_issue_pairing.is_active,
@@ -55,7 +56,7 @@ ranked_sprint_updates as (
         ) as row_num
     from sprint_issue_pairing
     left join sprint_activity_window
-        on sprint_activity_window.sprint_id = sprint_issue_pairing.sprint_id
+        on sprint_activity_window.sprint_id = cast(sprint_issue_pairing.sprint_id as {{ dbt.type_int() }})
     left join daily_issue_field_history 
         on sprint_issue_pairing.issue_id = daily_issue_field_history.issue_id
         -- Ensure tracking starts at the correct earliest date
