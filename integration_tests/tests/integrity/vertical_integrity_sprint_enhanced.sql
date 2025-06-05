@@ -60,5 +60,5 @@ select
     sprint_issues_end
 from end_model
 full outer join source_model
-    on end_model.sprint_id = source_model.sprint_id
+    on end_model.sprint_id = cast(source_model.sprint_id as string)
 where sprint_issues_source != sprint_issues_end 

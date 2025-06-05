@@ -63,6 +63,6 @@ select
     first_date_end
 from end_model
 full outer join source_model
-    on end_model.sprint_id = source_model.sprint_id
+    on end_model.sprint_id = cast(source_model.sprint_id as string)
     and end_model.issue_id = source_model.issue_id
 where first_date_source != first_date_end 
