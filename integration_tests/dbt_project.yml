@@ -1,9 +1,5 @@
 name: 'jira_integration_tests'
-<<<<<<< ours
-version: '0.20.1'
-=======
 version: '0.21.0'
->>>>>>> theirs
 config-version: 2
 profile: 'integration_tests'
 

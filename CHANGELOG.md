@@ -1,6 +1,6 @@
 # dbt_jira v0.21.0
 
-[PR #137](https://github.com/fivetran/dbt_jira/pull/137) includes the following updates:
+[PR #140](https://github.com/fivetran/dbt_jira/pull/140) includes the following updates:
 
 ## Breaking Change for dbt Core < 1.9.6
 
@@ -21,6 +21,9 @@ If you are using dbt Core < 1.9.6 and want to continue running Jira freshness te
   1. (Recommended) Upgrade to dbt Core >= 1.9.6
   2. Do not upgrade your installed version of the `jira` package. Pin your dependency on v0.20.0 in your `packages.yml` file.
   3. Utilize a dbt [override](https://docs.getdbt.com/reference/resource-properties/overrides) to overwrite the package's `jira` source and apply freshness via the previous release top-level property route. This will require you to copy and paste the entirety of the previous release `src_jira.yml` file and add an `overrides: jira_source` property.
+
+## Bug Fix
+- Changed casting of `sprint_id` to a string rather than an integer in `jira__daily_sprint_issue_history` to resolve casting errors.
 
 ## Under the Hood
 - Updates to ensure integration tests use latest version of dbt.
