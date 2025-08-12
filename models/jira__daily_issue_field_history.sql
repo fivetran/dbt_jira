@@ -54,26 +54,26 @@ calendar as (
 field_option as (
     
     select *
-    from {{ var('field_option') }}
+    from {{ ref('stg_jira__field_option') }}
 ),
 
 statuses as (
     
     select *
-    from {{ var('status') }}
+    from {{ ref('stg_jira__status') }}
 ),
 
 issue_types as (
     
     select *
-    from {{ var('issue_type') }}
+    from {{ ref('stg_jira__issue_type') }}
 ),
 
 {% if var('jira_using_components', True) %}
 components as (
 
     select * 
-    from {{ var('component') }}
+    from {{ ref('stg_jira__component') }}
 ),
 {% endif %}
 

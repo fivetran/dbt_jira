@@ -1,7 +1,7 @@
 with project as (
 
     select *
-    from {{ var('project') }}
+    from {{ ref('stg_jira__project') }}
 ),
 
 project_metrics as (
@@ -14,7 +14,7 @@ project_metrics as (
 jira_user as (
 -- to grab the project lead
     select *
-    from {{ var('user') }}
+    from {{ ref('stg_jira__user') }}
 ),
 
 agg_epics as (
@@ -37,7 +37,7 @@ agg_components as (
     select 
         project_id,
         {{ fivetran_utils.string_agg( "component_name", "', '" ) }} as components
-    from {{ var('component') }}
+    from {{ ref('stg_jira__component') }}
     group by 1
 ),
 

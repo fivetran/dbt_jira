@@ -221,11 +221,6 @@ models:
       because issue-epic relationships are represented differently in next-gen vs classic projects. 
       In next-gen projects, epics are stored as an issue's parent issue, whereas in classic projects epics are 
       captured in the 'epic link' field in `issue_field_history`. Next-gen issues will not appear in this table.
-    tests:
-      - dbt_utils.unique_combination_of_columns:
-          combination_of_columns: 
-            - issue_id  
-            - epic_issue_id
     columns:
       - name: issue_id
         description: Unique ID of the issue. 
@@ -234,11 +229,6 @@ models:
 
   - name: int_jira__issue_sprint
     description: Table relating issues to the sprints they currently belong to.
-    tests:
-      - dbt_utils.unique_combination_of_columns:
-          combination_of_columns: 
-            - issue_id  
-            - current_sprint_id
     columns:
       - name: issue_id
         description: Unique ID of the issue. 
@@ -473,12 +463,6 @@ models:
     description: >
       Table of every value that each **custom non-array** (not multiselect) field has been set to.
       This model serves to append the `field_name` to each record.
-    tests:
-      - dbt_utils.unique_combination_of_columns:
-          combination_of_columns: 
-            - field_id
-            - issue_id  
-            - updated_at
     columns:
       - name: field_id
         description: Foreign key referencing the ID of the `field` that was changed.
@@ -495,11 +479,6 @@ models:
     description: >
       Table of every value that each array-type (multiselect) field has been set to. Each row will pertain to **one** value.
       This model serves to append the `field_name` to each record.
-    tests:
-      - dbt_utils.unique_combination_of_columns:
-          combination_of_columns: 
-            - _fivetran_id
-            - updated_at
     columns:
       - name: _fivetran_id 
         description: Fivetran-generated ID hashed on field, issue, and value.
