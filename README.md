@@ -1,4 +1,4 @@
-# Jira Transformation dbt Package ([Docs](https://fivetran.github.io/dbt_jira/))
+# Jira dbt Package ([Docs](https://fivetran.github.io/dbt_jira/))
 
 <p align="left">
     <a alt="License"
