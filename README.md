@@ -73,8 +73,10 @@ Include the following jira package version in your `packages.yml` file:
 packages:
   - package: fivetran/jira
     version: [">=1.0.0", "<1.1.0"]
-
 ```
+
+> All required sources and staging models are now bundled into this transformation package. Do not include `fivetran/jira_source` in your `packages.yml` since this package has been deprecated.
+
 ### Step 3: Define database and schema variables
 By default, this package runs using your destination and the `jira` schema. If this is not where your Jira data is (for example, if your Jira schema is named `jira_fivetran`), add the following configuration to your root `dbt_project.yml` file:
 
