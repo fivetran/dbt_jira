@@ -1,7 +1,7 @@
 with jira_user as (
 
     select *
-    from {{ var('user') }}
+    from {{ ref('stg_jira__user') }}
 ),
 
 user_metrics as (

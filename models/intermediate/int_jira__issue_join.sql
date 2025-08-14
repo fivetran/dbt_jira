@@ -14,32 +14,32 @@ with issue as (
 project as (
 
     select * 
-    from {{ var('project') }}
+    from {{ ref('stg_jira__project') }}
 ),
 
 status as (
 
     select * 
-    from {{ var('status') }}
+    from {{ ref('stg_jira__status') }}
 ),
 
 status_category as (
 
     select * 
-    from {{ var('status_category') }}
+    from {{ ref('stg_jira__status_category') }}
 ),
 
 resolution as (
 
     select * 
-    from {{ var('resolution') }}
+    from {{ ref('stg_jira__resolution') }}
 ),
 
 {% if var('jira_using_priorities', True) %}
 priority as (
 
     select * 
-    from {{ var('priority') }}
+    from {{ ref('stg_jira__priority') }}
 ),
 {% endif %}
 

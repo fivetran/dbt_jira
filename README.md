@@ -16,7 +16,7 @@
 </p>
 
 ## What does this dbt package do?
-- Produces modeled tables that leverage Jira data from [Fivetran's connector](https://fivetran.com/docs/applications/jira) in the format described by [this ERD](https://fivetran.com/docs/applications/jira#schemainformation) and builds off the output of our [Jira source package](https://github.com/fivetran/dbt_jira_source).
+- Produces modeled tables that leverage Jira data from [Fivetran's connector](https://fivetran.com/docs/applications/jira) in the format described by [this ERD](https://fivetran.com/docs/applications/jira#schemainformation).
 - Enables you to better understand the workload, performance, and velocity of your team's work using Jira issues. It performs the following actions:
   - Creates a daily issue history table so you can quickly create agile reports, such as burndown charts, along any issue field.
   - Enriches the core issue table with relevant data regarding its workflow and current state.
@@ -72,7 +72,7 @@ Include the following jira package version in your `packages.yml` file:
 ```yaml
 packages:
   - package: fivetran/jira
-    version: [">=0.21.0", "<0.22.0"]
+    version: [">=1.0.0", "<1.1.0"]
 
 ```
 ### Step 3: Define database and schema variables
@@ -116,10 +116,10 @@ vars:
 The `jira__daily_issue_field_history` model generates historical data for the columns specified by the `issue_field_history_columns` variable. By default, the only columns tracked are `status`, `status_id`,`sprint`, `story_points` and `story_point_estimate`, but all fields found in the Jira `FIELD` table's `field_name` column can be included in this model. The most recent value of any tracked column is also captured in `jira__issue_enhanced`.
 
 If you would like to change these columns, add the following configuration to your `dbt_project.yml` file. After adding the columns to your `dbt_project.yml` file, run the `dbt run --full-refresh` command to fully refresh any existing models:
-
-> IMPORTANT: If you wish to use a custom field, be sure to list the `field_name` and not the `field_id`. The corresponding `field_name` can be found in the `stg_jira__field` model.
-
-```yml
+    jira:
+      +schema: my_new_schema_name # Leave +schema: blank to use the default target_schema.
+      staging:
+        +schema: my_new_schema_name # Leave +schema: blank to use the default target_schema.
 vars:
     issue_field_history_columns: ['the', 'list', 'of', 'field', 'names']
 ```
@@ -147,10 +147,10 @@ By default, this package builds the Jira staging models within a schema titled (
 
 ```yml
 models:
-    jira_source:
-      +schema: my_new_schema_name # leave blank for just the target_schema
     jira:
-      +schema: my_new_schema_name # leave blank for just the target_schema
+      +schema: my_new_schema_name # Leave +schema: blank to use the default target_schema.
+      staging:
+        +schema: my_new_schema_name # Leave +schema: blank to use the default target_schema.
 ```
 
 #### Change the source table references
@@ -187,9 +187,6 @@ This dbt package is dependent on the following dbt packages. These dependencies 
 
 ```yml
 packages:
-    - package: fivetran/jira_source
-      version: [">=0.9.0", "<0.10.0"]
-
     - package: fivetran/fivetran_utils
       version: [">=0.4.0", "<0.5.0"]
 

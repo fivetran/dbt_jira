@@ -1,27 +1,27 @@
 name: 'jira'
-version: '0.21.0'
+version: '1.0.0'
 config-version: 2
 require-dbt-version: [">=1.3.0", "<2.0.0"]
 vars:
 
   jira:
-    issue: "{{ ref('stg_jira__issue') }}"
-    project: "{{ ref('stg_jira__project') }}"
-    user: "{{ ref('stg_jira__user') }}"
-    issue_type: "{{ ref('stg_jira__issue_type') }}"
-    status: "{{ ref('stg_jira__status') }}"
-    status_category: "{{ ref('stg_jira__status_category') }}"
-    resolution: "{{ ref('stg_jira__resolution') }}"
-    priority: "{{ ref('stg_jira__priority') }}"
-    issue_multiselect_history: "{{ ref('stg_jira__issue_multiselect_history') }}"
-    issue_field_history: "{{ ref('stg_jira__issue_field_history') }}"
-    comment: "{{ ref('stg_jira__comment') }}"
-    issue_link: "{{ ref('stg_jira__issue_link') }}"
-    component: "{{ ref('stg_jira__component') }}"
-    field: "{{ ref('stg_jira__field') }}"
-    field_option: "{{ ref('stg_jira__field_option') }}"
-    sprint: "{{ ref('stg_jira__sprint') }}"
-    version: "{{ ref('stg_jira__version') }}"
+    issue: "{{ source('jira', 'issue') }}"
+    project: "{{ source('jira', 'project') }}"
+    user: "{{ source('jira', 'user') }}"
+    issue_type: "{{ source('jira', 'issue_type') }}"
+    status: "{{ source('jira', 'status') }}"
+    status_category: "{{ source('jira', 'status_category') }}"
+    resolution: "{{ source('jira', 'resolution') }}"
+    priority: "{{ source('jira', 'priority') }}"
+    issue_multiselect_history: "{{ source('jira', 'issue_multiselect_history') }}"
+    issue_field_history: "{{ source('jira', 'issue_field_history') }}"
+    comment: "{{ source('jira', 'comment') }}"
+    issue_link: "{{ source('jira', 'issue_link') }}"
+    component: "{{ source('jira', 'component') }}"
+    field: "{{ source('jira', 'field') }}"
+    field_option: "{{ source('jira', 'field_option') }}"
+    sprint: "{{ source('jira', 'sprint') }}"
+    version: "{{ source('jira', 'version') }}"
     jira_issue_history_buffer: 1
 models:
   jira:
@@ -30,3 +30,6 @@ models:
     intermediate:
       +materialized: ephemeral
       +schema: int_jira
+    staging:
+      +schema: jira_source
+      +materialized: view
