@@ -3,7 +3,7 @@
 with version as (
 
     select *
-    from {{ var('version') }}
+    from {{ ref('stg_jira__version') }}
 ),
 
 version_history as (

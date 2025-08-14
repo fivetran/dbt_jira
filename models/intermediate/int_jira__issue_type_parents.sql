@@ -4,13 +4,13 @@
 with issue as (
 
     select * 
-    from {{ var('issue') }}
+    from {{ ref('stg_jira__issue') }}
 ),
 
 issue_type as (
 
     select *
-    from {{ var('issue_type') }}
+    from {{ ref('stg_jira__issue_type') }}
 ), 
 -- issue-epic relationships are either captured via the issue's parent_issue_id (next-gen projects)
 -- or through the 'Epic Link' field (classic projects)

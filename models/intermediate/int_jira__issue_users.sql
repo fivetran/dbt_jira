@@ -20,7 +20,7 @@ with issue as (
 jira_user as (
 
     select *
-    from {{ var('user') }}
+    from {{ ref('stg_jira__user') }}
 ),
 
 issue_user_join as (

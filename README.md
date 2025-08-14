@@ -1,4 +1,4 @@
-# Jira Transformation dbt Package ([Docs](https://fivetran.github.io/dbt_jira/))
+# Jira dbt Package ([Docs](https://fivetran.github.io/dbt_jira/))
 
 <p align="left">
     <a alt="License"
@@ -16,7 +16,7 @@
 </p>
 
 ## What does this dbt package do?
-- Produces modeled tables that leverage Jira data from [Fivetran's connector](https://fivetran.com/docs/applications/jira) in the format described by [this ERD](https://fivetran.com/docs/applications/jira#schemainformation) and builds off the output of our [Jira source package](https://github.com/fivetran/dbt_jira_source).
+- Produces modeled tables that leverage Jira data from [Fivetran's connector](https://fivetran.com/docs/applications/jira) in the format described by [this ERD](https://fivetran.com/docs/applications/jira#schemainformation).
 - Enables you to better understand the workload, performance, and velocity of your team's work using Jira issues. It performs the following actions:
   - Creates a daily issue history table so you can quickly create agile reports, such as burndown charts, along any issue field.
   - Enriches the core issue table with relevant data regarding its workflow and current state.
@@ -72,9 +72,11 @@ Include the following jira package version in your `packages.yml` file:
 ```yaml
 packages:
   - package: fivetran/jira
-    version: [">=0.21.0", "<0.22.0"]
-
+    version: [">=1.0.0", "<1.1.0"]
 ```
+
+> All required sources and staging models are now bundled into this transformation package. Do not include `fivetran/jira_source` in your `packages.yml` since this package has been deprecated.
+
 ### Step 3: Define database and schema variables
 By default, this package runs using your destination and the `jira` schema. If this is not where your Jira data is (for example, if your Jira schema is named `jira_fivetran`), add the following configuration to your root `dbt_project.yml` file:
 
@@ -147,12 +149,12 @@ By default, this package builds the Jira staging models within a schema titled (
 
 ```yml
 models:
-    jira_source:
-      +schema: my_new_schema_name # leave blank for just the target_schema
     jira:
-      +schema: my_new_schema_name # leave blank for just the target_schema
+      +schema: my_new_schema_name # Leave +schema: blank to use the default target_schema.
+      staging:
+        +schema: my_new_schema_name # Leave +schema: blank to use the default target_schema.
 ```
-    
+
 #### Change the source table references
 If an individual source table has a different name than the package expects, add the table name as it appears in your destination to the respective variable:
 
@@ -177,19 +179,16 @@ vars:
 ### (Optional) Step 6: Orchestrate your models with Fivetran Transformations for dbt Core™
 <details><summary>Expand for details</summary>
 <br>
-    
+
 Fivetran offers the ability for you to orchestrate your dbt project through [Fivetran Transformations for dbt Core™](https://fivetran.com/docs/transformations/dbt). Learn how to set up your project for orchestration through Fivetran in our [Transformations for dbt Core setup guides](https://fivetran.com/docs/transformations/dbt#setupguide).
 </details>
 
 ## Does this package have dependencies?
 This dbt package is dependent on the following dbt packages. These dependencies are installed by default within this package. For more information on the following packages, refer to the [dbt hub](https://hub.getdbt.com/) site.
 > IMPORTANT: If you have any of these dependent packages in your own `packages.yml` file, we highly recommend that you remove them from your root `packages.yml` to avoid package version conflicts.
-    
+
 ```yml
 packages:
-    - package: fivetran/jira_source
-      version: [">=0.9.0", "<0.10.0"]
-
     - package: fivetran/fivetran_utils
       version: [">=0.4.0", "<0.5.0"]
 

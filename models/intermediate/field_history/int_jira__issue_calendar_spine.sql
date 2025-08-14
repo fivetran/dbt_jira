@@ -46,7 +46,7 @@ issue_dates as (
             'case when issue.resolved_at is null then ' ~ dbt.current_timestamp() ~ ' else cast(issue_history_scd.valid_starting_on as ' ~ dbt.type_timestamp() ~ ') end') }}
             as date) as open_until
     from issue_history_scd
-    left join {{ var('issue') }} as issue
+    left join {{ ref('stg_jira__issue') }} as issue
         on issue_history_scd.issue_id = issue.issue_id
 ),
 

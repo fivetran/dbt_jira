@@ -3,7 +3,7 @@
 with sprint as (
 
     select * 
-    from {{ var('sprint') }}
+    from {{ ref('stg_jira__sprint') }}
 ),
 
 field_history as (

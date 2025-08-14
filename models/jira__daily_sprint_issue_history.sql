@@ -84,7 +84,7 @@ filtered_issue_sprint_history as (
     from ranked_sprint_updates
     inner join {{ ref('jira__issue_enhanced') }} issue
         on ranked_sprint_updates.issue_id = issue.issue_id
-    inner join {{ var('sprint') }} sprint
+    inner join {{ ref('stg_jira__sprint') }} sprint
         on ranked_sprint_updates.sprint_id = cast(sprint.sprint_id as {{ dbt.type_string() }})
     where row_num = 1 --Keep only the last update per sprint-issue-date_day
 ),

@@ -1,14 +1,14 @@
 with field_history as (
 
     select *
-    from {{ var('issue_field_history') }}
+    from {{ ref('stg_jira__issue_field_history') }}
     
 ), 
 
 fields as (
       
     select *
-    from {{ var('field') }}
+    from {{ ref('stg_jira__field') }}
 
 ), 
 

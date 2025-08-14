@@ -3,7 +3,7 @@
 with comment as (
 
     select *
-    from {{ var('comment') }}
+    from {{ ref('stg_jira__comment') }}
     order by issue_id, created_at asc
 ),
 
@@ -11,7 +11,7 @@ with comment as (
 jira_user as (
 
     select *
-    from {{ var('user') }}
+    from {{ ref('stg_jira__user') }}
 ),
 
 agg_comments as (
