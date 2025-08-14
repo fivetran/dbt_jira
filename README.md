@@ -118,10 +118,10 @@ vars:
 The `jira__daily_issue_field_history` model generates historical data for the columns specified by the `issue_field_history_columns` variable. By default, the only columns tracked are `status`, `status_id`,`sprint`, `story_points` and `story_point_estimate`, but all fields found in the Jira `FIELD` table's `field_name` column can be included in this model. The most recent value of any tracked column is also captured in `jira__issue_enhanced`.
 
 If you would like to change these columns, add the following configuration to your `dbt_project.yml` file. After adding the columns to your `dbt_project.yml` file, run the `dbt run --full-refresh` command to fully refresh any existing models:
-    jira:
-      +schema: my_new_schema_name # Leave +schema: blank to use the default target_schema.
-      staging:
-        +schema: my_new_schema_name # Leave +schema: blank to use the default target_schema.
+
+> IMPORTANT: If you wish to use a custom field, be sure to list the `field_name` and not the `field_id`. The corresponding `field_name` can be found in the `stg_jira__field` model.
+
+```yml
 vars:
     issue_field_history_columns: ['the', 'list', 'of', 'field', 'names']
 ```
