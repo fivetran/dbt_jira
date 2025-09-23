@@ -285,6 +285,23 @@ models:
           - not_null
       - name: status_category_name
         description: Title of the status category.
+  
+  - name: st_jira__team
+    description: Table of teams associated with your organization.
+    columns:
+      - name: team_id
+        description: Unique ID of the team.
+        tests:
+          - unique
+          - not_null
+      - name: is_shared
+        description: Boolean that is true if the team is shared with other teams in your organization.
+      - name: is_visible
+        description: Boolean that is true if the team is visible to all users in your organization.
+      - name: team_name
+        description: Title of the status category.
+      - name: team_title
+        description: Longer, more descriptive name of the team.
 
   - name: stg_jira__user
     description: Table of users associated with your organization.
