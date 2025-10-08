@@ -20,9 +20,11 @@ issue_multiselect_batch_history as (
         field_name,
         issue_id,
         updated_at,
-        {{ fivetran_utils.string_agg('field_value', "', '") }} as field_values
+        author_id,
+        {{ fivetran_utils.string_agg('field_value', "', '") }} as field_values,
+
     from issue_multiselect_history
-    {{ dbt_utils.group_by(4) }}
+    {{ dbt_utils.group_by(5) }}
 ),
 
 combine_field_history as (
@@ -31,6 +33,7 @@ combine_field_history as (
         field_id,
         issue_id,
         updated_at,
+        author_id,
         field_value,
         field_name
     from issue_field_history
@@ -41,6 +44,7 @@ combine_field_history as (
         field_id,
         issue_id,
         updated_at,
+        author_id,
         field_values as field_value,
         field_name
     from issue_multiselect_batch_history
@@ -65,7 +69,8 @@ int_jira__timestamp_field_history as (
         issue_id,
         field_name,
         case when field_value is null then 'is_null' else field_value end as field_value,
-        updated_at
+        updated_at,
+        author_id
     from limit_to_relevant_fields
 ),
 
@@ -75,6 +80,7 @@ pivot_out as (
         updated_at,
         issue_id,
         cast({{ dbt.date_trunc('week', 'updated_at') }} as date) as updated_at_week,
+        author_id,
         max(case when lower(field_id) = 'status' then field_value end) as status,
         max(case when lower(field_name) = 'sprint' then field_value end) as sprint,
         max(case when lower(field_name) = 'story points' then field_value end) as story_points,
@@ -88,7 +94,7 @@ pivot_out as (
         {% endfor -%}
 
     from int_jira__timestamp_field_history
-    {{ dbt_utils.group_by(3) }}
+    {{ dbt_utils.group_by(4) }}
 ),
 
 final as (
