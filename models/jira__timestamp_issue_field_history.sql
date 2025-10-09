@@ -33,8 +33,8 @@ field_option as (
     from {{ ref('stg_jira__field_option') }}
 ),
 
--- Create SCD Type 2 with validity periods using window functions
 create_validity_periods as (
+    -- Create SCD Type 2 validity periods using lead() window function
     select
         updated_at as valid_from,
         -- Next update becomes valid_until for this record
@@ -59,8 +59,8 @@ create_validity_periods as (
     from timestamp_history_scd
 ),
 
--- Handle open-ended records (current state) and resolve status
 final as (
+    -- Resolve field values using lookup tables and add surrogate key
     select
         create_validity_periods.valid_from,
         coalesce(create_validity_periods.valid_until, {{ dbt.current_timestamp() }}) as valid_until,

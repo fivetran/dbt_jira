@@ -12,7 +12,7 @@ issue_multiselect_history as (
 ),
 
 issue_multiselect_batch_history as (
-
+    -- Aggregate multiselect field values into comma-separated strings
     select
         field_id,
         field_name,
@@ -26,7 +26,7 @@ issue_multiselect_batch_history as (
 ),
 
 combine_field_history as (
-
+    -- Union single-select and multiselect field histories
     select
         field_id,
         issue_id,
@@ -49,7 +49,7 @@ combine_field_history as (
 ),
 
 limit_to_relevant_fields as (
-    
+    -- Filter to only status and configured custom fields
     select
         combine_field_history.*
     from combine_field_history
@@ -61,7 +61,7 @@ limit_to_relevant_fields as (
 ),
 
 int_jira__timestamp_field_history as (
-
+    -- Convert null values to 'is_null' for consistent partitioning
     select
         field_id,
         issue_id,
@@ -73,7 +73,7 @@ int_jira__timestamp_field_history as (
 ),
 
 final as (
-    -- pivot out fields by timestamp instead of by day
+    -- Pivot field values into columns grouped by timestamp
     select
         updated_at,
         issue_id,

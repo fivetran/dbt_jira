@@ -8,7 +8,7 @@ with change_data as (
     from {{ ref('int_jira__pivot_timestamp_field_history') }}
 
 ), set_values as (
-
+    -- Create partitions to group consecutive null values for forward-filling
     select
         updated_at,
         issue_id,
@@ -29,7 +29,7 @@ with change_data as (
     from change_data
 
 ), fill_values as (
-
+    -- Forward-fill values within each partition to create SCD Type 2 records
     select
         updated_at,
         issue_id,

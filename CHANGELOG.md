@@ -2,9 +2,9 @@
 
 ## Schema Updates
 
-**6 total changes • 4 possible breaking changes (requires a --full-refresh run after upgrading)**
+**6 total changes • 4 possible breaking changes**
 
-| Data Model                                    | Change Type | Old Name | New Name                                  | Notes                                                             |
+| Data Model                                    | Change Type | Old  | New                               | Notes                                                             |
 |---------------------------------------------------|-------------|----------|-------------------------------------------|-------------------------------------------------------------------|
 | [jira__timestamp_issue_field_history](https://fivetran.github.io/dbt_jira/#!/model/model.jira.jira__timestamp_issue_field_history)       | New Model   |     |  | SCD Type 2 table tracking field changes at timestamp level with validity periods. Each record shows complete field state during a time period with `valid_from`/`valid_until` timestamps. |
 | [int_jira__pivot_timestamp_field_history](https://fivetran.github.io/dbt_jira/#!/model/model.jira.int_jira__pivot_timestamp_field_history)  | New Model   |          |    | Pivots field history into columns at timestamp level, capturing ALL field changes rather than daily snapshots. |
