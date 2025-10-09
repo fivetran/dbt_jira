@@ -1,3 +1,20 @@
+# dbt_jira v1.1.0
+
+## Schema Updates
+
+**6 total changes • 4 possible breaking changes (requires a --full-refresh run after upgrading)**
+
+| Data Model                                    | Change Type | Old Name | New Name                                  | Notes                                                             |
+|---------------------------------------------------|-------------|----------|-------------------------------------------|-------------------------------------------------------------------|
+| [jira__timestamp_issue_field_history](https://fivetran.github.io/dbt_jira/#!/model/model.jira.jira__timestamp_issue_field_history)       | New Model   |     |  | SCD Type 2 table tracking field changes at timestamp level with validity periods. Each record shows complete field state during a time period with `valid_from`/`valid_until` timestamps. |
+| [int_jira__pivot_timestamp_field_history](https://fivetran.github.io/dbt_jira/#!/model/model.jira.int_jira__pivot_timestamp_field_history)  | New Model   |          |    | Pivots field history into columns at timestamp level, capturing ALL field changes rather than daily snapshots. |
+| [int_jira__timestamp_field_history_scd](https://fivetran.github.io/dbt_jira/#!/model/model.jira.int_jira__timestamp_field_history_scd)        | New Model   |          |    | SCD logic that backfills field values at timestamp level, showing complete field state at each update timestamp. |
+| [stg_jira__issue_field_history](https://fivetran.github.io/dbt_jira_source/#!/model/model.jira_source.stg_jira__issue_field_history)        | New Column   |          |  `author_id`    |    Tracks which user made each field change for audit trail and change attribution.     |
+| [stg_jira__issue_multiselect_history](https://fivetran.github.io/dbt_jira_source/#!/model/model.jira_source.stg_jira__issue_multiselect_history)        | New Column   |          |  `author_id`    |    Tracks which user made each multiselect field change for audit trail and change attribution.       |
+| [jira__timestamp_issue_field_history](https://fivetran.github.io/dbt_jira/#!/model/model.jira.jira__timestamp_issue_field_history)        | New Columns   |          |  `author_id`, `status_id`, `is_current_record` |    Adds user attribution, raw status ID alongside resolved status name, and current record indicator for SCD Type 2 functionality.    | 
+ 
+
+
 # dbt_jira v1.0.0
 
 [PR #145](https://github.com/fivetran/dbt_jira/pull/145) includes the following updates:
