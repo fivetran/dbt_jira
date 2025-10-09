@@ -1,4 +1,4 @@
-{{ config( materialized='table') }}
+{{ config(materialized='table') }}
 
 {%- set timestamp_columns = adapter.get_columns_in_relation(ref('int_jira__pivot_timestamp_field_history')) -%}
 
