@@ -12,13 +12,13 @@ with change_data as (
     select
         updated_at,
         issue_id,
-        issue_timestamp_id,
         updated_at_week,
+        author_id,
         status,
         sum( case when status is null then 0 else 1 end) over ( partition by issue_id
             order by updated_at rows unbounded preceding) as status_field_partition
 
-        {% for col in timestamp_columns if col.name|lower not in ['updated_at','issue_id','issue_timestamp_id','updated_at_week','status'] %}
+        {% for col in timestamp_columns if col.name|lower not in ['updated_at','issue_id','updated_at_week','status', 'author_id'] %}
         , {{ col.name }}
         -- create a batch/partition once a new value is provided
         , sum( case when {{ col.name }} is null then 0 else 1 end) over ( partition by issue_id
@@ -30,18 +30,16 @@ with change_data as (
 
 ), fill_values as (
 
--- each row of the pivoted table includes field values if that field was updated at that timestamp
--- we need to backfill to persist values that have been previously updated and are still valid
     select
         updated_at,
         issue_id,
-        issue_timestamp_id,
         updated_at_week,
+        author_id,
         first_value( status ) over (
             partition by issue_id, status_field_partition
             order by updated_at asc rows between unbounded preceding and current row) as status
 
-        {% for col in timestamp_columns if col.name|lower not in ['updated_at','issue_id','issue_timestamp_id','updated_at_week','status'] %}
+        {% for col in timestamp_columns if col.name|lower not in ['updated_at','issue_id','updated_at_week','status', 'author_id'] %}
 
         -- grab the value that started this batch/partition
         , first_value( {{ col.name }} ) over (

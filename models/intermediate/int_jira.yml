@@ -519,11 +519,6 @@ models:
       - name: story_point_estimate
         description: The story point estimate that was updated at this timestamp (if story point estimate changed).
       # plus any fields specified by `var('issue_field_history_columns')`
-      - name: issue_timestamp_id
-        description: Surrogate key hashed on `updated_at` and `issue_id`.
-        tests:
-          - unique
-          - not_null
 
   - name: int_jira__timestamp_field_history_scd
     description: >
@@ -548,11 +543,6 @@ models:
       - name: story_point_estimate
         description: The complete story point estimate at this timestamp (backfilled from previous changes).
       # plus any fields specified by `var('issue_field_history_columns')`
-      - name: issue_timestamp_id
-        description: Surrogate key hashed on `updated_at` and `issue_id`.
-        tests:
-          - unique
-          - not_null
 
   - name: int_jira__issue_assign_resolution
     description: Table grabbing dates related to the assignment and resolution of issues.

@@ -72,7 +72,7 @@ int_jira__timestamp_field_history as (
     from limit_to_relevant_fields
 ),
 
-pivot_out as (
+final as (
     -- pivot out fields by timestamp instead of by day
     select
         updated_at,
@@ -86,21 +86,13 @@ pivot_out as (
 
         {% for col in var('issue_field_history_columns', []) -%}
         {% if col|lower not in ['story points', 'story point estimate'] %}
-            , max(case when lower(field_name) = '{{ col|lower }}' then field_value end) 
+            , max(case when lower(field_name) = '{{ col|lower }}' then field_value end)
             as {{ dbt_utils.slugify(col) | replace(' ', '_') | lower }}
         {% endif %}
         {% endfor -%}
 
     from int_jira__timestamp_field_history
     {{ dbt_utils.group_by(4) }}
-),
-
-final as (
-
-    select
-        *,
-        {{ dbt_utils.generate_surrogate_key(['updated_at','issue_id']) }} as issue_timestamp_id
-    from pivot_out
 )
 
 select *
