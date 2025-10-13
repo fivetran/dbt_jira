@@ -307,7 +307,7 @@ sources:
           - name: is_visible
             description: Boolean that is true if the team is visible to all users in your organization.
           - name: name
-            description: Title of the status category.
+            description: Name of the team.
           - name: title
             description: Longer, more descriptive name of the team.
 

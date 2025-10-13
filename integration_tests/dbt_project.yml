@@ -29,6 +29,7 @@ vars:
     jira_user_group_identifier: "user_group"
     jira_user_identifier: "user"
     jira_version_identifier: "version"
+    jira_team_identifier: "team"
 
 models:
   jira:

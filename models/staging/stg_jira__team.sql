@@ -22,8 +22,8 @@ final as (
     
     select 
         cast(id as {{ dbt.type_string() }}) as team_id,
-        is_shared,
-        is_visible,
+        is_shared as is_shared_team,
+        is_visible as is_visible_team,
         name as team_name,
         title as team_title,
         _fivetran_synced

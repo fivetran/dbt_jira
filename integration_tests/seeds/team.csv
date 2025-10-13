@@ -1,4 +1,4 @@
-team_id,is_shared,is_visible,team_name,team_title,_fivetran_synced
+id,is_shared,is_visible,name,title,_fivetran_synced
 01e9ac93-bccf-4ad2-af92-3317a37ec67b,true,true,HR,HR,2025-07-14 19:51:56.426000 UTC
 891da445-73e5-49b9-9d0d-89f6a587822a,true,true,Cloud Security,Cloud Security,2026-07-14 19:51:56.426000 UTC
 1bc241c7-6926-4b46-94b7-82d25069f067,true,true,People Ops,People Ops,2027-07-14 19:51:56.426000 UTC
