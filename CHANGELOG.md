@@ -1,3 +1,28 @@
+# dbt_jira v1.1.0
+
+[PR #XXX](https://github.com/fivetran/dbt_jira/pull/XXX) includes the following updates:
+
+## Schema/Data Change
+**3 total changes • 3 possible breaking changes**
+
+| Data Model(s) | Change type | Old | New | Notes |
+| ---------- | ----------- | -------- | -------- | ----- |
+| `stg_jira__team` | New model | N/A | New staging model | Added staging model for Jira teams functionality. |
+| `jira__daily_issue_field_history` | Column addition | N/A | `team` | Added team column to track team assignments for issues over time. |
+| `jira__issue_enhanced` | Column addition | N/A | `team` | Added team column to provide current team assignment for each issue. |
+
+## Feature Update
+- Added support for Jira teams functionality by introducing staging models `stg_jira__team` and `stg_jira__team_tmp`.
+- Enhanced issue field history models to include team information by joining with team data when the field type is 'team'.
+- Added team column to the `jira__daily_issue_field_history` model to track team assignments over time.
+- Added team column to the `jira__issue_enhanced` model to provide current team assignment for each issue.
+
+## Under the Hood
+- Added new seed file `team.csv` for integration testing.
+- Added team-related test data to `issue.csv`, `issue_field_history.csv`, and `field.csv` seed files.
+- Created `get_team_columns` macro for consistent team column definitions.
+- Updated package variables to include team source reference and team identifier configuration.
+
 # dbt_jira v1.0.0
 
 [PR #145](https://github.com/fivetran/dbt_jira/pull/145) includes the following updates:

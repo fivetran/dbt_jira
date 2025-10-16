@@ -1,5 +1,5 @@
 name: 'jira_integration_tests'
-version: '1.0.0'
+version: '1.1.0'
 config-version: 2
 profile: 'integration_tests'
 
@@ -7,7 +7,7 @@ vars:
   # Comment out the below when generating docs
   issue_field_history_columns: ['summary', 'components'] # @docs-ignore
   jira:
-    jira_schema: zz_dbt_savage
+    jira_schema: jira_integrations_tests_42
     jira_comment_identifier: "comment"
     jira_component_identifier: "component"
     jira_epic_identifier: "epic"
@@ -33,8 +33,8 @@ vars:
 
 models:
   jira:
-   # +schema: "{{ 'jira_integrations_tests_sqlw' if target.name == 'databricks-sql' else 'jira' }}"
-     +schema: "jira_{{ var('directed_schema','dev') }}"
+    +schema: "{{ 'jira_integrations_tests_sqlw' if target.name == 'databricks-sql' else 'jira' }}"
+    # +schema: "jira_{{ var('directed_schema','dev') }}"
 
 seeds:
   +docs:

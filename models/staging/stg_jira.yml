@@ -50,7 +50,7 @@ models:
           - unique
           - not_null
       - name: is_array
-        description: Boolean that is true if a field can have multiple values (is mulitselect).
+        description: Boolean that is true if a field can have multiple values (is multiselect).
       - name: is_custom
         description: >
           Boolean that is true if the field is custom to this organization, and false if 
@@ -286,7 +286,7 @@ models:
       - name: status_category_name
         description: Title of the status category.
   
-  - name: st_jira__team
+  - name: stg_jira__team
     description: Table of teams associated with your organization.
     columns:
       - name: team_id
@@ -294,12 +294,12 @@ models:
         tests:
           - unique
           - not_null
-      - name: is_shared
+      - name: is_shared_team
         description: Boolean that is true if the team is shared with other teams in your organization.
-      - name: is_visible
+      - name: is_visible_team
         description: Boolean that is true if the team is visible to all users in your organization.
       - name: team_name
-        description: Title of the status category.
+        description: Name of the team.
       - name: team_title
         description: Longer, more descriptive name of the team.
 
@@ -312,7 +312,7 @@ models:
           - unique
           - not_null
       - name: email
-        description: Email associated with the user acccount.
+        description: Email associated with the user account.
       - name: locale
         description: The Java locale of the user. 
       - name: user_display_name

@@ -62,7 +62,7 @@ sources:
               Unique ID of the field. Default fields will have descriptive IDs, whereas custom
               field IDs will be `'customfield_#####'`.
           - name: is_array
-            description: Boolean that is true if a field can have multiple values (is mulitselect).
+            description: Boolean that is true if a field can have multiple values (is multiselect).
           - name: is_custom
             description: >
               Boolean that is true if the field is custom to this organization, and false if 
@@ -303,9 +303,9 @@ sources:
           - name: id
             description: Unique ID of the team.
           - name: is_shared
-            description: Boolean that is true if the team is shared with other teams in your organization.
+            description: Boolean that is true if you share the team with other teams in your organization.
           - name: is_visible
-            description: Boolean that is true if the team is visible to all users in your organization.
+            description: Boolean that is true if all users in your organization can see the team.
           - name: name
             description: Name of the team.
           - name: title
