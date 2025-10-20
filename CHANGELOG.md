@@ -2,7 +2,7 @@
 
 ## Schema Updates
 
-**6 total changes • 4 possible breaking changes**
+**6 total changes • 4 possible breaking changes** 
 
 | Data Model                                    | Change Type | Old  | New                               | Notes                                                             |
 |---------------------------------------------------|-------------|----------|-------------------------------------------|-------------------------------------------------------------------|
