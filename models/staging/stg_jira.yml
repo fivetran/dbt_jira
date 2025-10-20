@@ -157,6 +157,8 @@ models:
         description: Content of the value of that the field was set to.
       - name: is_active
         description: Boolean showing whether this issue field is currently active.
+      - name: author_id
+        description: Foreign key referencing the ID of the `user` who made this field change.
 
   - name: stg_jira__issue_multiselect_history
     description: >
@@ -174,6 +176,8 @@ models:
         description: Content of the value of that the field was set to. 
       - name: is_active
         description: Boolean showing whether this issue field is currently active.
+      - name: author_id
+        description: Foreign key referencing the ID of the `user` who made this field change.
 
   - name: stg_jira__issue_type
     description: >

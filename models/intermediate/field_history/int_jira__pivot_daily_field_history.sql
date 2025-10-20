@@ -94,7 +94,7 @@ get_valid_dates as (
 ),
 
 limit_to_relevant_fields as (
-    -- let's remove unncessary rows moving forward and grab field names 
+    -- let's remove unnecessary rows moving forward and grab field names 
     select 
         get_valid_dates.*
 

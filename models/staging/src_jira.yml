@@ -158,6 +158,8 @@ sources:
             description: Timestamp of when the issue field was set to this value.
           - name: value
             description: Content of the value of that the field was set to.
+          - name: author_id
+            description: Foreign key referencing the ID of the `user` who made this field change.
           - name: is_active
             description: Boolean showing whether this issue field is currently active.
 
@@ -188,6 +190,8 @@ sources:
             description: Foreign key referencing the ID of the `issue` whose field was updated.
           - name: value
             description: Content of the value of that the field was set to.
+          - name: author_id
+            description: Foreign key referencing the ID of the `user` who made this field change.
           - name: is_active
             description: Boolean showing whether this issue field is currently active.
         
