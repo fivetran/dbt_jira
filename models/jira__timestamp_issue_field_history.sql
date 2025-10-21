@@ -56,7 +56,7 @@ create_validity_periods as (
         author_id
 
         -- list of exception columns
-        {% set exception_cols = ['issue_id', 'issue_timestamp_id', 'updated_at', 'updated_at_week', 'status', 'author_id', 'issue_type'] %}
+        {% set exception_cols = ['issue_id', 'issue_timestamp_id', 'updated_at', 'updated_at_week', 'status', 'author_id', 'issue_type','components',] %}
 
         {% for col in pivot_data_columns %}
             {% if col.name|lower not in exception_cols %}
