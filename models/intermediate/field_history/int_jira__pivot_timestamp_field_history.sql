@@ -54,7 +54,7 @@ limit_to_relevant_fields as (
         combine_field_history.*
     from combine_field_history
     where lower(field_id) = 'status'
-        or lower(field_name) in ('sprint', 'story points', 'story point estimate'
+        or lower(field_name) in ('sprint', 'story points', 'story point estimate', 'team'
         {%- for col in var('issue_field_history_columns', []) -%}
             ,'{{ (col|lower) }}'
         {%- endfor -%} )
@@ -82,7 +82,8 @@ final as (
         max(case when lower(field_id) = 'status' then field_value end) as status,
         max(case when lower(field_name) = 'sprint' then field_value end) as sprint,
         max(case when lower(field_name) = 'story points' then field_value end) as story_points,
-        max(case when lower(field_name) = 'story point estimate' then field_value end) as story_point_estimate
+        max(case when lower(field_name) = 'story point estimate' then field_value end) as story_point_estimate,
+        max(case when lower(field_name) = 'team' then field_value end) as team
 
         {% for col in var('issue_field_history_columns', []) -%}
         {% if col|lower not in ['story points', 'story point estimate'] %}
