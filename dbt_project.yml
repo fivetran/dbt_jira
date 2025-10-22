@@ -24,10 +24,6 @@ vars:
     version: "{{ source('jira', 'version') }}"
     jira_issue_history_buffer: 1
 
-    # Lead and cycle time configuration
-    jira_cycle_time_statuses: ['In Progress', 'In Review', 'Testing']
-    jira_lead_time_start_statuses: ['New', 'To Do', 'Backlog']
-    jira_done_statuses: ['Done', 'Closed', 'Resolved']
 
 models:
   jira:
