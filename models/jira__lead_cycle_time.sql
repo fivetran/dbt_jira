@@ -8,6 +8,12 @@ with status_periods as (
   select
     issue_id,
     status,
+    {% if 'project' in var('issue_field_history_columns', []) %}
+    project,
+    {% endif %}
+    {% if 'assignee' in var('issue_field_history_columns', []) %}
+    assignee,
+    {% endif %}
     valid_from,
     valid_until,
     is_current_record,
@@ -20,19 +26,46 @@ with status_periods as (
     end as seconds_in_status,
 
     -- Issue lifecycle context
-    min(valid_from) over (partition by issue_id) as issue_created_at,
+    min(valid_from) over (partition by issue_id
+      {% if 'project' in var('issue_field_history_columns', []) %}
+      , project
+      {% endif %}
+      {% if 'assignee' in var('issue_field_history_columns', []) %}
+      , assignee
+      {% endif %}
+    ) as issue_created_at,
     max(case when status in ({{ "'" + done_statuses|join("','") + "'" }})
-        then valid_from end) over (partition by issue_id) as issue_completed_at,
-    max(case when is_current_record then 1 else 0 end) over (partition by issue_id) as is_open_issue
+        then valid_from end) over (partition by issue_id
+      {% if 'project' in var('issue_field_history_columns', []) %}
+      , project
+      {% endif %}
+      {% if 'assignee' in var('issue_field_history_columns', []) %}
+      , assignee
+      {% endif %}
+    ) as issue_completed_at,
+    max(case when is_current_record then 1 else 0 end) over (partition by issue_id
+      {% if 'project' in var('issue_field_history_columns', []) %}
+      , project
+      {% endif %}
+      {% if 'assignee' in var('issue_field_history_columns', []) %}
+      , assignee
+      {% endif %}
+    ) as is_open_issue
 
   from {{ ref('jira__timestamp_issue_field_history') }}
 ),
 
--- Aggregate time by issue + status grain
+-- Aggregate time by issue + status + project + assignee grain
 status_periods_aggregated as (
   select
     issue_id,
     status,
+    {% if 'project' in var('issue_field_history_columns', []) %}
+    project,
+    {% endif %}
+    {% if 'assignee' in var('issue_field_history_columns', []) %}
+    assignee,
+    {% endif %}
 
     -- Aggregate time calculations
     sum(seconds_in_status) as total_seconds_in_status,
@@ -50,6 +83,12 @@ status_periods_aggregated as (
   from status_periods
   group by
     issue_id, status
+    {% if 'project' in var('issue_field_history_columns', []) %}
+    , project
+    {% endif %}
+    {% if 'assignee' in var('issue_field_history_columns', []) %}
+    , assignee
+    {% endif %}
 ),
 
 -- Convert to business-friendly time units
@@ -60,10 +99,16 @@ status_periods_with_units as (
   from status_periods_aggregated
 ),
 
--- Issue-level cycle and lead time calculations
+-- Issue-level cycle and lead time calculations (by project and assignee grain when available)
 issue_metrics as (
   select
     issue_id,
+    {% if 'project' in var('issue_field_history_columns', []) %}
+    project,
+    {% endif %}
+    {% if 'assignee' in var('issue_field_history_columns', []) %}
+    assignee,
+    {% endif %}
     min(issue_created_at) as issue_created_at,
     min(issue_completed_at) as issue_completed_at,
     min(is_open_issue) as is_open_issue,
@@ -93,12 +138,24 @@ issue_metrics as (
 
   from status_periods_with_units
   group by issue_id
+    {% if 'project' in var('issue_field_history_columns', []) %}
+    , project
+    {% endif %}
+    {% if 'assignee' in var('issue_field_history_columns', []) %}
+    , assignee
+    {% endif %}
 ),
 
 final as (
   select
     status_periods_with_units.issue_id,
     status_periods_with_units.status,
+    {% if 'project' in var('issue_field_history_columns', []) %}
+    status_periods_with_units.project,
+    {% endif %}
+    {% if 'assignee' in var('issue_field_history_columns', []) %}
+    status_periods_with_units.assignee,
+    {% endif %}
     status_periods_with_units.total_seconds_in_status,
     status_periods_with_units.total_hours_in_status,
     status_periods_with_units.total_days_in_status,
@@ -116,6 +173,12 @@ final as (
   from status_periods_with_units
   left join issue_metrics
     on status_periods_with_units.issue_id = issue_metrics.issue_id
+    {% if 'project' in var('issue_field_history_columns', []) %}
+    and status_periods_with_units.project = issue_metrics.project
+    {% endif %}
+    {% if 'assignee' in var('issue_field_history_columns', []) %}
+    and status_periods_with_units.assignee = issue_metrics.assignee
+    {% endif %}
 )
 
 select * from final
