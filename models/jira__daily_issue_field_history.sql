@@ -179,7 +179,7 @@ set_values as (
 
         {% elif col.name|lower == 'team'and var('jira_using_teams', True) %} 
         left join teams 
-            on cast(teams.team_name as {{ dbt.type_string() }}) = joined.team
+            on cast(teams.team_id as {{ dbt.type_string() }}) = joined.team
 
         {% elif col.name|lower not in exception_cols %}
         left join field_option as field_option_{{ col.name }}

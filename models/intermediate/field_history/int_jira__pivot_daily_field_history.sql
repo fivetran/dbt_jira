@@ -94,14 +94,14 @@ get_valid_dates as (
 ),
 
 limit_to_relevant_fields as (
-    -- let's remove unnecessary rows moving forward and grab field names 
+    -- let's remove unncessary rows moving forward and grab field names 
     select 
         get_valid_dates.*
 
     from get_valid_dates
 
     where lower(field_id) = 'status'
-        or lower(field_name) in ('sprint', 'story points', 'story point estimate', 'team'
+        or lower(field_name) in ('sprint', 'story points', 'story point estimate'
         {%- for col in var('issue_field_history_columns', []) -%}
             ,'{{ (col|lower) }}'
         {%- endfor -%} )
@@ -157,8 +157,7 @@ pivot_out as (
         max(case when lower(field_id) = 'status' then field_value end) as status,
         max(case when lower(field_name) = 'sprint' then field_value end) as sprint,
         max(case when lower(field_name) = 'story points' then field_value end) as story_points,
-        max(case when lower(field_name) = 'story point estimate' then field_value end) as story_point_estimate,
-        max(case when lower(field_name) = 'team' then field_value end) as team
+        max(case when lower(field_name) = 'story point estimate' then field_value end) as story_point_estimate
 
         {% for col in var('issue_field_history_columns', []) -%}
         {% if col|lower not in ['story points', 'story point estimate'] %}

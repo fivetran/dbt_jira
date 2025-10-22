@@ -56,7 +56,7 @@ create_validity_periods as (
         author_id
 
         -- list of exception columns
-        {% set exception_cols = ['issue_id', 'issue_timestamp_id', 'updated_at', 'updated_at_week', 'status', 'author_id', 'components', 'issue_type','team'] %}
+        {% set exception_cols = ['issue_id', 'issue_timestamp_id', 'updated_at', 'updated_at_week', 'status', 'author_id', 'issue_type'] %}
 
         {% for col in pivot_data_columns %}
             {% if col.name|lower not in exception_cols %}
@@ -117,7 +117,7 @@ final as (
 
         {% elif col.name|lower == 'team' and var('jira_using_teams', True) %}
         left join teams
-            on cast(teams.team_name as {{ dbt.type_string() }}) = create_validity_periods.team
+            on cast(teams.team_id as {{ dbt.type_string() }}) = create_validity_periods.team
 
         {% elif col.name|lower not in exception_cols %}
         left join field_option as field_option_{{ col.name }}

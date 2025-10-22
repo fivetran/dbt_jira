@@ -5,9 +5,8 @@
 
 | Data Model(s) | Change type | Old | New | Notes |
 | ---------- | ----------- | -------- | -------- | ----- |
-| `stg_jira__team` | New model | N/A | New staging model | Added staging model for Jira teams functionality. |
-| `jira__daily_issue_field_history` | Column addition | N/A | `team` | Added team column to track team assignments for issues over time. |
-| `jira__issue_enhanced` | Column addition | N/A | `team` | Added team column to provide current team assignment for each issue. |
+| [stg_jira__team_tmp](https://fivetran.github.io/dbt_jira/#!/model/model.jira.stg_jira__team) | New Model | N/A | New tmp model | Added temp model as Jira teams source. |
+| [stg_jira__team](https://fivetran.github.io/dbt_jira/#!/model/model.jira.stg_jira__team) |New Model | N/A | New staging model | Added staging model for Jira teams functionality
 | [jira__timestamp_issue_field_history](https://fivetran.github.io/dbt_jira/#!/model/model.jira.jira__timestamp_issue_field_history)       | New Model   |     |  | SCD Type 2 table tracking field changes at timestamp level with validity periods. Each record shows complete field state during a time period with `valid_from`/`valid_until` timestamps. |
 | [int_jira__pivot_timestamp_field_history](https://fivetran.github.io/dbt_jira/#!/model/model.jira.int_jira__pivot_timestamp_field_history)  | New Model   |          |    | Pivots field history into columns at timestamp level, capturing ALL field changes rather than daily snapshots. |
 | [int_jira__timestamp_field_history_scd](https://fivetran.github.io/dbt_jira/#!/model/model.jira.int_jira__timestamp_field_history_scd)        | New Model   |          |    | SCD logic that backfills field values at timestamp level, showing complete field state at each update timestamp. |
@@ -17,9 +16,8 @@
 
 ## Feature Update
 - Added support for Jira teams functionality by introducing staging models `stg_jira__team` and `stg_jira__team_tmp`.
-- Enhanced issue field history models to include team information by joining with team data when the field type is 'team'.
-- Added team column to the `jira__daily_issue_field_history` model to track team assignments over time.
-- Added team column to the `jira__issue_enhanced` model to provide current team assignment for each issue.
+- Enhanced issue field history models to include team information if teams are enabled for the customer.
+  - When teams are enabled, team data will populate in the `jira__daily_issue_field_history` model to track team assignments over time and the `jira__issue_enhanced` model to provide current team assignment for each issue.
 
 ## Under the Hood
 - Added new seed file `team.csv` for integration testing.
