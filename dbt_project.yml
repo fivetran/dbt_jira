@@ -21,6 +21,7 @@ vars:
     field: "{{ source('jira', 'field') }}"
     field_option: "{{ source('jira', 'field_option') }}"
     sprint: "{{ source('jira', 'sprint') }}"
+    team: "{{ source('jira', 'team') }}"
     version: "{{ source('jira', 'version') }}"
     jira_issue_history_buffer: 1
 

@@ -1,19 +1,29 @@
 # dbt_jira v1.1.0
 
-## Schema Updates
+## Schema/Data Change
+**8 total changes • 6 possible breaking changes**
 
-**6 total changes • 4 possible breaking changes**
-
-| Data Model                                    | Change Type | Old  | New                               | Notes                                                             |
-|---------------------------------------------------|-------------|----------|-------------------------------------------|-------------------------------------------------------------------|
+| Data Model(s) | Change type | Old | New | Notes |
+| ---------- | ----------- | -------- | -------- | ----- |
+| [stg_jira__team_tmp](https://fivetran.github.io/dbt_jira/#!/model/model.jira.stg_jira__team) | New Model |  |  | Added temp model as Jira teams source. |
+| [stg_jira__team](https://fivetran.github.io/dbt_jira/#!/model/model.jira.stg_jira__team) |New Model |  |  | Added staging model for Jira teams functionality
 | [jira__timestamp_issue_field_history](https://fivetran.github.io/dbt_jira/#!/model/model.jira.jira__timestamp_issue_field_history)       | New Model   |     |  | SCD Type 2 table tracking field changes at timestamp level with validity periods. Each record shows complete field state during a time period with `valid_from`/`valid_until` timestamps. |
 | [int_jira__pivot_timestamp_field_history](https://fivetran.github.io/dbt_jira/#!/model/model.jira.int_jira__pivot_timestamp_field_history)  | New Model   |          |    | Pivots field history into columns at timestamp level, capturing ALL field changes rather than daily snapshots. |
 | [int_jira__timestamp_field_history_scd](https://fivetran.github.io/dbt_jira/#!/model/model.jira.int_jira__timestamp_field_history_scd)        | New Model   |          |    | SCD logic that backfills field values at timestamp level, showing complete field state at each update timestamp. |
 | [stg_jira__issue_field_history](https://fivetran.github.io/dbt_jira_source/#!/model/model.jira_source.stg_jira__issue_field_history)        | New Column   |          |  `author_id`    |    Tracks which user made each field change for audit trail and change attribution.     |
 | [stg_jira__issue_multiselect_history](https://fivetran.github.io/dbt_jira_source/#!/model/model.jira_source.stg_jira__issue_multiselect_history)        | New Column   |          |  `author_id`    |    Tracks which user made each multiselect field change for audit trail and change attribution.       |
 | [jira__timestamp_issue_field_history](https://fivetran.github.io/dbt_jira/#!/model/model.jira.jira__timestamp_issue_field_history)        | New Columns   |          |  `author_id`, `status_id`, `is_current_record` |    Adds user attribution, raw status ID alongside resolved status name, and current record indicator for SCD Type 2 functionality.    | 
- 
 
+## Feature Update
+- Added support for Jira teams functionality by introducing staging models `stg_jira__team` and `stg_jira__team_tmp`.
+- Enhanced issue field history models to include team information if teams are enabled for the customer.
+  - When teams are enabled, team data will populate in the `jira__daily_issue_field_history` model to track team assignments over time and the `jira__issue_enhanced` model to provide current team assignment for each issue.
+
+## Under the Hood
+- Added new seed file `team.csv` for integration testing.
+- Added team-related test data to `issue.csv`, `issue_field_history.csv`, and `field.csv` seed files.
+- Created `get_team_columns` macro for consistent team column definitions.
+- Updated package variables to include team source reference and team identifier configuration.
 
 # dbt_jira v1.0.0
 
