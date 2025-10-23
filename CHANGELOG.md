@@ -1,12 +1,12 @@
 # dbt_jira v1.1.0
 
 ## Schema/Data Change
-**9 total changes • 7 possible breaking changes**
+**8 total changes • 6 possible breaking changes**
 
 | Data Model(s) | Change type | Old | New | Notes |
 | ---------- | ----------- | -------- | -------- | ----- |
-| [stg_jira__team_tmp](https://fivetran.github.io/dbt_jira/#!/model/model.jira.stg_jira__team) | New Model | N/A | New tmp model | Added temp model as Jira teams source. |
-| [stg_jira__team](https://fivetran.github.io/dbt_jira/#!/model/model.jira.stg_jira__team) |New Model | N/A | New staging model | Added staging model for Jira teams functionality
+| [stg_jira__team_tmp](https://fivetran.github.io/dbt_jira/#!/model/model.jira.stg_jira__team) | New Model |  |  | Added temp model as Jira teams source. |
+| [stg_jira__team](https://fivetran.github.io/dbt_jira/#!/model/model.jira.stg_jira__team) |New Model |  |  | Added staging model for Jira teams functionality
 | [jira__timestamp_issue_field_history](https://fivetran.github.io/dbt_jira/#!/model/model.jira.jira__timestamp_issue_field_history)       | New Model   |     |  | SCD Type 2 table tracking field changes at timestamp level with validity periods. Each record shows complete field state during a time period with `valid_from`/`valid_until` timestamps. |
 | [int_jira__pivot_timestamp_field_history](https://fivetran.github.io/dbt_jira/#!/model/model.jira.int_jira__pivot_timestamp_field_history)  | New Model   |          |    | Pivots field history into columns at timestamp level, capturing ALL field changes rather than daily snapshots. |
 | [int_jira__timestamp_field_history_scd](https://fivetran.github.io/dbt_jira/#!/model/model.jira.int_jira__timestamp_field_history_scd)        | New Model   |          |    | SCD logic that backfills field values at timestamp level, showing complete field state at each update timestamp. |
