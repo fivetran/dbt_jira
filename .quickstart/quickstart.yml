@@ -12,6 +12,8 @@ table_variables:
     - version
   jira_using_priorities:
     - priority
+  jira_using_teams:
+    - team
 
 destination_configurations:
   databricks:
