@@ -1,3 +1,5 @@
+{{ config(materialized='table') }}
+
 with issue_field_history as (
 
     select *

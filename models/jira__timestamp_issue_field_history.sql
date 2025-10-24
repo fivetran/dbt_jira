@@ -1,5 +1,6 @@
 -- grab column names that were pivoted out
 {% set pivot_data_columns = adapter.get_columns_in_relation(ref('int_jira__timestamp_field_history_scd')) %}
+{% set issue_field_history_columns = var('issue_field_history_columns', []) %}
 
 with timestamp_history_scd as (
 
@@ -11,6 +12,12 @@ statuses as (
 
     select *
     from {{ ref('stg_jira__status') }}
+),
+
+status_categories as (
+
+    select *
+    from {{ ref('stg_jira__status_category') }}
 ),
 
 issue_types as (
@@ -80,6 +87,7 @@ final as (
         create_validity_periods.issue_id,
         create_validity_periods.status_id,
         statuses.status_name as status,
+        status_categories.status_category_name,
         create_validity_periods.author_id
 
         -- list of exception columns
@@ -112,6 +120,9 @@ final as (
 
     left join statuses
         on cast(statuses.status_id as {{ dbt.type_string() }}) = create_validity_periods.status_id
+
+    left join status_categories
+        on statuses.status_category_id = status_categories.status_category_id
 
     {% for col in pivot_data_columns %}
         {% if col.name|lower == 'components' and var('jira_using_components', True) %}
