@@ -1,7 +1,6 @@
 # dbt_jira v1.1.0
 
 ## Schema/Data Change
-
 **8 total changes • 6 possible breaking changes**
 
 | Data Model(s) | Change type | Old | New | Notes |
