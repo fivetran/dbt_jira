@@ -46,6 +46,14 @@ users as (
     from {{ ref('stg_jira__user') }}
 ),
 
+{% if var('jira_using_teams', True) %}
+teams as (
+
+    select *
+    from {{ ref('stg_jira__team') }}
+),
+{% endif %}
+
 field_option as (
 
     select *
@@ -67,7 +75,7 @@ create_validity_periods as (
         author_id
 
         -- list of exception columns
-        {% set exception_cols = ['issue_id', 'issue_timestamp_id', 'updated_at', 'updated_at_week', 'status', 'author_id', 'components', 'issue_type'] %}
+        {% set exception_cols = ['issue_id', 'issue_timestamp_id', 'updated_at', 'updated_at_week', 'status', 'author_id', 'issue_type'] %}
 
         {% for col in pivot_data_columns %}
             {% if col.name|lower not in exception_cols %}
@@ -91,8 +99,8 @@ final as (
         create_validity_periods.author_id
 
         -- list of exception columns
-        {% set exception_cols = ['issue_id', 'issue_timestamp_id', 'updated_at', 'updated_at_week', 'status', 'author_id', 'components', 'issue_type', 'project', 'assignee'] %}
-
+        {% set exception_cols = ['issue_id', 'issue_timestamp_id', 'updated_at', 'updated_at_week', 'status', 'author_id', 'components', 'issue_type', 'project', 'assignee', 'team'] %}
+  
         {% for col in pivot_data_columns %}
             {% if col.name|lower == 'components' and var('jira_using_components', True) %}
             , coalesce(components.component_name, create_validity_periods.components) as components
@@ -105,6 +113,9 @@ final as (
 
             {% elif col.name|lower == 'assignee' %}
             , coalesce(users.user_display_name, create_validity_periods.assignee) as assignee
+
+            {% elif col.name|lower == 'team' and var('jira_using_teams', True) %}
+            , coalesce(teams.team_name, create_validity_periods.team) as team
 
             {% elif col.name|lower not in exception_cols %}
             , coalesce(field_option_{{ col.name }}.field_option_name, create_validity_periods.{{ col.name }}) as {{ col.name }}
@@ -140,6 +151,10 @@ final as (
         {% elif col.name|lower == 'assignee' %}
         left join users
             on cast(users.user_id as {{ dbt.type_string() }}) = create_validity_periods.assignee
+  
+        {% elif col.name|lower == 'team' and var('jira_using_teams', True) %}
+        left join teams
+            on cast(teams.team_id as {{ dbt.type_string() }}) = create_validity_periods.team
 
         {% elif col.name|lower not in exception_cols %}
         left join field_option as field_option_{{ col.name }}
