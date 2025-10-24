@@ -4,7 +4,6 @@ config-version: 2
 profile: 'integration_tests'
 
 vars:
-
   # Comment out the below when generating docs
   issue_field_history_columns: ['summary', 'components','team' ,'project']  # @docs-ignore
 
