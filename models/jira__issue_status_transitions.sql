@@ -1,5 +1,3 @@
-{{ config(materialized='table') }}
-
 -- Issue status transitions tracking for workflow analysis
 -- Grain: One row per status transition (issue_id + status + transition sequence)
 -- Captures clean status change history with previous status context
@@ -87,20 +85,12 @@ final as (
     is_current_status, 
 
     -- Time spent in current status
-    round(seconds_in_status / 86400.0, 2) as days_in_status,
-    round(seconds_in_status / 3600.0, 2) as hours_in_status,
+    round(seconds_in_status / 60.0, 0) as minutes_in_status,
 
     -- Time spent in previous status (when transitioning)
     case when seconds_in_previous_status is not null
-      then round(seconds_in_previous_status / 86400.0, 2)
-      else null end as days_in_previous_status,
-    case when seconds_in_previous_status is not null
-      then round(seconds_in_previous_status / 3600.0, 2)
-      else null end as hours_in_previous_status,
-
-    -- Transition type indicators
-    case when status_sequence = 1 then 1 else 0 end as is_first_status,
-    case when previous_status is null then 1 else 0 end as is_initial_transition,
+      then round(seconds_in_previous_status / 60.0, 0)
+      else null end as minutes_in_previous_status,
 
     -- Workflow direction indicators
     case
@@ -116,12 +106,10 @@ final as (
     end as transition_direction,
 
     -- Key lifecycle transitions
+    case when previous_status_category_name is null and status_category_name = 'To Do' then 1 else 0 end as added_work,
     case when previous_status_category_name != 'In Progress' and status_category_name = 'In Progress' then 1 else 0 end as started_work,
     case when previous_status_category_name != 'Done' and status_category_name = 'Done' then 1 else 0 end as completed_work,
-    case when previous_status_category_name = 'Done' and status_category_name != 'Done' then 1 else 0 end as reopened_work,
-
-    -- Category transition tracking
-    case when previous_status_category_name != status_category_name or previous_status_category_name is null then 1 else 0 end as category_changed,
+    case when previous_status_category_name = 'Done' and status_category_name != 'Done' then 1 else 0 end as reopened_work
 
   from status_transitions
 )
