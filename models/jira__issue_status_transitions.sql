@@ -116,4 +116,3 @@ final as (
 
 select * 
 from final
-order by issue_id, status_sequence
