@@ -35,7 +35,7 @@ issue_status_history as (
     case when lead(valid_from) over (partition by issue_id order by valid_from) is null then true else false end as is_current_status,
 
     -- Calculate seconds in each status period using recalculated valid_until
-    {{ dbt.datediff('valid_from', 'coalesce(lead(valid_from) over (partition by issue_id order by valid_from), ' ~ dbt.current_timestamp() ~ ')', 'second') }} as seconds_in_status
+    cast({{ dbt.datediff('valid_from', 'coalesce(lead(valid_from) over (partition by issue_id order by valid_from), ' ~ dbt.current_timestamp() ~ ')', 'second') }} as {{ dbt.type_int() }}) as seconds_in_status
 
   from status_changes_only
   where
@@ -85,11 +85,11 @@ final as (
     is_current_status, 
 
     -- Time spent in current status
-    round(seconds_in_status / 60.0, 0) as minutes_in_status,
+    round(cast(seconds_in_status as {{ dbt.type_numeric() }}) / 60, 2) as minutes_in_status,
 
     -- Time spent in previous status (when transitioning)
     case when seconds_in_previous_status is not null
-      then round(seconds_in_previous_status / 60.0, 0)
+      then round(cast(seconds_in_previous_status as {{ dbt.type_numeric() }}) / 60, 2)
       else null end as minutes_in_previous_status,
 
     -- Workflow direction indicators
