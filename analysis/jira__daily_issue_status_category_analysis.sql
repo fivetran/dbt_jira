@@ -14,11 +14,11 @@ status_transitions as (
 
 ---if you prefer to keep anayltics at the status level,substitute 'status' for 'status_category' throughout this model
 joined as (
-  select 
+    select 
     transitions.transition_at,
     transitions.issue_id,
     transitions.status_category_name,
-    transitions.days_in_status,
+    transitions.minutes_in_status / 1440.0 as days_in_status,
     transitions.started_work,
     transitions.completed_work,
     transitions.reopened_work,
@@ -31,6 +31,7 @@ joined as (
         on transitions.issue_id = field_history.issue_id
         and transitions.transition_at = field_history.valid_from
 ),
+
 
 daily_rollup as (
  select
