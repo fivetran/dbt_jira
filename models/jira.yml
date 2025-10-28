@@ -416,4 +416,83 @@ models:
         description: The median age of a user's currently open issues.
       - name: is_active
         description: Boolean showing whether this user is currently active.
-      
+
+  - name: jira__lead_cycle_time
+    description: >
+      Each record represents time spent by an issue in a specific status, with aggregated cycle and lead time metrics.
+      This model provides the foundation for cycle time, lead time, and bottleneck analysis. The grain is
+      issue_id + status, with time aggregated for each combination.
+    columns:
+      - name: issue_id
+        description: Foreign key referencing the ID of the issue.
+      - name: status
+        description: The status name that the issue was in during this period.
+      - name: total_seconds_in_status
+        description: Total time spent in this status (in seconds).
+      - name: total_hours_in_status
+        description: Total time spent in this status (in hours).
+      - name: total_days_in_status
+        description: Total time spent in this status (in days).
+      - name: first_time_in_status
+        description: Timestamp when the issue first entered this status.
+      - name: last_time_in_status
+        description: Timestamp when the issue last exited this status.
+      - name: times_in_this_status
+        description: Number of times the issue visited this status.
+      - name: issue_created_at
+        description: Timestamp when the issue was first created.
+      - name: issue_completed_at
+        description: Timestamp when the issue was completed (moved to done status).
+      - name: is_open_issue
+        description: Boolean indicating if the issue is currently open.
+      - name: cycle_time_days
+        description: Total cycle time for the issue (time in configured cycle statuses) in days.
+      - name: cycle_time_hours
+        description: Total cycle time for the issue (time in configured cycle statuses) in hours.
+      - name: lead_time_days
+        description: Total lead time for the issue (creation to completion) in days.
+      - name: lead_time_hours
+        description: Total lead time for the issue (creation to completion) in hours.
+
+  - name: jira__issue_status_transitions
+    description: >
+      Each record represents a status transition for an issue, tracking the complete workflow journey
+      with timing metrics and transition analysis. The grain is issue_id + status_sequence, providing
+      a chronological view of how issues move through different statuses over time.
+    columns:
+      - name: issue_id
+        description: Foreign key referencing the ID of the issue.
+        tests:
+          - not_null
+      - name: status
+        description: The status name during this transition period.
+      - name: status_category_name
+        description: The category of the status (To Do, In Progress, Done).
+      - name: previous_status
+        description: The status the issue transitioned from (null for initial status).
+      - name: previous_status_category_name
+        description: The category of the previous status.
+      - name: transition_at
+        description: Timestamp when the issue transitioned to this status.
+      - name: transition_until
+        description: Timestamp when the issue transitioned out of this status (or current time if still in status).
+      - name: status_sequence
+        description: Sequential number indicating the order of status transitions (1 = first, incrementing chronologically).
+      - name: is_current_status
+        description: Boolean indicating if this is the current active status for the issue.
+      - name: minutes_in_status
+        description: Time spent in this status, measured in minutes.
+      - name: minutes_in_previous_status
+        description: Time spent in the previous status before this transition, measured in minutes (null for initial status).
+      - name: transition_direction
+        description: >
+          Categorizes the workflow direction: 'new' (initial), 'forward' (toward completion),
+          'backward' (reopening/regression), 'lateral' (within same category), or 'other'.
+      - name: added_work
+        description: Boolean indicating if this transition represents new work being added (null -> To Do).
+      - name: started_work
+        description: Boolean indicating if this transition represents work starting (any status -> In Progress).
+      - name: completed_work
+        description: Boolean indicating if this transition represents work completion (any status -> Done).
+      - name: reopened_work
+        description: Boolean indicating if this transition represents work being reopened (Done -> any other status).

@@ -1,5 +1,14 @@
--- grab column names that were pivoted out
-{% set pivot_data_columns = adapter.get_columns_in_relation(ref('int_jira__timestamp_field_history_scd')) %}
+-- Define columns that were pivoted out
+{%- set base_columns = ['updated_at', 'issue_id', 'updated_at_week', 'status', 'author_id', 'sprint', 'story_points', 'story_point_estimate'] -%}
+{%- set custom_columns = [] -%}
+{%- for col in var('issue_field_history_columns', []) -%}
+    {%- if col|lower not in ['story points', 'story point estimate'] -%}
+        {%- set clean_col = dbt_utils.slugify(col) | replace(' ', '_') | lower -%}
+        {%- set _ = custom_columns.append(clean_col) -%}
+    {%- endif -%}
+{%- endfor -%}
+{%- set all_columns = base_columns + custom_columns -%}
+{% set issue_field_history_columns = var('issue_field_history_columns', []) %}
 
 with timestamp_history_scd as (
 
@@ -11,6 +20,12 @@ statuses as (
 
     select *
     from {{ ref('stg_jira__status') }}
+),
+
+status_categories as (
+
+    select *
+    from {{ ref('stg_jira__status_category') }}
 ),
 
 issue_types as (
@@ -26,6 +41,18 @@ components as (
     from {{ ref('stg_jira__component') }}
 ),
 {% endif %}
+
+projects as (
+
+    select *
+    from {{ ref('stg_jira__project') }}
+),
+
+users as (
+
+    select *
+    from {{ ref('stg_jira__user') }}
+),
 
 {% if var('jira_using_teams', True) %}
 teams as (
@@ -58,9 +85,9 @@ create_validity_periods as (
         -- list of exception columns
         {% set exception_cols = ['issue_id', 'issue_timestamp_id', 'updated_at', 'updated_at_week', 'status', 'author_id', 'issue_type'] %}
 
-        {% for col in pivot_data_columns %}
-            {% if col.name|lower not in exception_cols %}
-            , {{ col.name }}
+        {% for col in all_columns %}
+            {% if col|lower not in exception_cols %}
+            , {{ col }}
             {% endif %}
         {% endfor %}
 
@@ -76,23 +103,30 @@ final as (
         create_validity_periods.issue_id,
         create_validity_periods.status_id,
         statuses.status_name as status,
+        status_categories.status_category_name,
         create_validity_periods.author_id
 
         -- list of exception columns
-        {% set exception_cols = ['issue_id', 'issue_timestamp_id', 'updated_at', 'updated_at_week', 'status', 'author_id', 'components', 'issue_type', 'team'] %}
+        {% set exception_cols = ['issue_id', 'issue_timestamp_id', 'updated_at', 'updated_at_week', 'status', 'author_id', 'components', 'issue_type', 'project', 'assignee', 'team'] %}
 
-        {% for col in pivot_data_columns %}
-            {% if col.name|lower == 'components' and var('jira_using_components', True) %}
+        {% for col in all_columns %}
+            {% if col|lower == 'components' and var('jira_using_components', True) %}
             , coalesce(components.component_name, create_validity_periods.components) as components
 
-            {% elif col.name|lower == 'issue_type' %}
+            {% elif col|lower == 'issue_type' %}
             , coalesce(issue_types.issue_type_name, create_validity_periods.issue_type) as issue_type
 
-            {% elif col.name|lower == 'team' and var('jira_using_teams', True) %}
+            {% elif col|lower == 'project' %}
+            , coalesce(projects.project_name, create_validity_periods.project) as project
+
+            {% elif col|lower == 'assignee' %}
+            , coalesce(users.user_display_name, create_validity_periods.assignee) as assignee
+
+            {% elif col|lower == 'team' and var('jira_using_teams', True) %}
             , coalesce(teams.team_name, create_validity_periods.team) as team
 
-            {% elif col.name|lower not in exception_cols %}
-            , coalesce(field_option_{{ col.name }}.field_option_name, create_validity_periods.{{ col.name }}) as {{ col.name }}
+            {% elif col|lower not in exception_cols %}
+            , coalesce(field_option_{{ col }}.field_option_name, create_validity_periods.{{ col }}) as {{ col }}
 
             {% endif %}
         {% endfor %}
@@ -106,22 +140,33 @@ final as (
     left join statuses
         on cast(statuses.status_id as {{ dbt.type_string() }}) = create_validity_periods.status_id
 
-    {% for col in pivot_data_columns %}
-        {% if col.name|lower == 'components' and var('jira_using_components', True) %}
+    left join status_categories
+        on statuses.status_category_id = status_categories.status_category_id
+
+    {% for col in all_columns %}
+        {% if col|lower == 'components' and var('jira_using_components', True) %}
         left join components
             on cast(components.component_id as {{ dbt.type_string() }}) = create_validity_periods.components
 
-        {% elif col.name|lower == 'issue_type' %}
+        {% elif col|lower == 'issue_type' %}
         left join issue_types
             on cast(issue_types.issue_type_id as {{ dbt.type_string() }}) = create_validity_periods.issue_type
 
-        {% elif col.name|lower == 'team' and var('jira_using_teams', True) %}
+        {% elif col|lower == 'project' %}
+        left join projects
+            on cast(projects.project_id as {{ dbt.type_string() }}) = create_validity_periods.project
+
+        {% elif col|lower == 'assignee' %}
+        left join users
+            on cast(users.user_id as {{ dbt.type_string() }}) = create_validity_periods.assignee
+
+        {% elif col|lower == 'team' and var('jira_using_teams', True) %}
         left join teams
             on cast(teams.team_id as {{ dbt.type_string() }}) = create_validity_periods.team
 
-        {% elif col.name|lower not in exception_cols %}
-        left join field_option as field_option_{{ col.name }}
-            on cast(field_option_{{ col.name }}.field_id as {{ dbt.type_string() }}) = create_validity_periods.{{ col.name }}
+        {% elif col|lower not in exception_cols %}
+        left join field_option as field_option_{{ col }}
+            on cast(field_option_{{ col }}.field_id as {{ dbt.type_string() }}) = create_validity_periods.{{ col }}
 
         {% endif %}
     {% endfor %}

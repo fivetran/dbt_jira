@@ -25,6 +25,7 @@ vars:
     version: "{{ source('jira', 'version') }}"
     jira_issue_history_buffer: 1
 
+
 models:
   jira:
     +materialized: table
