@@ -19,7 +19,7 @@ compile the sql, you will perform the following steps:
 - Navigate to your project's `/target/compiled/jira/analysis` directory.
 - Copy the `jira__daily_issue_status_category_analysis` code and run in your data warehouse.
 - Confirm the issue status category metrics match your expected workflow patterns.
-- Analyze the daily counts, rolling averages, and completion metrics to identify trends and bottlenecks in your development process.
+- Analyze the daily counts, cumulative flow, and completion metrics to identify trends and bottlenecks in your development process.
 
 
 ## Contributions

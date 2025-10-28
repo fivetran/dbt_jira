@@ -32,7 +32,7 @@ joined as (
         and transitions.transition_at = field_history.valid_from
 ),
 
-
+---roll up to daily for reporing
 daily_rollup as (
  select
     cast(transition_at as date) as status_category_date,
@@ -47,5 +47,20 @@ daily_rollup as (
  from joined
     group by 1,2,3,4
 )
-
-select * from daily_rollup
+--add cumuliative flow calculation
+select
+  status_category_date,
+  project,
+  team,
+  status_category,
+  issues_in_status_category,
+  sum(issues_in_status_category) over (
+    partition by project, team, status_category
+    order by status_category_date
+    rows unbounded preceding
+  ) as cumulative_issues_in_status_category,
+  avg_days_in_status_category,
+  issues_started_work,
+  issues_completed_work,
+  issues_reopened_work
+from daily_rollup
