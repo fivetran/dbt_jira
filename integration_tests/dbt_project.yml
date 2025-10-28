@@ -5,10 +5,9 @@ profile: 'integration_tests'
 
 
 vars:
-  jira_using_components: false
 
  # Comment out the below when generating docs
-  issue_field_history_columns: ['summary', 'components','team' ,'project']  # @docs-ignore
+  issue_field_history_columns: ['summary', 'components', 'team' ,'project']  # @docs-ignore
 
   jira:
     jira_schema: jira_integrations_tests_42

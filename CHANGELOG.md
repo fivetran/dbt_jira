@@ -24,7 +24,8 @@
 - Added team-related test data to `issue.csv`, `issue_field_history.csv`, and `field.csv` seed files.
 - Created `get_team_columns` macro for consistent team column definitions.
 - Updated package variables to include team source reference and team identifier configuration.
-- Created consistency tests for new end models. 
+- Created consistency tests for new end models.
+- Created new analysis folder with `jira__issue_cumulative_flow_analysis` model. See analysis [README.md](https://github.com/fivetran/dbt_jira/blob/main/analysis/README.md) for more details on how to use this model for your Jira reporting.
 
 # dbt_jira v1.0.0
 

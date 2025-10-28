@@ -1,7 +1,3 @@
--- grab non hard-coded issue_field_history columns
-{% set issue_field_history_columns = var('issue_field_history_columns', []) %}
-
-
 with field_history as (
  select *
  from {{ ref('jira__timestamp_issue_field_history') }}
@@ -12,7 +8,7 @@ status_transitions as (
  from {{ ref('jira__issue_status_transitions') }}
 ),
 
----if you prefer to keep anayltics at the status level,substitute 'status' for 'status_category' throughout this model
+---if you prefer to keep analytics at the status level, substitute 'status' for 'status_category' throughout this model
 joined as (
     select 
     transitions.transition_at,
@@ -32,28 +28,28 @@ joined as (
         and transitions.transition_at = field_history.valid_from
 ),
 
----roll up to daily for reporing
+---roll up to daily for reporting
 daily_rollup as (
  select
     cast(transition_at as date) as status_category_date,
     project,
     team,
     status_category_name as status_category,
-    count(distinct issue_id) as issues_in_status_category,
+    count(distinct issue_id) as issues_in_new_status_category,
     round(avg(days_in_status),2) as avg_days_in_status_category,
     sum(started_work) as issues_started_work,
     sum(completed_work) as issues_completed_work,
     sum(reopened_work) as issues_reopened_work   
  from joined
-    group by 1,2,3,4
+  group by 1,2,3,4
 )
---add cumuliative flow calculation
+--add cumulative flow calculation
 select
   status_category_date,
   project,
   team,
   status_category,
-  issues_in_status_category,
+  issues_in_new_status_category,
   sum(issues_in_status_category) over (
     partition by project, team, status_category
     order by status_category_date

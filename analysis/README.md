@@ -1,12 +1,12 @@
 # Jira Analysis
-> Note: The compiled sql within the analysis folder references the final model [jira__issue_status_transitions](https://github.com/fivetran/dbt_jira/blob/master/models/jira__issue_status_transitions.sql). As such, prior to
+> Note: The compiled sql within the analysis folder references the final models [jira__issue_status_transitions](https://github.com/fivetran/dbt_jira/blob/master/models/jira__issue_status_transitions.sql) and [jira__timestamp_issue_field_history](https://github.com/fivetran/dbt_jira/blob/master/models/jira__timestamp_issue_field_history). As such, prior to
 compiling the provided sql to analyze issue status category metrics, you must first execute `dbt run`.
 
 
 ## Analysis SQL
 | **sql**                | **description**                                                                                                                                |
 | ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------- |
-| [jira__daily_issue_status_category_analysis](https://github.com/fivetran/dbt_jira/blob/master/analysis/jira__daily_issue_status_category_analysis.sql) | The output of the compiled sql will generate daily metrics for issue status categories by joining status transitions with field history data. The analysis aggregates data by date, project, team, and status category to provide: count of distinct issues in each status category, average days spent in status category, and counts of issues that started work, completed work, or reopened work. The SQL references the `jira__issue_status_transitions` and `jira__timestamp_issue_field_history` models. Aggregation granularity can be adjusted by adding/removing field names in the `issue_field_history_columns` var in your dbt project.yml. `status` can be used in place of `status_category` if desired by modifying the model accordingly. |
+| [jira__issue_cumulative_flow_analysis](https://github.com/fivetran/dbt_jira/blob/master/analysis/jira__issue_cumulative_flow_analysis.sql) | The output of the compiled sql will generate daily metrics for issue status categories by joining status transitions with field history data. The analysis aggregates data by date, project, team, and status category to provide: count of distinct issues transitioning into a new status category, average days spent in status category, and counts of issues that started work, completed work, or reopened work. The SQL references the `jira__issue_status_transitions` and `jira__timestamp_issue_field_history` models. Aggregation granularity can be adjusted by adding/removing field names in the `issue_field_history_columns` var in your dbt project.yml. `status` can be used in place of `status_category` if desired by modifying the model accordingly. |
 
 
 
@@ -17,7 +17,7 @@ compile the sql, you will perform the following steps:
 - Execute `dbt run` to create the package models.
 - Execute `dbt compile` to generate the target specific sql.
 - Navigate to your project's `/target/compiled/jira/analysis` directory.
-- Copy the `jira__daily_issue_status_category_analysis` code and run in your data warehouse.
+- Copy the `jira__issue_cumulative_flow_analysis` code and run in your data warehouse.
 - Confirm the issue status category metrics match your expected workflow patterns.
 - Analyze the daily counts, cumulative flow, and completion metrics to identify trends and bottlenecks in your development process.
 
@@ -29,7 +29,7 @@ Please create issues or open PRs against `master`. Check out [this post](https:/
 
 
 ## Database Support
-This package has been tested on BigQuery, Snowflake and Redshift.
+This package has been tested on BigQuery, Snowflake, Redshift, Postgres, and Databricks.
 
 
 ## Are there any resources available?
