@@ -1,5 +1,3 @@
-{{ config(materialized='ephemeral') }}
-
 {%- set base_columns = ['updated_at', 'issue_id', 'updated_at_week', 'status', 'author_id', 'sprint', 'story_points', 'story_point_estimate'] -%}
 {%- set custom_columns = [] -%}
 {%- for col in var('issue_field_history_columns', []) -%}

@@ -1,5 +1,3 @@
-{{ config(materialized='ephemeral') }}
-
 with issue_field_history as (
 
     select *

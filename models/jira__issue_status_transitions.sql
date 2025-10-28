@@ -1,8 +1,3 @@
--- Issue status transitions tracking for workflow analysis
--- Grain: One row per status transition (issue_id + status + transition sequence)
--- Captures clean status change history with previous status context
-
--- Filter to only actual status changes to avoid duplicate rows
 with status_changes_only as (
 
   select
@@ -38,10 +33,8 @@ issue_status_history as (
     cast({{ dbt.datediff('valid_from', 'coalesce(lead(valid_from) over (partition by issue_id order by valid_from), ' ~ dbt.current_timestamp() ~ ')', 'second') }} as {{ dbt.type_int() }}) as seconds_in_status
 
   from status_changes_only
-  where
-    -- Keep first record (no previous status) OR actual status changes
-    previous_status is null
-    or previous_status != status
+  -- Keep first record (no previous status) OR actual status changes
+  where previous_status is null or previous_status != status
 ),
 
 -- Add sequence and transition tracking

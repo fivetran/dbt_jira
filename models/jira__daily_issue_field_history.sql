@@ -124,7 +124,7 @@ joined as (
 
                 {% elif col.name|lower == 'team' and var('jira_using_teams', True) %} 
                 , pivoted_daily_history.team
-  
+
                 {% elif col.name|lower not in ['issue_day_id', 'issue_id', 'valid_starting_on', 'valid_starting_at_week', 'components','team'] %} 
                 , pivoted_daily_history.{{ col.name }}
 
@@ -204,8 +204,8 @@ set_values as (
         {% elif col.name|lower == 'assignee' %}
         left join users
             on cast(users.user_id as {{ dbt.type_string() }}) = joined.assignee
-  
-        {% elif col.name|lower == 'team'and var('jira_using_teams', True) %} 
+
+        {% elif col.name|lower == 'team' and var('jira_using_teams', True) %} 
         left join teams 
             on cast(teams.team_id as {{ dbt.type_string() }}) = joined.team
 
