@@ -19,6 +19,8 @@
   - When teams are enabled, team data will populate in the `jira__daily_issue_field_history` model to track team assignments over time and the `jira__issue_enhanced` model to provide current team assignment for each issue.
 
 ## Under the Hood
+- Introduced relevant team related seed data, macros, and variables to ensure team support.
+- Created new analysis folder with `jira__issue_transition_cumulative_flow_analysis` and `jira_daily_issue_status_category_analysis` models. See the analysis [README.md](https://github.com/fivetran/dbt_jira/blob/main/analysis/README.md) for more details on how to use these models for your Jira reporting.
 - Created new ephemeral intermediate models that perform necessary operations to build the new `jira__timestamp_issue_field_history` models.
   - `int_jira__pivot_timestamp_field_history`: Table pivoting out the fields in field history into columns at the timestamp level to capture all field changes rather than just daily snapshots. 
   - `int_jira__timestamp_field_history_scd`: Slowly-changing-dimension model that backfills field values at the timestamp level.

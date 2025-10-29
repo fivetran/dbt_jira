@@ -3,9 +3,10 @@ version: '1.1.0'
 config-version: 2
 profile: 'integration_tests'
 
-vars: 
-  # Comment out the below when generating docs
-  issue_field_history_columns: ['summary', 'components', 'team'] # @docs-ignore
+
+vars:
+ # Comment out the below when generating docs
+  issue_field_history_columns: ['summary', 'components', 'team' ,'project']  # @docs-ignore
 
   jira:
     jira_schema: jira_integrations_tests_42
@@ -31,6 +32,7 @@ vars:
     jira_user_identifier: "user"
     jira_version_identifier: "version"
     jira_team_identifier: "team"
+
 
 models:
   jira:
