@@ -89,13 +89,14 @@ vars:
 ```
 
 ### Step 4: Disable models for non-existent sources
-Your Jira connection may not sync every table that this package expects. If you do not have the `SPRINT`, `COMPONENT`, or `VERSION` tables synced, add the respective variables to your root `dbt_project.yml` file. Additionally, if you want to remove comment aggregations from your `jira__issue_enhanced` model,  add the `jira_include_comments` variable to your root `dbt_project.yml`:
+Your Jira connection may not sync every table that this package expects. If you do not have the `SPRINT`, `COMPONENT`, `VERSION`, `PRIORITY` or `TEAM` tables synced, add the respective variables to your root `dbt_project.yml` file. Additionally, if you want to remove comment aggregations from your `jira__issue_enhanced` model,  add the `jira_include_comments` variable to your root `dbt_project.yml`:
 ```yml
 vars:
     jira_using_sprints: false    # Enabled by default. Disable if you do not have the sprint table or do not want sprint-related metrics reported.
     jira_using_components: false # Enabled by default. Disable if you do not have the component table or do not want component-related metrics reported.
     jira_using_versions: false   # Enabled by default. Disable if you do not have the versions table or do not want versions-related metrics reported.
     jira_using_priorities: false # Enabled by default. Disable if you are not using priorities in Jira.
+    jira_using_teams: false # Enabled by default. Disable if you are not using teams in Jira.
     jira_include_comments: false # Enabled by default. Disabling will remove the aggregation of comments via the `count_comments` and `conversations` columns in the `jira__issue_enhanced` table.
 ```
 
@@ -117,7 +118,7 @@ vars:
 ```
 
 #### Define daily issue field history columns
-The `jira__daily_issue_field_history` model generates historical data for the columns specified by the `som` variable. By default, the only columns tracked are `status`, `status_id`,`sprint`, `story_points` and `story_point_estimate`, but all fields found in the Jira `FIELD` table's `field_name` column can be included in this model. The most recent value of any tracked column is also captured in `jira__issue_enhanced`.
+The `jira__daily_issue_field_history` model generates historical data for the columns specified by the `issue_field_history_columns` variable. By default, the only columns tracked are `status`, `status_id`,`sprint`, `story_points` and `story_point_estimate`, but all fields found in the Jira `FIELD` table's `field_name` column can be included in this model. The most recent value of any tracked column is also captured in `jira__issue_enhanced`.
 
 If you would like to change these columns, add the following configuration to your `dbt_project.yml` file. After adding the columns to your `dbt_project.yml` file, run the `dbt run --full-refresh` command to fully refresh any existing models:
 

@@ -2,7 +2,6 @@ with issue_field_history as (
 
     select *
     from {{ ref('int_jira__issue_field_history') }}
-
 ),
 
 issue_multiselect_history as (
@@ -54,10 +53,9 @@ limit_to_relevant_fields as (
         combine_field_history.*
     from combine_field_history
     where lower(field_id) = 'status'
-        or lower(field_name) in ('sprint', 'story points', 'story point estimate'
         {%- for col in var('issue_field_history_columns', []) -%}
-            ,'{{ (col|lower) }}'
-        {%- endfor -%} )
+        or lower(field_name) = '{{ (col|lower) }}'
+        {%- endfor -%}
 ),
 
 int_jira__timestamp_field_history as (
@@ -79,16 +77,11 @@ final as (
         issue_id,
         cast({{ dbt.date_trunc('week', 'updated_at') }} as date) as updated_at_week,
         author_id,
-        max(case when lower(field_id) = 'status' then field_value end) as status,
-        max(case when lower(field_name) = 'sprint' then field_value end) as sprint,
-        max(case when lower(field_name) = 'story points' then field_value end) as story_points,
-        max(case when lower(field_name) = 'story point estimate' then field_value end) as story_point_estimate
+        max(case when lower(field_id) = 'status' then field_value end) as status
 
         {% for col in var('issue_field_history_columns', []) -%}
-        {% if col|lower not in ['story points', 'story point estimate'] %}
-            , max(case when lower(field_name) = '{{ col|lower }}' then field_value end)
+        , max(case when lower(field_name) = '{{ col|lower }}' then field_value end)
             as {{ dbt_utils.slugify(col) | replace(' ', '_') | lower }}
-        {% endif %}
         {% endfor -%}
 
     from int_jira__timestamp_field_history

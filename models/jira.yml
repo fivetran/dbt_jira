@@ -417,43 +417,6 @@ models:
       - name: is_active
         description: Boolean showing whether this user is currently active.
 
-  - name: jira__lead_cycle_time
-    description: >
-      Each record represents time spent by an issue in a specific status, with aggregated cycle and lead time metrics.
-      This model provides the foundation for cycle time, lead time, and bottleneck analysis. The grain is
-      issue_id + status, with time aggregated for each combination.
-    columns:
-      - name: issue_id
-        description: Foreign key referencing the ID of the issue.
-      - name: status
-        description: The status name that the issue was in during this period.
-      - name: total_seconds_in_status
-        description: Total time spent in this status (in seconds).
-      - name: total_hours_in_status
-        description: Total time spent in this status (in hours).
-      - name: total_days_in_status
-        description: Total time spent in this status (in days).
-      - name: first_time_in_status
-        description: Timestamp when the issue first entered this status.
-      - name: last_time_in_status
-        description: Timestamp when the issue last exited this status.
-      - name: times_in_this_status
-        description: Number of times the issue visited this status.
-      - name: issue_created_at
-        description: Timestamp when the issue was first created.
-      - name: issue_completed_at
-        description: Timestamp when the issue was completed (moved to done status).
-      - name: is_open_issue
-        description: Boolean indicating if the issue is currently open.
-      - name: cycle_time_days
-        description: Total cycle time for the issue (time in configured cycle statuses) in days.
-      - name: cycle_time_hours
-        description: Total cycle time for the issue (time in configured cycle statuses) in hours.
-      - name: lead_time_days
-        description: Total lead time for the issue (creation to completion) in days.
-      - name: lead_time_hours
-        description: Total lead time for the issue (creation to completion) in hours.
-
   - name: jira__issue_status_transitions
     description: >
       Each record represents a status transition for an issue, tracking the complete workflow journey

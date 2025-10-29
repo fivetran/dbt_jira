@@ -1,14 +1,10 @@
--- Define columns that were pivoted out
-{%- set base_columns = ['updated_at', 'issue_id', 'updated_at_week', 'status', 'author_id', 'sprint', 'story_points', 'story_point_estimate'] -%}
+{%- set base_columns = ['updated_at', 'issue_id', 'updated_at_week', 'status', 'author_id'] -%}
 {%- set custom_columns = [] -%}
 {%- for col in var('issue_field_history_columns', []) -%}
-    {%- if col|lower not in ['story points', 'story point estimate'] -%}
-        {%- set clean_col = dbt_utils.slugify(col) | replace(' ', '_') | lower -%}
-        {%- set _ = custom_columns.append(clean_col) -%}
-    {%- endif -%}
+    {%- set clean_col = dbt_utils.slugify(col) | replace(' ', '_') | lower -%}
+    {%- set _ = custom_columns.append(clean_col) -%}
 {%- endfor -%}
 {%- set all_columns = base_columns + custom_columns -%}
-{% set issue_field_history_columns = var('issue_field_history_columns', []) %}
 
 with timestamp_history_scd as (
 
@@ -170,7 +166,44 @@ final as (
 
         {% endif %}
     {% endfor %}
+),
+
+fix_null_values as (
+
+    select
+        final.valid_from,
+        final.valid_until,
+        final.updated_at_week,
+        final.issue_id,
+        final.status_id,
+        final.status,
+        final.status_category_name,
+        final.author_id
+
+        {% for col in all_columns %}
+            {% if col|lower == 'components' and var('jira_using_components', True) %}
+            , case when final.components = 'is_null' then null else final.components end as components
+
+            {% elif col|lower == 'project' %}
+            , case when final.project = 'is_null' then null else final.project end as project
+
+            {% elif col|lower == 'assignee' %}
+            , case when final.assignee = 'is_null' then null else final.assignee end as assignee
+
+            {% elif col|lower == 'team' and var('jira_using_teams', True) %}
+            , case when final.team = 'is_null' then null else final.team end as team
+
+            {% elif col|lower not in ['updated_at', 'issue_id', 'updated_at_week', 'status', 'author_id', 'components', 'project', 'assignee', 'team'] %}
+            , case when final.{{ col }} = 'is_null' then null else final.{{ col }} end as {{ col }}
+
+            {% endif %}
+        {% endfor %}
+
+        , final.is_current_record,
+        final.issue_timestamp_id
+
+    from final
 )
 
 select *
-from final
+from fix_null_values

@@ -302,7 +302,6 @@ surrogate_key as (
             {% if col.name|lower == 'components' and var('jira_using_components', True) %}
             , fix_null_values.components as components
 
-
             {% elif col.name|lower == 'project' %}
             , fix_null_values.project as project
 

@@ -499,7 +499,7 @@ models:
 
   - name: int_jira__pivot_timestamp_field_history
     description: >
-      Table pivoting out the fields in field history into columns at the timestamp level, capturing ALL field changes
+      Table pivoting out the fields in field history into columns at the timestamp level, capturing all field changes
       rather than just daily snapshots. Each row represents field updates that occurred at a specific timestamp.
     columns:
       - name: updated_at
