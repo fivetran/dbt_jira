@@ -23,7 +23,7 @@ joined as (
     field_history.team,
     field_history.project
   from status_transitions as transitions
-    join field_history 
+  join field_history 
       on transitions.issue_id = field_history.issue_id
       and transitions.transition_at = field_history.valid_from
 ),
@@ -43,6 +43,7 @@ daily_rollup as (
 
 --add cumulative flow calculation
 cumulative_flow as (
+  
   select
     status_category_transition_date,
     project,
