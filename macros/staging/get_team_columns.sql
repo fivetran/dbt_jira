@@ -6,7 +6,7 @@
     {"name": "is_shared", "datatype": "boolean"},
     {"name": "is_visible", "datatype": "boolean"},
     {"name": "name", "datatype": dbt.type_string()},
-    {"name": "title", "datatype": dbt.type_string()},
+    {"name": "title", "datatype": dbt.type_string()}
 ] %}
 
 {{ return(columns) }}

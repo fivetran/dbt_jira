@@ -1,10 +1,8 @@
-{%- set base_columns = ['updated_at', 'issue_id', 'updated_at_week', 'status', 'author_id', 'sprint', 'story_points', 'story_point_estimate'] -%}
+{%- set base_columns = ['updated_at', 'issue_id', 'updated_at_week', 'status', 'author_id'] -%}
 {%- set custom_columns = [] -%}
 {%- for col in var('issue_field_history_columns', []) -%}
-    {%- if col|lower not in ['story points', 'story point estimate'] -%}
-        {%- set clean_col = dbt_utils.slugify(col) | replace(' ', '_') | lower -%}
-        {%- set _ = custom_columns.append(clean_col) -%}
-    {%- endif -%}
+    {%- set clean_col = dbt_utils.slugify(col) | replace(' ', '_') | lower -%}
+    {%- set _ = custom_columns.append(clean_col) -%}
 {%- endfor -%}
 {%- set all_columns = base_columns + custom_columns -%}
 
@@ -24,12 +22,11 @@ with change_data as (
         sum( case when status is null then 0 else 1 end) over ( partition by issue_id
             order by updated_at rows unbounded preceding) as status_field_partition
 
-        {% for col in all_columns if col not in ['updated_at','issue_id','updated_at_week','status', 'author_id'] %}
+        {% for col in custom_columns %}
         , {{ col }}
         -- create a batch/partition once a new value is provided
         , sum( case when {{ col }} is null then 0 else 1 end) over ( partition by issue_id
             order by updated_at rows unbounded preceding) as {{ col }}_field_partition
-
         {% endfor %}
 
     from change_data
@@ -45,13 +42,11 @@ with change_data as (
             partition by issue_id, status_field_partition
             order by updated_at asc rows between unbounded preceding and current row) as status
 
-        {% for col in all_columns if col not in ['updated_at','issue_id','updated_at_week','status', 'author_id'] %}
-
+        {% for col in custom_columns %}
         -- grab the value that started this batch/partition
         , first_value( {{ col }} ) over (
             partition by issue_id, {{ col }}_field_partition
             order by updated_at asc rows between unbounded preceding and current row) as {{ col }}
-
         {% endfor %}
 
     from set_values
