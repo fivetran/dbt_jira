@@ -96,14 +96,8 @@ final as (
       when previous_status_category_name = 'Done' and status_category_name = 'To Do' then 'backward'
       when previous_status_category_name = status_category_name then 'lateral'
       else 'other'
-    end as transition_direction,
-
-    -- Key lifecycle transitions
-    case when previous_status_category_name is null and status_category_name = 'To Do' then 1 else 0 end as added_work,
-    case when previous_status_category_name != 'In Progress' and status_category_name = 'In Progress' then 1 else 0 end as started_work,
-    case when previous_status_category_name != 'Done' and status_category_name = 'Done' then 1 else 0 end as completed_work,
-    case when previous_status_category_name = 'Done' and status_category_name != 'Done' then 1 else 0 end as reopened_work
-
+    end as transition_direction
+    
   from status_transitions
 )
 
