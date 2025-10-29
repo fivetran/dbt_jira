@@ -38,7 +38,7 @@ daily_rollup as (
     status_category_name as status_category,
     count(distinct issue_id) as issues_in_new_status_category,
   from joined
-    group by 1,2,3,4
+  group by 1,2,3,4
 ),
 
 --add cumulative flow calculation

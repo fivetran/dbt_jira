@@ -2,19 +2,19 @@ with field_history as (
   
   select * 
   from {{ ref('jira__daily_issue_field_history') }} 
-  ), 
+), 
 
 statuses as ( 
 
   select * 
   from {{ ref('stg_jira__status') }} 
-  ), 
+), 
 
 status_category as ( 
 
   select * 
   from {{ ref('stg_jira__status_category') }} 
-  ), 
+), 
 
 status_mapping as ( 
 
@@ -29,7 +29,7 @@ status_mapping as (
     end as status_category_name 
   from statuses left join status_category 
     on statuses.status_category_id = status_category.status_category_id
-    ), 
+), 
 
 --if you prefer to keep analytics at the status level, substitute 'status' for 'status_category' throughout this model and skip the status_mapping step
 daily_issue_status_category as ( 
@@ -45,7 +45,7 @@ daily_issue_status_category as (
   from field_history 
     left join status_mapping 
     on lower(field_history.status) = lower(status_mapping.status_name) 
-    ), 
+), 
 
 --count of issues in each status on report date 
 daily_counts as ( 
@@ -56,8 +56,8 @@ daily_counts as (
     status_category, 
     count(distinct issue_id) as issues_in_status 
   from daily_issue_status_category 
-    group by 1,2,3,4 
-    )
+  group by 1,2,3,4 
+)
 
 select *
 from daily_counts
