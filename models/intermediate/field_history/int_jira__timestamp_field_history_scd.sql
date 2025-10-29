@@ -1,10 +1,8 @@
-{%- set base_columns = ['updated_at', 'issue_id', 'updated_at_week', 'status', 'author_id'] -%}
 {%- set custom_columns = [] -%}
 {%- for col in var('issue_field_history_columns', []) -%}
     {%- set clean_col = dbt_utils.slugify(col) | replace(' ', '_') | lower -%}
-    {%- set _ = custom_columns.append(clean_col) -%}
-{%- endfor -%}
-{%- set all_columns = base_columns + custom_columns -%}
+    {%- do custom_columns.append(clean_col) -%}
+{%- endfor -%} 
 
 with change_data as (
 

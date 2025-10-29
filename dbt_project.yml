@@ -26,11 +26,6 @@ vars:
     jira_issue_history_buffer: 1
 
 analysis-paths: ["analysis"]
-clean-targets:
-  - target
-  - dbt_modules
-  - dbt_packages
-
 
 models:
   jira:
@@ -42,5 +37,3 @@ models:
     staging:
       +materialized: view
       +schema: jira_source
-
-

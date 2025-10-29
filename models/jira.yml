@@ -451,11 +451,3 @@ models:
         description: >
           Categorizes the workflow direction: 'new' (initial), 'forward' (toward completion),
           'backward' (reopening/regression), 'lateral' (within same category), or 'other'.
-      - name: added_work
-        description: Boolean indicating if this transition represents new work being added (null -> To Do).
-      - name: started_work
-        description: Boolean indicating if this transition represents work starting (any status -> In Progress).
-      - name: completed_work
-        description: Boolean indicating if this transition represents work completion (any status -> Done).
-      - name: reopened_work
-        description: Boolean indicating if this transition represents work being reopened (Done -> any other status).

@@ -21,13 +21,4 @@ compile the sql, you will perform the following steps:
 
 ## Contributions
 Don't see a compiled sql statement you would have liked to be included? Notice any bugs when compiling
-and running the analysis sql? If so, we highly encourage and welcome contributions to this package!
-Please create issues or open PRs against `master`. Check out [this post](https://discourse.getdbt.com/t/contributing-to-a-dbt-package/657) on the best workflow for contributing to a package.
-
-## Database Support
-This package has been tested on BigQuery, Snowflake, Redshift, Postgres, and Databricks.
-
-## Are there any resources available?
-- If you have questions or want to reach out for help, see the [GitHub Issue](https://github.com/fivetran/dbt_jira/issues/new/choose) section to find the right avenue of support for you.
-- If you would like to provide feedback to the dbt package team at Fivetran or would like to request a new dbt package, fill out our [Feedback Form](https://www.surveymonkey.com/r/DQ7K7WW).
-
+and running the analysis sql? If so, we highly encourage and welcome contributions to this package! If interested, the best first step is [opening a feature request](https://github.com/fivetran/dbt_jira/issues/new?template=feature-request.yml).
