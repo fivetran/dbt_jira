@@ -62,7 +62,7 @@ sources:
               Unique ID of the field. Default fields will have descriptive IDs, whereas custom
               field IDs will be `'customfield_#####'`.
           - name: is_array
-            description: Boolean that is true if a field can have multiple values (is mulitselect).
+            description: Boolean that is true if a field can have multiple values (is multiselect).
           - name: is_custom
             description: >
               Boolean that is true if the field is custom to this organization, and false if 
@@ -158,6 +158,8 @@ sources:
             description: Timestamp of when the issue field was set to this value.
           - name: value
             description: Content of the value of that the field was set to.
+          - name: author_id
+            description: Foreign key referencing the ID of the `user` who made this field change.
           - name: is_active
             description: Boolean showing whether this issue field is currently active.
 
@@ -188,6 +190,8 @@ sources:
             description: Foreign key referencing the ID of the `issue` whose field was updated.
           - name: value
             description: Content of the value of that the field was set to.
+          - name: author_id
+            description: Foreign key referencing the ID of the `user` who made this field change.
           - name: is_active
             description: Boolean showing whether this issue field is currently active.
         
@@ -293,6 +297,23 @@ sources:
             description: Unique ID of the status category.
           - name: name
             description: Title of the status category.
+
+      - name: team
+        identifier: "{{ var('jira_team_identifier', 'team')}}"
+        description: Table of teams associated with your organization.
+        config:
+          enabled: "{{ var('jira_using_teams', true) }}"
+        columns:
+          - name: id
+            description: Unique ID of the team.
+          - name: is_shared
+            description: Boolean that is true if you share the team with other teams in your organization.
+          - name: is_visible
+            description: Boolean that is true if all users in your organization can see the team.
+          - name: name
+            description: Name of the team.
+          - name: title
+            description: Longer, more descriptive name of the team.
 
       - name: user
         identifier: "{{ var('jira_user_identifier', 'user')}}"

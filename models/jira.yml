@@ -34,6 +34,37 @@ models:
         description: The story point estimate that an issue has on a given day.  
         # other fields included in var(issue_history_columns)
 
+  - name: jira__timestamp_issue_field_history
+    description: >
+      Each record represents a time period when an issue had specific field values. This is an SCD Type 2 table
+      that tracks field changes at the timestamp level, showing the complete field state during each validity period.
+      Each record contains valid_from/valid_until timestamps and an is_current_record flag.
+    columns:
+      - name: valid_from
+        description: Timestamp when this field state became effective.
+      - name: valid_until
+        description: Timestamp when this field state ended (next change or current time).
+      - name: updated_at_week
+        description: The start date of the week corresponding to the update timestamp.
+      - name: issue_id
+        description: Foreign key referencing the ID of the `issue` with these values.
+      - name: status_id
+        description: The ID of the status that an issue has during this period.
+      - name: status
+        description: The name of the status that an issue has during this period.
+      - name: status_category_name
+        description: The category of the status (To Do, In Progress, Done).
+      - name: author_id
+        description: Foreign key referencing the ID of the `user` who made the field changes.
+      - name: is_current_record
+        description: Boolean indicating if this is the current/active field state.
+      - name: issue_timestamp_id
+        description: Surrogate key hashed on `valid_from` and `issue_id`
+        tests:
+          - unique
+          - not_null
+        # other fields included in var(issue_history_columns)
+
   - name: jira__daily_sprint_issue_history
     description: >
       Each record represents a snapshot of a sprint and its assorted issues on a given day between the sprint start date and the most recent update to the sprint.
@@ -381,4 +412,38 @@ models:
         description: The median age of a user's currently open issues.
       - name: is_active
         description: Boolean showing whether this user is currently active.
-      
+
+  - name: jira__issue_status_transitions
+    description: >
+      Each record represents a status transition for an issue, tracking the complete workflow journey
+      with timing metrics and transition analysis. The grain is issue_id + status_sequence, providing
+      a chronological view of how issues move through different statuses over time.
+    columns:
+      - name: issue_id
+        description: Foreign key referencing the ID of the issue.
+        tests:
+          - not_null
+      - name: status
+        description: The status name during this transition period.
+      - name: status_category_name
+        description: The category of the status (To Do, In Progress, Done).
+      - name: previous_status
+        description: The status the issue transitioned from (null for initial status).
+      - name: previous_status_category_name
+        description: The category of the previous status.
+      - name: transition_at
+        description: Timestamp when the issue transitioned to this status.
+      - name: transition_until
+        description: Timestamp when the issue transitioned out of this status (or current time if still in status).
+      - name: status_sequence
+        description: Sequential number indicating the order of status transitions (1 = first, incrementing chronologically).
+      - name: is_current_status
+        description: Boolean indicating if this is the current active status for the issue.
+      - name: minutes_in_status
+        description: Time spent in this status, measured in minutes.
+      - name: minutes_in_previous_status
+        description: Time spent in the previous status before this transition, measured in minutes (null for initial status).
+      - name: transition_direction
+        description: >
+          Categorizes the workflow direction: 'new' (initial), 'forward' (toward completion),
+          'backward' (reopening/regression), 'lateral' (within same category), or 'other'.

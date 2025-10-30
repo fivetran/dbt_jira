@@ -29,7 +29,9 @@ The following table provides a detailed list of all tables materialized within t
 
 | **Table**                | **Description**                                                                                                                                |
 | ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------- |
-| [jira__daily_issue_field_history](https://fivetran.github.io/dbt_jira/#!/model/model.jira.jira__daily_issue_field_history)             | History table with one row for each day an issue remained open, with additional details about the issue sprint, status, and story points (if enabled). <br><br>**Example Analytics Questions:**<br>• How many issues, by sprint, were Closed or Blocked each week in Q1, 2025? <br>• How many days, on average, does it take an issue to go from 'Accepted' to either 'Closed' or 'Blocked'?|
+| [jira__daily_issue_field_history](https://fivetran.github.io/dbt_jira/#!/model/model.jira.jira__daily_issue_field_history)             | History table with one row for each day an issue remained open, with additional details about the issue sprint, status, and story points (if enabled).  The `jira__daily_issue_status_category_analysis` is built on top to gather a daily view of issues in their work state; [see the README for more details](https://github.com/fivetran/dbt_jira/blob/main/analysis/README.md). <br><br>**Example Analytics Questions:**<br>• How many issues, by sprint, were Closed or Blocked each week in Q1, 2025? <br>• How many days, on average, does it take an issue to go from 'Accepted' to either 'Closed' or 'Blocked'?|
+| [jira__timestamp_issue_field_history](https://fivetran.github.io/dbt_jira/#!/model/model.jira.jira__timestamp_issue_field_history)             | Table tracking field changes at timestamp level with validity periods. Each record shows complete field state during a time period with `valid_from`/`valid_until` timestamps. The `jira__issue_transition_cumulative_flow_analysis` is built on top of this to track the workflow of issues from creation to completion; [see the README for more details](https://github.com/fivetran/dbt_jira/blob/main/analysis/README.md). <br><br>**Example Analytics Questions:**<br>• What was the exact sequence of field changes for a specific issue? <br>• How long did an issue spend in each status with precise timing?|
+| [jira__issue_status_transitions](https://fivetran.github.io/dbt_jira/#!/model/model.jira.jira__issue_status_transitions)             | Issue status transition tracking with workflow analysis. Provides chronological view of status changes with timing metrics, transition direction analysis, and lifecycle indicators.  <br><br>**Example Analytics Questions:**<br>• What is the average time spent in each status across all issues? <br>• Which is the lead time and cycle time for issues based on when work is added/started/completed? <br>• What are the most common workflow transition paths?|
 | [jira__issue_enhanced](https://fivetran.github.io/dbt_jira/#!/model/model.jira.jira__issue_enhanced)            | One row per Jira issue with enriched details about assignee, reporter, sprint, project, and current status, plus metrics on assignments and re-openings. <br><br>**Example Analytics Questions:** <br>• How many issues are currently blocked and who owns them? <br>• What's the average time to resolution for high-priority bugs by assignee? |
 | [jira__project_enhanced](https://fivetran.github.io/dbt_jira/#!/model/model.jira.jira__project_enhanced)            | One row per project with team member details, issue counts, work velocity metrics, and project scope information. <br><br>**Example Analytics Questions:**<br>• Which projects have the highest velocity in terms of issues closed per sprint? <br>• What is the ratio of unassigned open tickets to assigned open tickets by project? |
 | [jira__user_enhanced](https://fivetran.github.io/dbt_jira/#!/model/model.jira.jira__user_enhanced)            | One row per user with metrics on open and completed issues, and individual work velocity. <br><br>**Example Analytics Questions:**<br>• Who are the top performers in terms of issues resolved per month? <br>• Which team members have the highest workload based on open issue count and how long, on average, have those issues been open? <br> |
@@ -37,7 +39,7 @@ The following table provides a detailed list of all tables materialized within t
 | [jira__daily_sprint_issue_history](https://fivetran.github.io/dbt_jira/#!/model/model.jira.jira__daily_sprint_issue_history)            | Daily snapshot of each sprint showing all associated issues from sprint start to completion, useful for tracking progress over time. <br><br>**Example Analytics Questions:**<br>• How many issues were active in each sprint on any given day? <br>• What's the daily count of open vs. completed issues per sprint? <br>• Which sprints had issues added or removed mid-sprint? |
 
 ### Materialized Models
-Each Quickstart transformation job run materializes 44 models if all components of this data model are enabled. This count includes all staging, intermediate, and final models materialized as `view`, `table`, or `incremental`.
+Each Quickstart transformation job run materializes 48 models if all components of this data model are enabled. This count includes all staging, intermediate, and final models materialized as `view`, `table`, or `incremental`.
 <!--section-end-->
 
 ## How do I use the dbt package?
@@ -72,7 +74,7 @@ Include the following jira package version in your `packages.yml` file:
 ```yaml
 packages:
   - package: fivetran/jira
-    version: [">=1.0.0", "<1.1.0"]
+    version: [">=1.1.0", "<1.2.0"]
 ```
 
 > All required sources and staging models are now bundled into this transformation package. Do not include `fivetran/jira_source` in your `packages.yml` since this package has been deprecated.
@@ -87,13 +89,14 @@ vars:
 ```
 
 ### Step 4: Disable models for non-existent sources
-Your Jira connection may not sync every table that this package expects. If you do not have the `SPRINT`, `COMPONENT`, or `VERSION` tables synced, add the respective variables to your root `dbt_project.yml` file. Additionally, if you want to remove comment aggregations from your `jira__issue_enhanced` model,  add the `jira_include_comments` variable to your root `dbt_project.yml`:
+Your Jira connection may not sync every table that this package expects. If you do not have the `SPRINT`, `COMPONENT`, `VERSION`, `PRIORITY` or `TEAM` tables synced, add the respective variables to your root `dbt_project.yml` file. Additionally, if you want to remove comment aggregations from your `jira__issue_enhanced` model,  add the `jira_include_comments` variable to your root `dbt_project.yml`:
 ```yml
 vars:
     jira_using_sprints: false    # Enabled by default. Disable if you do not have the sprint table or do not want sprint-related metrics reported.
     jira_using_components: false # Enabled by default. Disable if you do not have the component table or do not want component-related metrics reported.
     jira_using_versions: false   # Enabled by default. Disable if you do not have the versions table or do not want versions-related metrics reported.
     jira_using_priorities: false # Enabled by default. Disable if you are not using priorities in Jira.
+    jira_using_teams: false # Enabled by default. Disable if you are not using teams in Jira.
     jira_include_comments: false # Enabled by default. Disabling will remove the aggregation of comments via the `count_comments` and `conversations` columns in the `jira__issue_enhanced` table.
 ```
 

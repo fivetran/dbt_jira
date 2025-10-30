@@ -69,13 +69,33 @@ issue_types as (
     from {{ ref('stg_jira__issue_type') }}
 ),
 
+{% if var('jira_using_teams', True) %}
+teams as ( 
+
+    select * 
+    from {{ ref('stg_jira__team') }} 
+),
+{% endif %}
+
 {% if var('jira_using_components', True) %}
 components as (
 
-    select * 
+    select *
     from {{ ref('stg_jira__component') }}
 ),
 {% endif %}
+
+projects as (
+
+    select *
+    from {{ ref('stg_jira__project') }}
+),
+
+users as (
+
+    select *
+    from {{ ref('stg_jira__user') }}
+),
 
 joined as (
 
@@ -88,7 +108,10 @@ joined as (
                 {% if col.name|lower == 'components' and var('jira_using_components', True) %}
                 , coalesce(pivoted_daily_history.components, most_recent_data.components) as components
 
-                {% elif col.name|lower not in ['issue_day_id', 'issue_id', 'valid_starting_on', 'valid_starting_at_week', 'components'] %} 
+                {% elif col.name|lower == 'team' and var('jira_using_teams', True) %} 
+                , coalesce(pivoted_daily_history.team, most_recent_data.team) as team 
+
+                {% elif col.name|lower not in ['issue_day_id', 'issue_id', 'valid_starting_on', 'valid_starting_at_week', 'components', 'team'] %} 
                 , coalesce(pivoted_daily_history.{{ col.name }}, most_recent_data.{{ col.name }}) as {{ col.name }}
 
                 {% endif %}
@@ -97,9 +120,12 @@ joined as (
         {% else %}
             {% for col in pivot_data_columns %}
                 {% if col.name|lower == 'components' and var('jira_using_components', True) %}
-                , pivoted_daily_history.components   
+                , pivoted_daily_history.components
 
-                {% elif col.name|lower not in ['issue_day_id', 'issue_id', 'valid_starting_on', 'valid_starting_at_week', 'components'] %} 
+                {% elif col.name|lower == 'team' and var('jira_using_teams', True) %} 
+                , pivoted_daily_history.team
+
+                {% elif col.name|lower not in ['issue_day_id', 'issue_id', 'valid_starting_on', 'valid_starting_at_week', 'components','team'] %} 
                 , pivoted_daily_history.{{ col.name }}
 
                 {% endif %}
@@ -127,7 +153,7 @@ set_values as (
             order by date_day rows unbounded preceding) as status_id_field_partition
 
         -- list of exception columns
-        {% set exception_cols = ['issue_id', 'issue_day_id', 'valid_starting_on', 'valid_starting_at_week', 'status', 'status_id', 'components', 'issue_type'] %}
+        {% set exception_cols = ['issue_id', 'issue_day_id', 'valid_starting_on', 'valid_starting_at_week', 'status', 'status_id', 'components', 'issue_type', 'project', 'assignee', 'team'] %}
 
         {% for col in pivot_data_columns %}
             {% if col.name|lower == 'components' and var('jira_using_components', True) %}
@@ -137,6 +163,19 @@ set_values as (
             {% elif col.name|lower == 'issue_type' %}
             , coalesce(issue_types.issue_type_name, joined.issue_type) as issue_type
             , sum(case when joined.issue_type is null then 0 else 1 end) over (partition by issue_id order by date_day rows unbounded preceding) as issue_type_field_partition
+            
+            {% elif col.name|lower == 'team' and var('jira_using_teams', True) %}
+            , coalesce(teams.team_name, joined.team) as team
+            , sum(case when joined.team is null then 0 else 1 end) over ( partition by issue_id
+                order by date_day rows unbounded preceding) as team_field_partition
+
+            {% elif col.name|lower == 'project' %}
+            , coalesce(projects.project_name, joined.project) as project
+            , sum(case when joined.project is null then 0 else 1 end) over (partition by issue_id order by date_day rows unbounded preceding) as project_field_partition
+
+            {% elif col.name|lower == 'assignee' %}
+            , coalesce(users.user_display_name, joined.assignee) as assignee
+            , sum(case when joined.assignee is null then 0 else 1 end) over (partition by issue_id order by date_day rows unbounded preceding) as assignee_field_partition
 
             {% elif col.name|lower not in exception_cols %}
             , coalesce(field_option_{{ col.name }}.field_option_name, joined.{{ col.name }}) as {{ col.name }}
@@ -155,8 +194,20 @@ set_values as (
             on cast(components.component_id as {{ dbt.type_string() }}) = joined.components
         
         {% elif col.name|lower == 'issue_type' %}
-        left join issue_types   
+        left join issue_types
             on cast(issue_types.issue_type_id as {{ dbt.type_string() }}) = joined.issue_type
+
+        {% elif col.name|lower == 'project' %}
+        left join projects
+            on cast(projects.project_id as {{ dbt.type_string() }}) = joined.project
+
+        {% elif col.name|lower == 'assignee' %}
+        left join users
+            on cast(users.user_id as {{ dbt.type_string() }}) = joined.assignee
+
+        {% elif col.name|lower == 'team' and var('jira_using_teams', True) %} 
+        left join teams 
+            on cast(teams.team_id as {{ dbt.type_string() }}) = joined.team
 
         {% elif col.name|lower not in exception_cols %}
         left join field_option as field_option_{{ col.name }}
@@ -181,7 +232,23 @@ fill_values as (
                 partition by issue_id, component_field_partition 
                 order by date_day asc rows between unbounded preceding and current row) as components
 
-            {% elif col.name|lower not in ['issue_id', 'issue_day_id', 'valid_starting_on', 'valid_starting_at_week', 'status', 'status_id', 'components'] %}
+            {% elif col.name|lower == 'project' %}
+            , first_value(project) over (
+                partition by issue_id, project_field_partition
+                order by date_day asc rows between unbounded preceding and current row) as project
+
+            {% elif col.name|lower == 'assignee' %}
+            , first_value(assignee) over (
+                partition by issue_id, assignee_field_partition
+                order by date_day asc rows between unbounded preceding and current row) as assignee
+  
+            {% elif col.name|lower == 'team' and var('jira_using_teams', True) %}
+            , first_value(team) over (
+                partition by issue_id, team_field_partition
+                order by date_day asc rows between unbounded preceding and current row) as team
+
+            {% elif col.name|lower not in ['issue_id', 'issue_day_id', 'valid_starting_on', 'valid_starting_at_week', 'status', 'status_id', 'components', 'project', 'assignee', 'team'] %}
+
             -- grab the value that started this batch/partition
             , first_value( {{ col.name }} ) over (
                 partition by issue_id, {{ col.name }}_field_partition 
@@ -203,7 +270,16 @@ fix_null_values as (
             {% if col.name|lower == 'components' and var('jira_using_components', True) %}
             , case when components = 'is_null' then null else components end as components
 
-            {% elif col.name|lower not in ['issue_id','issue_day_id','valid_starting_on', 'valid_starting_at_week', 'status', 'components'] %}
+            {% elif col.name|lower == 'project' %}
+            , case when project = 'is_null' then null else project end as project
+
+            {% elif col.name|lower == 'assignee' %}
+            , case when assignee = 'is_null' then null else assignee end as assignee
+
+            {% elif col.name|lower == 'team' and var('jira_using_teams', True) %}
+            , case when team = 'is_null' then null else team end as team
+
+            {% elif col.name|lower not in ['issue_id','issue_day_id','valid_starting_on', 'valid_starting_at_week', 'status', 'components', 'project', 'assignee', 'team'] %}
             -- we de-nulled the true null values earlier in order to differentiate them from nulls that just needed to be backfilled
             , case when {{ col.name }} = 'is_null' then null else {{ col.name }} end as {{ col.name }}
 
@@ -226,7 +302,16 @@ surrogate_key as (
             {% if col.name|lower == 'components' and var('jira_using_components', True) %}
             , fix_null_values.components as components
 
-            {% elif col.name|lower not in ['issue_id','issue_day_id','valid_starting_on', 'valid_starting_at_week', 'status', 'components'] %} 
+            {% elif col.name|lower == 'project' %}
+            , fix_null_values.project as project
+
+            {% elif col.name|lower == 'assignee' %}
+            , fix_null_values.assignee as assignee
+
+            {% elif col.name|lower == 'team' and var('jira_using_teams', True) %} 
+            , fix_null_values.team as team
+
+            {% elif col.name|lower not in ['issue_id','issue_day_id','valid_starting_on', 'valid_starting_at_week', 'status', 'components', 'project', 'assignee', 'team'] %}
             , fix_null_values.{{ col.name }} as {{ col.name }}
 
             {% endif %}

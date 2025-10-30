@@ -474,6 +474,8 @@ models:
         description: Content of the value of that the field was set to.
       - name: field_name
         description: Name of the field as it appears on issue cards.
+      - name: author_id
+        description: Foreign key referencing the ID of the `user` who made this field change.
 
   - name: int_jira__issue_multiselect_history
     description: >
@@ -492,6 +494,55 @@ models:
         description: Content of the value of that the field was set to. 
       - name: field_name
         description: Name of the field as it appears on issue cards.
+      - name: author_id
+        description: Foreign key referencing the ID of the `user` who made this field change.
+
+  - name: int_jira__pivot_timestamp_field_history
+    description: >
+      Table pivoting out the fields in field history into columns at the timestamp level, capturing all field changes
+      rather than just daily snapshots. Each row represents field updates that occurred at a specific timestamp.
+    columns:
+      - name: updated_at
+        description: Timestamp when the field changes occurred.
+      - name: issue_id
+        description: Foreign key referencing the ID of the `issue` whose field was updated.
+      - name: updated_at_week
+        description: The start date of the week corresponding to the update timestamp.
+      - name: author_id
+        description: Foreign key referencing the ID of the `user` who made the field changes.
+      - name: status
+        description: The ID of the status that was updated at this timestamp (if status changed).
+      - name: sprint
+        description: The ID of the sprint that was updated at this timestamp (if sprint changed).
+      - name: story_points
+        description: The story points value that was updated at this timestamp (if story points changed).
+      - name: story_point_estimate
+        description: The story point estimate that was updated at this timestamp (if story point estimate changed).
+      # plus any fields specified by `var('issue_field_history_columns')`
+
+  - name: int_jira__timestamp_field_history_scd
+    description: >
+      Slowly-changing-dimension model that backfills field values at the timestamp level. Takes the pivoted timestamp
+      field history and uses window functions to carry forward field values, showing the complete field state at each
+      timestamp rather than just the fields that changed.
+    columns:
+      - name: updated_at
+        description: Timestamp when field changes occurred.
+      - name: issue_id
+        description: Foreign key referencing the ID of the `issue` whose field was updated.
+      - name: updated_at_week
+        description: The start date of the week corresponding to the update timestamp.
+      - name: author_id
+        description: Foreign key referencing the ID of the `user` who made the field changes.
+      - name: status
+        description: The complete status value at this timestamp (backfilled from previous changes).
+      - name: sprint
+        description: The complete sprint value at this timestamp (backfilled from previous changes).
+      - name: story_points
+        description: The complete story points value at this timestamp (backfilled from previous changes).
+      - name: story_point_estimate
+        description: The complete story point estimate at this timestamp (backfilled from previous changes).
+      # plus any fields specified by `var('issue_field_history_columns')`
 
   - name: int_jira__issue_assign_resolution
     description: Table grabbing dates related to the assignment and resolution of issues.

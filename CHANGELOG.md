@@ -1,3 +1,34 @@
+# dbt_jira v1.1.0
+
+## Schema/Data Change
+**7 total changes • 5 possible breaking changes**
+
+| Data Model(s) | Change type | Old | New | Notes |
+| ---------- | ----------- | -------- | -------- | ----- |
+| [jira__timestamp_issue_field_history](https://fivetran.github.io/dbt_jira/#!/model/model.jira.jira__timestamp_issue_field_history)       | New Model (**Breaking Change**)  |     |  | SCD Type 2 table tracking field changes at timestamp level with validity periods. Each record shows complete field state during a time period with `valid_from`/`valid_until` timestamps. |
+| [jira__issue_status_transitions](https://fivetran.github.io/dbt_jira/#!/model/model.jira.jira__issue_status_transitions) | New Model (**Breaking Change**) |  |  | Issue status transition tracking with workflow analysis. Provides chronological view of status changes with timing metrics, transition direction analysis, and lifecycle indicators.  |
+| [stg_jira__team](https://fivetran.github.io/dbt_jira/#!/model/model.jira.stg_jira__team) | New Model (**Breaking Change**) |  |  | Adds staging model for Jira teams functionality. You can leverage the `jira__using_teams` variable to disable this model in dbt Core (Quickstart will handle enabling/disabling automatically).  |
+| [stg_jira__team_tmp](https://fivetran.github.io/dbt_jira/#!/model/model.jira.stg_jira__team) | New Model (**Breaking Change**) |  |  | Adds temp model for Jira teams functionality.  You can leverage the `jira__using_teams` variable to disable this model in dbt Core (Quickstart will handle enabling/disabling automatically).  |
+| [jira__daily_issue_field_history](https://fivetran.github.io/dbt_jira/#!/model/model.jira.jira__daily_issue_field_history)       | Data Change (**Breaking Change**)  | If configured -  `project`, `assignee`, `team` brought in with default field id values. | If configured - `project`, `assignee`, `team` names now brought through. | Fields customers can define with the `issue_field_history_columns` variable that bring in their identifier values now bring in the names for easier analytical insights. |
+| [stg_jira__issue_field_history](https://fivetran.github.io/dbt_jira_source/#!/model/model.jira_source.stg_jira__issue_field_history)        | New Column   |          |  `author_id`    |    Tracks which user made each field change for audit trail and change attribution.     |
+| [stg_jira__issue_multiselect_history](https://fivetran.github.io/dbt_jira_source/#!/model/model.jira_source.stg_jira__issue_multiselect_history)        | New Column   |          |  `author_id`    |    Tracks which user made each multiselect field change for audit trail and change attribution.       |
+
+## Feature Update
+- Adds support for Jira teams functionality by introducing staging models `stg_jira__team` and `stg_jira__team_tmp`.
+- Enhances issue field history models to include team information if teams are enabled.
+  - When teams are enabled, team data will populate in the `jira__daily_issue_field_history` model to track team assignments over time and the `jira__issue_enhanced` model to provide current team assignment for each issue.
+
+## Feature Update
+- Creates new analysis folder with `jira__issue_transition_cumulative_flow_analysis` and `jira_daily_issue_status_category_analysis` models. See the analysis [README.md](https://github.com/fivetran/dbt_jira/blob/main/analysis/README.md) for more details on how to use these models for your Jira reporting.
+
+## Under the Hood
+- Introduces relevant team related seed data, macros, and variables to ensure team support.
+- Creates new ephemeral intermediate models that perform necessary operations to build the new `jira__timestamp_issue_field_history` models.
+  - `int_jira__pivot_timestamp_field_history`: Table pivoting out the fields in field history into columns at the timestamp level to capture all field changes rather than just daily snapshots. 
+  - `int_jira__timestamp_field_history_scd`: Slowly-changing-dimension model that backfills field values at the timestamp level.
+- Introduces relevant team related seed data, macros, and variables to ensure team support.
+- Creates consistency tests for new end models. 
+
 # dbt_jira v1.0.0
 
 [PR #145](https://github.com/fivetran/dbt_jira/pull/145) includes the following updates:
