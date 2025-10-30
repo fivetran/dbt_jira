@@ -1,6 +1,6 @@
 id,is_shared,is_visible,name,title,_fivetran_synced
-01e9ac93-bccf-4ad2-af92-3317a37ec67b,true,true,HR,HR,2020-11-23 22:20:39.685
-891da445-73e5-49b9-9d0d-89f6a587822a,true,true,Cloud Security,Cloud Security,2020-11-23 22:20:39.711
-1bc241c7-6926-4b46-94b7-82d25069f067,true,true,People Ops,People Ops,2020-11-23 22:20:39.643
-e74a1782-f463-4542-8440-66de07d4b083,true,true,Detection & Response,Detection & Response,2020-11-23 22:20:40.643
-d8a8402f-bc1b-4990-9b11-06a52d2de68a,true,true,Platform Security,Platform Security,2020-11-23 22:20:41.553
+01e9ac93-bccf-4ad2-af92-3317a37ec67b,true,true,Alpha,Alpha,2020-11-23 22:20:39.685
+891da445-73e5-49b9-9d0d-89f6a587822a,true,true,Beta,Beta,2020-11-23 22:20:39.711
+1bc241c7-6926-4b46-94b7-82d25069f067,true,true,Delta,Delta,2020-11-23 22:20:39.643
+e74a1782-f463-4542-8440-66de07d4b083,true,true,Omega,Omega,2020-11-23 22:20:40.643
+d8a8402f-bc1b-4990-9b11-06a52d2de68a,true,true,Phi,Phi,2020-11-23 22:20:41.553
