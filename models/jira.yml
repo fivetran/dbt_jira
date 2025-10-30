@@ -52,14 +52,10 @@ models:
         description: The ID of the status that an issue has during this period.
       - name: status
         description: The name of the status that an issue has during this period.
+      - name: status_category_name
+        description: The category of the status (To Do, In Progress, Done).
       - name: author_id
         description: Foreign key referencing the ID of the `user` who made the field changes.
-      - name: sprint
-        description: The ID of the sprint that an issue is slotted into during this period.
-      - name: story_points
-        description: The story points that an issue has during this period.
-      - name: story_point_estimate
-        description: The story point estimate that an issue has during this period.
       - name: is_current_record
         description: Boolean indicating if this is the current/active field state.
       - name: issue_timestamp_id

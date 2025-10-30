@@ -78,7 +78,7 @@ create_validity_periods as (
 
         -- list of exception columns
         {% set exception_cols = ['issue_id', 'updated_at', 'updated_at_week', 'status', 'author_id', 'issue_type'] %}
-
+        
         {% for col in custom_columns %}
             {% if col|lower not in exception_cols %}
             , {{ col }}
@@ -100,6 +100,9 @@ fix_null_values as (
         status_categories.status_category_name,
         create_validity_periods.author_id
 
+        -- list of exception columns
+        {% set exception_cols = ['issue_id', 'issue_timestamp_id', 'updated_at', 'updated_at_week', 'status', 'author_id', 'components', 'issue_type', 'project', 'assignee', 'team'] %}
+
         {% for col in custom_columns %}
             {% if col|lower == 'components' and var('jira_using_components', True) %}
             , case when create_validity_periods.components = 'is_null' then null else create_validity_periods.components end as components
@@ -113,7 +116,7 @@ fix_null_values as (
             {% elif col|lower == 'team' and var('jira_using_teams', True) %}
             , case when create_validity_periods.team = 'is_null' then null else create_validity_periods.team end as team
 
-            {% elif col|lower not in ['updated_at', 'issue_id', 'updated_at_week', 'status', 'author_id', 'components', 'project', 'assignee', 'team'] %}
+            {% elif col|lower not in exception_cols %}
             , case when create_validity_periods.{{ col }} = 'is_null' then null else create_validity_periods.{{ col }} end as {{ col }}
 
             {% endif %}
@@ -141,9 +144,6 @@ final as (
         fix_null_values.status,
         fix_null_values.status_category_name,
         fix_null_values.author_id
-
-        -- list of exception columns
-        {% set exception_cols = ['issue_id', 'updated_at', 'updated_at_week', 'status', 'author_id', 'components', 'issue_type', 'project', 'assignee', 'team'] %}
 
         {% for col in custom_columns %}
             {% if col|lower == 'components' and var('jira_using_components', True) %}
