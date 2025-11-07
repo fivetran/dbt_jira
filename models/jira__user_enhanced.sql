@@ -18,20 +18,22 @@ issue as (
 
 user_project as (
 
-    select 
+    select
         assignee_user_id,
+        source_relation,
         project_name
     from issue
-    group by 1, 2
+    group by 1, 2, 3
 ),
 
 agg_user_projects as (
 
-    select 
+    select
         assignee_user_id,
+        source_relation,
         {{ fivetran_utils.string_agg( "project_name", "', '" ) }} as projects
     from user_project
-    group by 1
+    group by 1, 2
 ),
 
 user_join as (
@@ -51,9 +53,13 @@ user_join as (
         user_metrics.avg_age_currently_open_seconds,
         user_metrics.median_close_time_seconds,
         user_metrics.median_age_currently_open_seconds
-    from jira_user 
-    left join user_metrics on jira_user.user_id = user_metrics.user_id
-    left join agg_user_projects on jira_user.user_id = agg_user_projects.assignee_user_id
+    from jira_user
+    left join user_metrics
+        on jira_user.user_id = user_metrics.user_id
+        and jira_user.source_relation = user_metrics.source_relation
+    left join agg_user_projects
+        on jira_user.user_id = agg_user_projects.assignee_user_id
+        and jira_user.source_relation = agg_user_projects.source_relation
 )
 
 select * 

@@ -14,12 +14,14 @@ fields as (
                 staging_columns=get_issue_link_columns()
             )
         }}
+        {{ jira.apply_source_relation() }}
     from base
 ),
 
 final as (
-    
-    select 
+
+    select
+        source_relation,
         issue_id,
         related_issue_id,
         relationship,

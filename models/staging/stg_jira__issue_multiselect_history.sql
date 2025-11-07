@@ -14,12 +14,14 @@ fields as (
                 staging_columns=get_issue_multiselect_history_columns()
             )
         }}
+        {{ jira.apply_source_relation() }}
     from base
 ),
 
 final as (
-    
-    select 
+
+    select
+        source_relation,
         _fivetran_id,
         cast(field_id as {{ dbt.type_string() }}) as field_id,
         issue_id,

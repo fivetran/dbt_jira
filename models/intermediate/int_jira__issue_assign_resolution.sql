@@ -17,11 +17,12 @@ issue_dates as (
 
     select
         issue_id,
+        source_relation,
         min(case when field_id = 'assignee' then updated_at end) as first_assigned_at,
         max(case when field_id = 'assignee' then updated_at end) as last_assigned_at,
         min(case when field_id = 'resolutiondate' then updated_at end) as first_resolved_at -- in case it's been re-opened
     from filtered
-    group by 1
+    group by 1, 2
 )
 
 select *

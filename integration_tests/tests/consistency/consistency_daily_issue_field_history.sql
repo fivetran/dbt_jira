@@ -4,23 +4,23 @@
     enabled=var('fivetran_validation_tests_enabled', false)
 ) }}
 
+-- source_relation is excluded as it will differ between prod and dev schemas
 with prod as (
     select
         date_day,
         issue_id,
         status,
-        status_id,
-        issue_day_id
+        status_id
     from {{ target.schema }}_jira_prod.jira__daily_issue_field_history
 ),
 
 dev as (
+    
     select
         date_day,
         issue_id,
         status,
-        status_id,
-        issue_day_id
+        status_id
     from {{ target.schema }}_jira_dev.jira__daily_issue_field_history
 ),
 

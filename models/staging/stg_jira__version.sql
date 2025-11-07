@@ -15,12 +15,14 @@ fields as (
                 staging_columns=get_version_columns()
             )
         }}
+        {{ jira.apply_source_relation() }}
     from base
 ),
 
 final as (
-    
-    select 
+
+    select
+        source_relation,
         archived as is_archived,
         description,
         id as version_id,

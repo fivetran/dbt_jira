@@ -5,7 +5,7 @@
 ) }}
 
 {# Exclude columns that depend on calculations involving the current time in seconds or aggregate strings in a random order, as they will differ between runs. #}
-{% set exclude_columns = [] %}
+{% set exclude_columns = ['source_relation'] + var('consistency_test_exclude_metrics', []) %}
 
 with prod as (
     select {{ dbt_utils.star(from=ref('jira__sprint_enhanced'), except=exclude_columns) }}

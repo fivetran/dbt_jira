@@ -68,17 +68,18 @@ create_validity_periods as (
         updated_at as valid_from,
         -- Next update becomes valid_until for this record
         lead(updated_at) over (
-            partition by issue_id
+            partition by issue_id {{ jira.partition_by_source_relation() }}
             order by updated_at
         ) as valid_until,
         updated_at_week,
         issue_id,
+        source_relation,
         status as status_id,
         author_id
 
         -- list of exception columns
-        {% set exception_cols = ['issue_id', 'updated_at', 'updated_at_week', 'status', 'author_id', 'issue_type'] %}
-        
+        {% set exception_cols = ['issue_id', 'updated_at', 'updated_at_week', 'status', 'author_id', 'source_relation'] %}
+
         {% for col in custom_columns %}
             {% if col|lower not in exception_cols %}
             , {{ col }}
@@ -95,13 +96,14 @@ fix_null_values as (
         coalesce(create_validity_periods.valid_until, {{ dbt.current_timestamp() }}) as valid_until,
         create_validity_periods.updated_at_week,
         create_validity_periods.issue_id,
+        create_validity_periods.source_relation,
         create_validity_periods.status_id,
         statuses.status_name as status,
         status_categories.status_category_name,
         create_validity_periods.author_id
 
         -- list of exception columns
-        {% set exception_cols = ['issue_id', 'issue_timestamp_id', 'updated_at', 'updated_at_week', 'status', 'author_id', 'components', 'issue_type', 'project', 'assignee', 'team'] %}
+        {% set exception_cols = ['issue_id', 'issue_timestamp_id', 'updated_at', 'updated_at_week', 'status', 'author_id', 'components', 'project', 'assignee', 'team', 'source_relation'] %}
 
         {% for col in custom_columns %}
             {% if col|lower == 'components' and var('jira_using_components', True) %}
@@ -128,9 +130,11 @@ fix_null_values as (
 
     left join statuses
         on cast(statuses.status_id as {{ dbt.type_string() }}) = create_validity_periods.status_id
+        and statuses.source_relation = create_validity_periods.source_relation
 
     left join status_categories
         on statuses.status_category_id = status_categories.status_category_id
+        and statuses.source_relation = status_categories.source_relation
 ),
 
 final as (
@@ -140,6 +144,7 @@ final as (
         coalesce(fix_null_values.valid_until, {{ dbt.current_timestamp() }}) as valid_until,
         fix_null_values.updated_at_week,
         fix_null_values.issue_id,
+        fix_null_values.source_relation,
         fix_null_values.status_id,
         fix_null_values.status,
         fix_null_values.status_category_name,
@@ -168,7 +173,7 @@ final as (
         {% endfor %}
 
         , fix_null_values.is_current_record
-        , {{ dbt_utils.generate_surrogate_key(['fix_null_values.valid_from','fix_null_values.issue_id']) }} as issue_timestamp_id
+        , {{ dbt_utils.generate_surrogate_key(['fix_null_values.valid_from','fix_null_values.issue_id','fix_null_values.source_relation']) }} as issue_timestamp_id
 
     from fix_null_values
 
@@ -176,26 +181,32 @@ final as (
         {% if col|lower == 'components' and var('jira_using_components', True) %}
         left join components
             on cast(components.component_id as {{ dbt.type_string() }}) = fix_null_values.components
+            and components.source_relation = fix_null_values.source_relation
 
         {% elif col|lower == 'issue_type' %}
         left join issue_types
             on cast(issue_types.issue_type_id as {{ dbt.type_string() }}) = fix_null_values.issue_type
+            and issue_types.source_relation = fix_null_values.source_relation
 
         {% elif col|lower == 'project' %}
         left join projects
             on cast(projects.project_id as {{ dbt.type_string() }}) = fix_null_values.project
+            and projects.source_relation = fix_null_values.source_relation
 
         {% elif col|lower == 'assignee' %}
         left join users
             on cast(users.user_id as {{ dbt.type_string() }}) = fix_null_values.assignee
+            and users.source_relation = fix_null_values.source_relation
 
         {% elif col|lower == 'team' and var('jira_using_teams', True) %}
         left join teams
             on cast(teams.team_id as {{ dbt.type_string() }}) = fix_null_values.team
+            and teams.source_relation = fix_null_values.source_relation
 
         {% elif col|lower not in exception_cols %}
         left join field_option as field_option_{{ col }}
             on cast(field_option_{{ col }}.field_id as {{ dbt.type_string() }}) = fix_null_values.{{ col }}
+            and field_option_{{ col }}.source_relation = fix_null_values.source_relation
 
         {% endif %}
     {% endfor %}

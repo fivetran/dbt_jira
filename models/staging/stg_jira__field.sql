@@ -14,12 +14,14 @@ fields as (
                 staging_columns=get_field_columns()
             )
         }}
+        {{ jira.apply_source_relation() }}
     from base
 ),
 
 final as (
-    
-    select 
+
+    select
+        source_relation,
         cast(id as {{ dbt.type_string() }}) as field_id,
         is_array,
         is_custom,

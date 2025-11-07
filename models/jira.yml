@@ -1,16 +1,18 @@
 version: 2
 
 models:
-  - name: jira__daily_issue_field_history 
+  - name: jira__daily_issue_field_history
     description: >
       Each record represents a snapshot of an issue's selected fields (as specified in
       the `issue_history_columns` variable + sprint and status by default) on a given day.
-      Each issue will have a record for every day in which it was open and/or being updated. 
+      Each issue will have a record for every day in which it was open and/or being updated.
       For currently open issues, the latest date will be the current date, and for closed issues,
       this will be the last time the issue was resolved OR updated in any way (plus a configurable buffer afterward,
       set to a month by default).
       Note: this is an incremental model.
     columns:
+      - name: source_relation
+        description: "{{ doc('source_relation') }}"
       - name: date_day
         description: Date on which the issue had these field values.
       - name: date_week
@@ -18,9 +20,8 @@ models:
       - name: issue_id
         description: Foreign key referencing the ID of the `issue` with these values.
       - name: issue_day_id
-        description: Surrogate key hashed on `date_day` and `issue_id`
+        description: Surrogate key hashed on `date_day`, `issue_id`, and `source_relation`
         tests:
-          - unique
           - not_null
       - name: sprint
         description: The ID of the sprint that an issue is slotted into on a given day.
@@ -40,6 +41,8 @@ models:
       that tracks field changes at the timestamp level, showing the complete field state during each validity period.
       Each record contains valid_from/valid_until timestamps and an is_current_record flag.
     columns:
+      - name: source_relation
+        description: "{{ doc('source_relation') }}"
       - name: valid_from
         description: Timestamp when this field state became effective.
       - name: valid_until
@@ -59,9 +62,8 @@ models:
       - name: is_current_record
         description: Boolean indicating if this is the current/active field state.
       - name: issue_timestamp_id
-        description: Surrogate key hashed on `valid_from` and `issue_id`
+        description: Surrogate key hashed on `valid_from`, `issue_id`, and `source_relation`
         tests:
-          - unique
           - not_null
         # other fields included in var(issue_history_columns)
 
@@ -69,10 +71,11 @@ models:
     description: >
       Each record represents a snapshot of a sprint and its assorted issues on a given day between the sprint start date and the most recent update to the sprint.
     columns:
+      - name: source_relation
+        description: "{{ doc('source_relation') }}"
       - name: sprint_issue_day_id
-        description: Surrogate key hashed on `date_day`, `sprint_id`, and `issue_id`
+        description: Surrogate key hashed on `date_day`, `sprint_id`, `issue_id`, and `source_relation`
         tests:
-          - unique
           - not_null
       - name: sprint_id
         description: Foreign key referencing the ID of the `sprint` with these values.
@@ -118,10 +121,11 @@ models:
       The core issue table, enhanced with current-status attributes from foreign-key-related tables,
       and metrics regarding resolutions and assignments.
     columns:
+      - name: source_relation
+        description: "{{ doc('source_relation') }}"
       - name: issue_id
-        description: Unique ID of the issue. 
+        description: Unique ID of the issue.
         tests:
-          - unique
           - not_null
       - name: issue_name
         description: Title of the issue.
@@ -256,10 +260,11 @@ models:
     description: >
       Table of projects enriched with data about its lead, epics, components, and volume and velocity of worktime.
     columns:
+      - name: source_relation
+        description: "{{ doc('source_relation') }}"
       - name: project_id
         description: Unique ID of the project.
         tests:
-          - unique
           - not_null
       - name: project_description
         description: Description of the project, if given.
@@ -325,10 +330,11 @@ models:
       This model provides enhanced sprint-level metrics in Jira, incorporating data from sprints,
       sprint-related issue history, and sprint-based story points tracking.
     columns:
+      - name: source_relation
+        description: "{{ doc('source_relation') }}"
       - name: sprint_id
         description: Unique ID of the sprint.
         tests:
-          - unique
           - not_null
       - name: sprint_name
         description: Name of the sprint.
@@ -373,10 +379,11 @@ models:
     description: >
       Table of users enriched with their projects, and the volume and velocity of their issues.
     columns:
-      - name: user_id  
-        description: Unique ID of the user. 
+      - name: source_relation
+        description: "{{ doc('source_relation') }}"
+      - name: user_id
+        description: Unique ID of the user.
         tests:
-          - unique
           - not_null
       - name: email
         description: Email associated with the user acccount.
@@ -419,6 +426,8 @@ models:
       with timing metrics and transition analysis. The grain is issue_id + status_sequence, providing
       a chronological view of how issues move through different statuses over time.
     columns:
+      - name: source_relation
+        description: "{{ doc('source_relation') }}"
       - name: issue_id
         description: Foreign key referencing the ID of the issue.
         tests:

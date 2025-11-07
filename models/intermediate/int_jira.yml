@@ -6,10 +6,11 @@ models:
       The core issue table, enhanced with current-status attributes from foreign-key-related tables,
       and metrics regarding resolutions and assignments.
     columns:
+      - name: source_relation
+        description: "{{ doc('source_relation') }}"
       - name: issue_id
         description: Unique ID of the issue. 
         tests:
-          - unique
           - not_null
       - name: issue_name
         description: Title of the issue.
@@ -128,10 +129,11 @@ models:
   - name: int_jira__project_metrics
     description: Table calculating issue-related metrics per project.
     columns:
+      - name: source_relation
+        description: "{{ doc('source_relation') }}"
       - name: project_id
         description: Unique ID of the project.
         tests:
-          - unique
           - not_null
       - name: count_closed_issues
         description: The number of issues closed in this project.
@@ -175,10 +177,11 @@ models:
   - name: int_jira__user_metrics
     description: Table calculating issue-related metrics per user.
     columns:
+      - name: source_relation
+        description: "{{ doc('source_relation') }}"
       - name: user_id  
         description: Unique ID of the user. 
         tests:
-          - unique
           - not_null
       - name: count_closed_issues
         description: The number of issues that the user has closed (while being assigned to).
@@ -204,10 +207,11 @@ models:
   - name: int_jira__issue_comments
     description: Table aggregating issue comments into conversations.
     columns:
+      - name: source_relation
+        description: "{{ doc('source_relation') }}"
       - name: issue_id
         description: Unique ID of the issue.
         tests:
-          - unique
           - not_null
       - name: conversation
         description: >
@@ -217,11 +221,13 @@ models:
 
   - name: int_jira__issue_epic
     description: >
-      Table associating **classic-project** issues with the epics they are linked to. This is necessary 
-      because issue-epic relationships are represented differently in next-gen vs classic projects. 
-      In next-gen projects, epics are stored as an issue's parent issue, whereas in classic projects epics are 
+      Table associating **classic-project** issues with the epics they are linked to. This is necessary
+      because issue-epic relationships are represented differently in next-gen vs classic projects.
+      In next-gen projects, epics are stored as an issue's parent issue, whereas in classic projects epics are
       captured in the 'epic link' field in `issue_field_history`. Next-gen issues will not appear in this table.
     columns:
+      - name: source_relation
+        description: "{{ doc('source_relation') }}"
       - name: issue_id
         description: Unique ID of the issue. 
       - name: epic_issue_id
@@ -230,6 +236,8 @@ models:
   - name: int_jira__issue_sprint
     description: Table relating issues to the sprints they currently belong to.
     columns:
+      - name: source_relation
+        description: "{{ doc('source_relation') }}"
       - name: issue_id
         description: Unique ID of the issue. 
       - name: current_sprint_id
@@ -252,10 +260,11 @@ models:
       Table relating issues with data regarding their parent issues (which may be epics).
       Contains all columns present in `stg_jira__issue`.
     columns:
+      - name: source_relation
+        description: "{{ doc('source_relation') }}"
       - name: issue_id
         description: Unique ID of the issue.
         tests:
-          - unique
           - not_null
       - name: parent_issue_id
         description: Unique ID of the parent issue.
@@ -328,15 +337,16 @@ models:
           The percentage of work that has been logged against the issue (time_spent) vs the original estimate of worktime.
           Equals -1.0 when the fields required for calculation are not provided.
     
-  - name: int_jira__issue_users 
+  - name: int_jira__issue_users
     description: >
       Table relating issues to attributes about their assignees and reporters.
       Builds off of the `int_jira__issue_type_parents` model.
     columns:
+      - name: source_relation
+        description: "{{ doc('source_relation') }}"
       - name: issue_id
         description: Unique ID of the issue.
         tests:
-          - unique
           - not_null
       - name: assignee_name
         description: User display name of the person currently assigned this issue.
@@ -422,6 +432,8 @@ models:
       Table relating every issue to every day it was open (plus a buffer of one month, in case the issue is re-opened, as this model
       is materialized incrementally).
     columns:
+      - name: source_relation
+        description: "{{ doc('source_relation') }}"
       - name: date_day
         description: Calendar date on which the issue was open.
       - name: issue_id
@@ -429,7 +441,6 @@ models:
       - name: issue_day_id
         description: Unique ID hashed on `date_day` and `issue_id`. 
         tests:
-          - unique
           - not_null
       - name: earliest_open_until_date
         description: Used for incremental materialization logic.
@@ -439,6 +450,8 @@ models:
       Table pivoting out the fields in `int_jira__daily_field_history` into columns, in which the value of each field column
       is the latest value updated a given day.
     columns:
+      - name: source_relation
+        description: "{{ doc('source_relation') }}"
       - name: valid_starting_on
         description: Calendar date of when the field was changed to this value.
       - name: issue_id
@@ -455,7 +468,6 @@ models:
       - name: issue_day_id
         description: Unique ID hashed on `valid_starting_on` and `issue_field_history`.
         tests:
-          - unique
           - not_null
 
 
@@ -464,6 +476,8 @@ models:
       Table of every value that each **custom non-array** (not multiselect) field has been set to.
       This model serves to append the `field_name` to each record.
     columns:
+      - name: source_relation
+        description: "{{ doc('source_relation') }}"
       - name: field_id
         description: Foreign key referencing the ID of the `field` that was changed.
       - name: issue_id
@@ -482,6 +496,8 @@ models:
       Table of every value that each array-type (multiselect) field has been set to. Each row will pertain to **one** value.
       This model serves to append the `field_name` to each record.
     columns:
+      - name: source_relation
+        description: "{{ doc('source_relation') }}"
       - name: _fivetran_id 
         description: Fivetran-generated ID hashed on field, issue, and value.
       - name: updated_at
@@ -502,6 +518,8 @@ models:
       Table pivoting out the fields in field history into columns at the timestamp level, capturing all field changes
       rather than just daily snapshots. Each row represents field updates that occurred at a specific timestamp.
     columns:
+      - name: source_relation
+        description: "{{ doc('source_relation') }}"
       - name: updated_at
         description: Timestamp when the field changes occurred.
       - name: issue_id
@@ -526,6 +544,8 @@ models:
       field history and uses window functions to carry forward field values, showing the complete field state at each
       timestamp rather than just the fields that changed.
     columns:
+      - name: source_relation
+        description: "{{ doc('source_relation') }}"
       - name: updated_at
         description: Timestamp when field changes occurred.
       - name: issue_id
@@ -547,6 +567,8 @@ models:
   - name: int_jira__issue_assign_resolution
     description: Table grabbing dates related to the assignment and resolution of issues.
     columns:
+      - name: source_relation
+        description: "{{ doc('source_relation') }}"
       - name: first_assigned_at
         description: Timestamp of when the issue was first assigned to a user.
       - name: last_assigned_at
@@ -556,14 +578,15 @@ models:
       - name: issue_id
         description: Foreign key referencing the ID of the `issue` that was assigned or resolved.
         tests:
-          - unique
           - not_null
   
   - name: int_jira__field_history_scd
     description: >
-      Slowly-changing-dimension model that fills values from differnt fields in the pivoted daily history model. 
+      Slowly-changing-dimension model that fills values from differnt fields in the pivoted daily history model.
       Note: this is the singular field history-related model that is not incremental (materialized as table)
     columns:
+      - name: source_relation
+        description: "{{ doc('source_relation') }}"
       - name: valid_starting_on
         description: Calendar date of when the field was changed to this value.
       - name: issue_id
@@ -576,17 +599,17 @@ models:
       - name: issue_day_id
         description: Unique ID hashed on `valid_starting_on` and `issue_field_history`.
         tests:
-          - unique
           - not_null
 
   - name: int_jira__issue_versions
     description: >
-      Table associating issues with the versions that they fix and/or affect. 
+      Table associating issues with the versions that they fix and/or affect.
     columns:
+      - name: source_relation
+        description: "{{ doc('source_relation') }}"
       - name: issue_id
         description: Foreign key referencing the `issue` tagged with these versions. 
         tests:
-          - unique
           - not_null
       - name: affects_versions
         description: Comma-separated list of the names of project versions that this issue affects.

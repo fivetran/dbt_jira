@@ -13,12 +13,14 @@ fields as (
                 staging_columns=get_status_columns()
             )
         }}
+        {{ jira.apply_source_relation() }}
     from base
 ),
 
 final as (
 
     select
+        source_relation,
         description as status_description,
         id as status_id,
         name as status_name,

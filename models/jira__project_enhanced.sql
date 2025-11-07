@@ -19,26 +19,28 @@ jira_user as (
 
 agg_epics as (
 
-    select 
+    select
         project_id,
+        source_relation,
         {{ fivetran_utils.string_agg( "issue_name", "', '" ) }} as epics
 
     from {{ ref('jira__issue_enhanced') }}
     where lower(issue_type) = 'epic'
     -- should we limit to active epics?
-    group by 1
+    group by 1, 2
 ),
 
 {% if var('jira_using_components', True) %}
 
 agg_components as (
-    -- i'm just aggregating the components here, but perhaps pivoting out components (and epics) 
+    -- i'm just aggregating the components here, but perhaps pivoting out components (and epics)
     -- into columns where the values are the number of issues completed and/or open would be more valuable
-    select 
+    select
         project_id,
+        source_relation,
         {{ fivetran_utils.string_agg( "component_name", "', '" ) }} as components
     from {{ ref('stg_jira__component') }}
-    group by 1
+    group by 1, 2
 ),
 
 {% endif %}
@@ -84,12 +86,20 @@ project_join as (
         project_metrics.median_age_currently_open_assigned_seconds
 
     from project
-    left join project_metrics on project.project_id = project_metrics.project_id
-    left join jira_user on project.project_lead_user_id = jira_user.user_id
-    left join agg_epics on project.project_id = agg_epics.project_id 
-    
+    left join project_metrics
+        on project.project_id = project_metrics.project_id
+        and project.source_relation = project_metrics.source_relation
+    left join jira_user
+        on project.project_lead_user_id = jira_user.user_id
+        and project.source_relation = jira_user.source_relation
+    left join agg_epics
+        on project.project_id = agg_epics.project_id
+        and project.source_relation = agg_epics.source_relation
+
     {% if var('jira_using_components', True) %}
-    left join agg_components on project.project_id = agg_components.project_id 
+    left join agg_components
+        on project.project_id = agg_components.project_id
+        and project.source_relation = agg_components.source_relation
     {% endif %}
 
 )

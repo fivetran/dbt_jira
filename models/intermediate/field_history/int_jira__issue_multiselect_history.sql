@@ -13,14 +13,15 @@ fields as (
 ), 
 
 joined as (
-  
+
   select
     issue_multiselect_history.*,
     lower(fields.field_name) as field_name
 
   from issue_multiselect_history
-  join fields 
+  join fields
     on fields.field_id = issue_multiselect_history.field_id
+    and fields.source_relation = issue_multiselect_history.source_relation
 
 )
 

@@ -14,12 +14,14 @@ fields as (
                 staging_columns=get_field_option_columns()
             )
         }}
+        {{ jira.apply_source_relation() }}
     from base
 ),
 
 final as (
-    
-    select 
+
+    select
+        source_relation,
         id as field_id,
         parent_id as parent_field_id,
         name as field_option_name

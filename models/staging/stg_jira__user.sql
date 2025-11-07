@@ -13,12 +13,14 @@ fields as (
                 staging_columns=get_user_columns()
             )
         }}
+        {{ jira.apply_source_relation() }}
     from base
 ),
 
 final as (
 
-    select 
+    select
+        source_relation,
         email,
         id as user_id,
         locale,

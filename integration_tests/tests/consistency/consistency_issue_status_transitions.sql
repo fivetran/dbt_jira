@@ -4,14 +4,15 @@
     enabled=var('fivetran_validation_tests_enabled', false)
 ) }}
 
+-- source_relation is excluded as it will differ between prod and dev schemas
 with prod as (
-    
-    select 
+
+    select
         issue_id,
         status,
         status_category_name,
         previous_status,
-        previous_status_category_name 
+        previous_status_category_name
     from {{ target.schema }}_jira_prod.jira__issue_status_transitions
 ),
 

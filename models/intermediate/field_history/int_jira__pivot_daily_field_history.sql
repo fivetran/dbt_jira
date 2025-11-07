@@ -38,27 +38,29 @@ issue_multiselect_history as (
 
 issue_multiselect_batch_history as (
 
-    select 
+    select
         field_id,
         field_name,
         issue_id,
+        source_relation,
         updated_at,
         cast( {{ dbt.date_trunc('day', 'updated_at') }} as date) as date_day,
 
         -- if the field refers to an object captured in a table elsewhere (ie sprint, users, field_option for custom fields),
-        -- the value is actually a foreign key to that table. 
-        {{ fivetran_utils.string_agg('field_value', "', '") }} as field_values 
+        -- the value is actually a foreign key to that table.
+        {{ fivetran_utils.string_agg('field_value', "', '") }} as field_values
 
     from issue_multiselect_history
 
-    {{ dbt_utils.group_by(5) }}
+    {{ dbt_utils.group_by(6) }}
 ),
 
 combine_field_history as (
 -- combining all the field histories together
-    select 
+    select
         field_id,
         issue_id,
+        source_relation,
         updated_at,
         field_value,
         field_name
@@ -67,9 +69,10 @@ combine_field_history as (
 
     union all
 
-    select 
+    select
         field_id,
         issue_id,
+        source_relation,
         updated_at,
         field_values as field_value, -- this is an aggregated list but we'll just call it field_value
         field_name
@@ -79,15 +82,16 @@ combine_field_history as (
 
 get_valid_dates as (
 
-    select 
+    select
         field_id,
         issue_id,
+        source_relation,
         field_value,
         field_name,
         updated_at as valid_starting_at,
 
         -- this value is valid until the next value is updated
-        lead(updated_at, 1) over(partition by issue_id, {{ var('jira_field_grain', 'field_id') }} order by updated_at asc) as valid_ending_at, 
+        lead(updated_at, 1) over(partition by issue_id, {{ var('jira_field_grain', 'field_id') }} {{ jira.partition_by_source_relation() }} order by updated_at asc) as valid_ending_at,
         cast( {{ dbt.date_trunc('day', 'updated_at') }} as date) as valid_starting_on
 
     from combine_field_history
@@ -109,11 +113,11 @@ limit_to_relevant_fields as (
 
 order_daily_values as (
 
-    select 
+    select
         *,
         -- want to grab last value for an issue's field for each day
         row_number() over (
-            partition by valid_starting_on, issue_id, {{ var('jira_field_grain', 'field_id') }}
+            partition by valid_starting_on, issue_id, {{ var('jira_field_grain', 'field_id') }} {{ jira.partition_by_source_relation() }}
             order by valid_starting_at desc
             ) as row_num
 
@@ -134,12 +138,13 @@ int_jira__daily_field_history as (
     select
         field_id,
         issue_id,
+        source_relation,
         field_name,
 
         -- doing this to figure out what values are actually null and what needs to be backfilled in jira__daily_issue_field_history
         case when field_value is null then 'is_null' else field_value end as field_value,
         valid_starting_at,
-        valid_ending_at, 
+        valid_ending_at,
         valid_starting_on
 
     from get_latest_daily_value
@@ -148,11 +153,12 @@ int_jira__daily_field_history as (
 pivot_out as (
 
     -- pivot out default columns (status and sprint) and others specified in the var(issue_field_history_columns)
-    -- only days on which a field value was actively changed will have a non-null value. the nulls will need to 
+    -- only days on which a field value was actively changed will have a non-null value. the nulls will need to
     -- be backfilled in the final jira__daily_issue_field_history model
-    select 
+    select
         valid_starting_on,
         issue_id,
+        source_relation,
         cast({{ dbt.date_trunc('week', 'valid_starting_at') }} as date) as valid_starting_at_week,
         max(case when lower(field_id) = 'status' then field_value end) as status,
         max(case when lower(field_name) = 'sprint' then field_value end) as sprint,
@@ -167,13 +173,13 @@ pivot_out as (
 
     from int_jira__daily_field_history
 
-    {{ dbt_utils.group_by(3) }}
+    {{ dbt_utils.group_by(4) }}
 ),
 
 final as (
-    select 
+    select
         *,
-        {{ dbt_utils.generate_surrogate_key(['valid_starting_on','issue_id']) }} as issue_day_id
+        {{ dbt_utils.generate_surrogate_key(['valid_starting_on','issue_id','source_relation']) }} as issue_day_id
 
     from pivot_out
 )

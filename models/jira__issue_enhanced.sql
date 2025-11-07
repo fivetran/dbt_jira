@@ -14,10 +14,10 @@ with issue as (
 {%- endfor -%}
 
 daily_issue_field_history as (
-    
+
     select
         *,
-        row_number() over (partition by issue_id order by date_day desc) = 1 as latest_record
+        row_number() over (partition by issue_id {{ jira.partition_by_source_relation() }} order by date_day desc) = 1 as latest_record
     from {{ ref('jira__daily_issue_field_history')}}
 
 ),
@@ -40,15 +40,16 @@ final as (
         -- if an issue is not currently assigned this will not be null
         {{ dbt.datediff('last_assigned_at', "coalesce(resolved_at, " ~ dbt.current_timestamp() ~ ')', 'second') }} last_assignment_duration_seconds 
 
-        {% for col in pivot_data_columns if col.name|lower not in issue_data_columns_clean %} 
-            {%- if col.name|lower not in ['issue_day_id','issue_id','latest_record', 'date_day', 'date_week'] -%}
+        {% for col in pivot_data_columns if col.name|lower not in issue_data_columns_clean %}
+            {%- if col.name|lower not in ['issue_day_id','issue_id','latest_record', 'date_day', 'date_week', 'source_relation'] -%}
                 , {{ col.name }}
             {%- endif -%}
         {% endfor %}
 
     from issue
-    left join latest_issue_field_history 
+    left join latest_issue_field_history
         on issue.issue_id = latest_issue_field_history.issue_id
+        and issue.source_relation = latest_issue_field_history.source_relation
         
 )
 

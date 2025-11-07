@@ -1,3 +1,26 @@
+# dbt_jira v1.2.0
+[PR #157](https://github.com/fivetran/dbt_jira/pull/157) includes the following updates:
+
+## Schema/Data Change
+**1 total change • 0 possible breaking changes**
+
+| Data Model(s) | Change type | Old | New | Notes |
+| ------------- | ----------- | ----| --- | ----- |
+| All models | New column | | `source_relation` | Identifies the source connection when using multiple Jira connections |
+
+## Feature Update
+- **Union Data Functionality**: This release supports running the package on multiple Jira source connections. See the [README](https://github.com/fivetran/dbt_jira/tree/main?tab=readme-ov-file#step-3-define-database-and-schema-variables) for details on how to leverage this feature.
+
+## Bug Fix
+- Remove `issue_type` from `exception_cols` set in `jira__timestamp_issue_field_history` to avoid compilation errors when the field is set by the `issue_field_history_columns` variable.
+
+## Tests Update
+- Removes uniqueness tests. The new unioning feature requires combination-of-column tests to consider the new `source_relation` column in addition to the existing primary key, but this is not supported across dbt versions.
+- These tests will be reintroduced once a version-agnostic solution is available.
+
+## Under the Hood
+- Consistency tests introduced and updated on all end models to validate that the above changes do not impact end model values. 
+
 # dbt_jira v1.1.0
 
 ## Schema/Data Change

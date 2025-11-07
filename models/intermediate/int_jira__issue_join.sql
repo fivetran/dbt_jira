@@ -76,10 +76,10 @@ issue_versions as (
 join_issue as (
 
     select
-        issue.* 
+        issue.*
         ,project.project_name as project_name
         ,status.status_name as current_status
-        ,status_category.status_category_name as current_status_category   
+        ,status_category.status_category_name as current_status_category
         ,resolution.resolution_name as resolution_type
 
         {% if var('jira_using_priorities', True) %}
@@ -113,37 +113,46 @@ join_issue as (
         {% endif %}
 
     from issue
-    left join project 
+    left join project
         on project.project_id = issue.project_id
-    left join status 
+        and project.source_relation = issue.source_relation
+    left join status
         on status.status_id = issue.status_id
-    left join status_category 
+        and status.source_relation = issue.source_relation
+    left join status_category
         on status.status_category_id = status_category.status_category_id
-    left join resolution 
+        and status.source_relation = status_category.source_relation
+    left join resolution
         on resolution.resolution_id = issue.resolution_id
+        and resolution.source_relation = issue.source_relation
 
 	{% if var('jira_using_priorities', True) %}
     left join priority
         on priority.priority_id = issue.priority_id
+        and priority.source_relation = issue.source_relation
 	{% endif %}
-    left join issue_assignments_and_resolutions 
+    left join issue_assignments_and_resolutions
         on issue_assignments_and_resolutions.issue_id = issue.issue_id
+        and issue_assignments_and_resolutions.source_relation = issue.source_relation
 
     {% if var('jira_using_versions', True) %}
-    left join issue_versions 
+    left join issue_versions
         on issue_versions.issue_id = issue.issue_id
+        and issue_versions.source_relation = issue.source_relation
     {% endif %}
-    
+
     {% if var('jira_using_sprints', True) %}
-    left join issue_sprint 
+    left join issue_sprint
         on issue_sprint.issue_id = issue.issue_id
+        and issue_sprint.source_relation = issue.source_relation
     {% endif %}
 
     {% if var('jira_include_comments', True) %}
-    left join issue_comments 
+    left join issue_comments
         on issue_comments.issue_id = issue.issue_id
+        and issue_comments.source_relation = issue.source_relation
     {% endif %}
 )
 
-select * 
+select *
 from join_issue

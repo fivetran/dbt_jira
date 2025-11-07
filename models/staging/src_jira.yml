@@ -8,8 +8,9 @@ sources:
     schema: "{{ var ('jira_schema', 'jira') }}"
 
     loader: fivetran
-      
+
     config:
+      enabled: "{{ var('jira_sources', []) == [] }}"
       loaded_at_field: _fivetran_synced
       freshness:
         warn_after: {count: 72, period: hour}
@@ -42,7 +43,7 @@ sources:
         description: >
           Table of project components (subsections to group issues).
         config:
-          enabled: "{{ var('jira_using_components', true) }}"
+          enabled: "{{ var('jira_using_components', True) and var('jira_sources', []) == [] }}"
         columns:
           - name: id
             description: ID of the component.
@@ -214,7 +215,7 @@ sources:
         identifier: "{{ var('jira_priority_identifier', 'priority')}}"
         description: Table of issue priority levels (global).
         config:
-          enabled: "{{ var('jira_using_priorities', true) }}"
+          enabled: "{{ var('jira_using_priorities', True) and var('jira_sources', []) == [] }}"
         columns:
           - name: id
             description: Unique ID of the priority level.
@@ -258,7 +259,7 @@ sources:
       - name: sprint
         identifier: "{{ var('jira_sprint_identifier', 'sprint')}}"
         config:
-          enabled: "{{ var('jira_using_sprints', true) }}"
+          enabled: "{{ var('jira_using_sprints', True) and var('jira_sources', []) == [] }}"
         description: Table of all sprints.
         columns:
           - name: id
@@ -302,7 +303,7 @@ sources:
         identifier: "{{ var('jira_team_identifier', 'team')}}"
         description: Table of teams associated with your organization.
         config:
-          enabled: "{{ var('jira_using_teams', true) }}"
+          enabled: "{{ var('jira_using_teams', True) and var('jira_sources', []) == [] }}"
         columns:
           - name: id
             description: Unique ID of the team.
@@ -338,7 +339,7 @@ sources:
         identifier: "{{ var('jira_version_identifier', 'version')}}"
         description: Table of project versions in your organization.
         config:
-          enabled: "{{ var('jira_using_versions', true) }}"
+          enabled: "{{ var('jira_using_versions', True) and var('jira_sources', []) == [] }}"
         columns:
           - name: archived
             description: Boolean that is true if the project version has been archived.
