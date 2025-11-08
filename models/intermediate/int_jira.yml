@@ -466,8 +466,9 @@ models:
         description: The story point estimate that an issue has on a given day.  
       # plus any fields specified by `var('issue_field_history_columns')`
       - name: issue_day_id
-        description: Unique ID hashed on `valid_starting_on` and `issue_field_history`.
+        description: Unique ID hashed on `valid_starting_on`, `issue_id` and `source_relation`.
         tests:
+          - unique
           - not_null
 
 
@@ -597,8 +598,9 @@ models:
         description: The ID of the status that an issue has on a given day.
       # plus any fields specified by `var('issue_field_history_columns')`
       - name: issue_day_id
-        description: Unique ID hashed on `valid_starting_on` and `issue_field_history`.
+        description: Unique ID hashed on `valid_starting_on`, `issue_id`, and `source_relation`.
         tests:
+          - unique
           - not_null
 
   - name: int_jira__issue_versions

@@ -20,8 +20,9 @@ models:
       - name: issue_id
         description: Foreign key referencing the ID of the `issue` with these values.
       - name: issue_day_id
-        description: Surrogate key hashed on `date_day`, `issue_id`, and `source_relation`
+        description: Surrogate key hashed on `date_day`, `issue_id`, and `source_relation`.
         tests:
+          - unique
           - not_null
       - name: sprint
         description: The ID of the sprint that an issue is slotted into on a given day.
@@ -64,6 +65,7 @@ models:
       - name: issue_timestamp_id
         description: Surrogate key hashed on `valid_from`, `issue_id`, and `source_relation`
         tests:
+          - unique
           - not_null
         # other fields included in var(issue_history_columns)
 

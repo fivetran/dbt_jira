@@ -32,7 +32,7 @@ issue_status_history as (
     case when lead(valid_from) over (partition by issue_id {{ jira.partition_by_source_relation() }} order by valid_from) is null then true else false end as is_current_status,
 
     -- Calculate seconds in each status period using recalculated valid_until
-    {{ dbt.datediff('valid_from', 'coalesce(lead(valid_from) over (partition by issue_id' ~ (', source_relation' if var('jira_sources', [])|length > 1 else '') ~ ' order by valid_from), ' ~ dbt.current_timestamp() ~ ')', 'second') }} as seconds_in_status
+    {{ dbt.datediff('valid_from', 'coalesce(lead(valid_from) over (partition by issue_id' ~ jira.partition_by_source_relation() ~ ' order by valid_from), ' ~ dbt.current_timestamp() ~ ')', 'second') }} as seconds_in_status
 
   from status_changes_only
   -- Keep first record (no previous status) OR actual status changes
