@@ -5,7 +5,7 @@
 ) }}
 
 {# Exclude columns that depend on calculations involving the current time in seconds or aggregate strings in a random order, as they will differ between runs. #}
-{% set exclude_columns = ['source_relation', 'avg_age_currently_open_seconds', 'avg_age_currently_open_days', 'median_age_currently_open_seconds', 'median_age_currently_open_days', 'projects'] + var('consistency_test_exclude_metrics', []) %}
+{% set exclude_columns = ['avg_age_currently_open_seconds', 'avg_age_currently_open_days', 'median_age_currently_open_seconds', 'median_age_currently_open_days', 'projects'] + var('consistency_test_exclude_metrics', []) %}
 
 with prod as (
     select {{ dbt_utils.star(from=ref('jira__user_enhanced'), except=exclude_columns) }}
