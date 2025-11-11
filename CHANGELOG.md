@@ -21,6 +21,7 @@
 ## Tests Update
 - Removes uniqueness tests. The new unioning feature requires combination-of-column tests to consider the new `source_relation` column in addition to the existing primary key, but this is not supported across dbt versions.
 - These tests will be reintroduced once a version-agnostic solution is available.
+> We have kept uniqueness tests on the surrogate keys listed above.
 
 ## Under the Hood
 - Consistency tests introduced and updated on all end models to validate that the above changes do not impact end model values. 

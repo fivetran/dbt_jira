@@ -439,8 +439,9 @@ models:
       - name: issue_id
         description: Foreign key referencing the unique ID of the `issue` whose field was updated.
       - name: issue_day_id
-        description: Unique ID hashed on `date_day` and `issue_id`. 
+        description: Unique ID hashed on `date_day`, `issue_id`, and `source_relation`. 
         tests:
+          - unique
           - not_null
       - name: earliest_open_until_date
         description: Used for incremental materialization logic.

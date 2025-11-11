@@ -78,6 +78,7 @@ models:
       - name: sprint_issue_day_id
         description: Surrogate key hashed on `date_day`, `sprint_id`, `issue_id`, and `source_relation`
         tests:
+          - unique
           - not_null
       - name: sprint_id
         description: Foreign key referencing the ID of the `sprint` with these values.
