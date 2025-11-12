@@ -15,12 +15,14 @@ fields as (
                 staging_columns=get_component_columns()
             )
         }}
+        {{ jira.apply_source_relation() }}
     from base
 ),
 
 final as (
-    
-    select 
+
+    select
+        source_relation,
         description as component_description,
         id as component_id,
         name as component_name,

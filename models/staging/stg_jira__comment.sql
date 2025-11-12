@@ -14,12 +14,14 @@ fields as (
                 staging_columns=get_comment_columns()
             )
         }}
+        {{ jira.apply_source_relation() }}
     from base
 ),
 
 final as (
-    
-    select 
+
+    select
+        source_relation,
         author_id as author_user_id,
         body,
         cast(created as {{ dbt.type_timestamp() }}) as created_at,

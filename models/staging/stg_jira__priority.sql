@@ -15,12 +15,14 @@ fields as (
                 staging_columns=get_priority_columns()
             )
         }}
+        {{ jira.apply_source_relation() }}
     from base
 ),
 
 final as (
-    
-    select 
+
+    select
+        source_relation,
         description as priority_description,
         id as priority_id,
         name as priority_name,

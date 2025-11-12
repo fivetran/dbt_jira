@@ -11,16 +11,18 @@ order_epic_links as (
 
     select
         issue_id,
+        source_relation,
         cast(field_value as {{ dbt.type_string() }} ) as epic_issue_id,
-        row_number() over (partition by issue_id order by updated_at desc) as row_num
+        row_number() over (partition by issue_id {{ jira.partition_by_source_relation() }} order by updated_at desc) as row_num
     from epic_field_history
 ),
 
 last_epic_link as (
 
-    select 
-        issue_id, 
-        epic_issue_id 
+    select
+        issue_id,
+        source_relation,
+        epic_issue_id
     from order_epic_links
     where row_num = 1
 )

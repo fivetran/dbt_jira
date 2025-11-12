@@ -7,19 +7,21 @@ with base as (
 
 fields as (
 
-    select 
+    select
         {{
             fivetran_utils.fill_staging_columns(
                 source_columns=adapter.get_columns_in_relation(ref('stg_jira__issue_tmp')),
                 staging_columns=get_issue_columns()
             )
         }}
+        {{ jira.apply_source_relation() }}
     from base
 ),
 
 final as (
 
     select
+        source_relation,
         coalesce(original_estimate, _original_estimate) as original_estimate_seconds,
         coalesce(remaining_estimate, _remaining_estimate) as remaining_estimate_seconds,
         coalesce(time_spent, _time_spent) as time_spent_seconds,

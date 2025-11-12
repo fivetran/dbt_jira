@@ -20,7 +20,7 @@ order_versions as (
         *,
         -- using rank so batches stick together
         rank() over (
-            partition by field_id, issue_id 
+            partition by field_id, issue_id {{ jira.partition_by_source_relation() }}
             order by updated_at desc
             ) as row_num
     from version_history
@@ -28,9 +28,10 @@ order_versions as (
 
 latest_versions as (
 
-    select 
+    select
         field_id,
-        issue_id,	
+        issue_id,
+        source_relation,
         updated_at,
         cast(field_value as {{ dbt.type_int() }}) as version_id
     from order_versions
@@ -39,21 +40,24 @@ latest_versions as (
 
 version_info as (
 
-    select 
+    select
         latest_versions.field_id,
         latest_versions.issue_id,
+        latest_versions.source_relation,
         {{ fivetran_utils.string_agg('version.version_name', "', '") }} as versions
 
     from latest_versions
     join version on latest_versions.version_id = version.version_id
+        and latest_versions.source_relation = version.source_relation
 
-    group by 1,2
+    group by 1,2,3
 ),
 
 split_versions as (
 
-    select 
+    select
         issue_id,
+        source_relation,
         case when field_id = 'versions' then versions else null end as affects_versions,
         case when field_id = 'fixVersions' then versions else null end as fixes_versions
     from version_info
@@ -61,12 +65,13 @@ split_versions as (
 
 final as (
 
-    select 
+    select
         issue_id,
+        source_relation,
         max(affects_versions) as affects_versions,
         max(fixes_versions) as fixes_versions
     from split_versions
-    group by 1
+    group by 1, 2
 )
 
 select *

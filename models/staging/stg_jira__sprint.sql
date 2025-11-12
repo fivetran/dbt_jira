@@ -15,12 +15,14 @@ fields as (
                 staging_columns=get_sprint_columns()
             )
         }}
+        {{ jira.apply_source_relation() }}
     from base
 ),
 
 final as (
-    
-    select 
+
+    select
+        source_relation,
         id as sprint_id,
         name as sprint_name,
         board_id,

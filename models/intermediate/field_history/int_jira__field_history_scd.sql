@@ -9,41 +9,43 @@ with change_data as (
 
 ), set_values as (
 
-    select 
-        valid_starting_on, 
+    select
+        valid_starting_on,
         issue_id,
+        source_relation,
         issue_day_id,
         status as status_id,
-        sum( case when status is null then 0 else 1 end) over ( partition by issue_id 
+        sum( case when status is null then 0 else 1 end) over ( partition by issue_id {{ jira.partition_by_source_relation() }}
             order by valid_starting_on rows unbounded preceding) as status_id_field_partition
 
-        {% for col in issue_columns if col.name|lower not in ['valid_starting_on','issue_id','issue_day_id'] %} 
+        {% for col in issue_columns if col.name|lower not in ['valid_starting_on','issue_id','issue_day_id','source_relation'] %}
         , {{ col.name }}
         -- create a batch/partition once a new value is provided
-        , sum( case when {{ col.name }} is null then 0 else 1 end) over ( partition by issue_id 
+        , sum( case when {{ col.name }} is null then 0 else 1 end) over ( partition by issue_id {{ jira.partition_by_source_relation() }}
             order by valid_starting_on rows unbounded preceding) as {{ col.name }}_field_partition
 
         {% endfor %}
-    
+
     from change_data
 
 ), fill_values as (
 
 -- each row of the pivoted table includes field values if that field was updated on that day
--- we need to backfill to persist values that have been previously updated and are still valid 
-    select 
-        valid_starting_on, 
+-- we need to backfill to persist values that have been previously updated and are still valid
+    select
+        valid_starting_on,
         issue_id,
+        source_relation,
         issue_day_id,
         first_value( status ) over (
-            partition by issue_id, status_id_field_partition 
+            partition by issue_id, status_id_field_partition {{ jira.partition_by_source_relation() }}
             order by valid_starting_on asc rows between unbounded preceding and current row) as status_id
-        
-        {% for col in issue_columns if col.name|lower not in ['valid_starting_on','issue_id','issue_day_id'] %} 
+
+        {% for col in issue_columns if col.name|lower not in ['valid_starting_on','issue_id','issue_day_id','source_relation'] %}
 
         -- grab the value that started this batch/partition
         , first_value( {{ col.name }} ) over (
-            partition by issue_id, {{ col.name }}_field_partition 
+            partition by issue_id, {{ col.name }}_field_partition {{ jira.partition_by_source_relation() }}
             order by valid_starting_on asc rows between unbounded preceding and current row) as {{ col.name }}
 
         {% endfor %}

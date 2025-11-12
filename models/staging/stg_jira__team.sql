@@ -15,12 +15,14 @@ fields as (
                 staging_columns=get_team_columns()
             )
         }}
+        {{ jira.apply_source_relation() }}
     from base
 ),
 
 final as (
-    
-    select 
+
+    select
+        source_relation,
         cast(id as {{ dbt.type_string() }}) as team_id,
         is_shared as is_shared_team,
         is_visible as is_visible_team,

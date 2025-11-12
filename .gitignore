@@ -16,6 +16,9 @@ target/
 *.swp
 *.swo
 
+# Claude instructions
+CLAUDE.md
+
 # Jupyter Notebook
 .ipynb_checkpoints
 

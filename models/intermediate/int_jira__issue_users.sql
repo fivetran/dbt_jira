@@ -34,10 +34,12 @@ issue_user_join as (
         reporter.user_display_name as reporter_name,
         reporter.time_zone as reporter_timezone
     from issue
-    left join jira_user as assignee 
-        on issue.assignee_user_id = assignee.user_id 
-    left join jira_user as reporter 
+    left join jira_user as assignee
+        on issue.assignee_user_id = assignee.user_id
+        and issue.source_relation = assignee.source_relation
+    left join jira_user as reporter
         on issue.reporter_user_id = reporter.user_id
+        and issue.source_relation = reporter.source_relation
 )
 
 select * 

@@ -74,18 +74,77 @@ Include the following jira package version in your `packages.yml` file:
 ```yaml
 packages:
   - package: fivetran/jira
-    version: [">=1.1.0", "<1.2.0"]
+    version: [">=1.2.0", "<1.3.0"]
 ```
 
 > All required sources and staging models are now bundled into this transformation package. Do not include `fivetran/jira_source` in your `packages.yml` since this package has been deprecated.
 
 ### Step 3: Define database and schema variables
+
+#### Option A: Single connection
 By default, this package runs using your destination and the `jira` schema. If this is not where your Jira data is (for example, if your Jira schema is named `jira_fivetran`), add the following configuration to your root `dbt_project.yml` file:
 
 ```yml
 vars:
     jira_database: your_destination_name
-    jira_schema: your_schema_name 
+    jira_schema: your_schema_name
+```
+
+#### Option B: Union multiple connections
+If you have multiple Jira connections in Fivetran and would like to use this package on all of them simultaneously, we have provided functionality to do so. For each source table, the package will union all of the data together and pass the unioned table into the transformations. The `source_relation` column in each model indicates the origin of each record.
+
+To use this functionality, you will need to set the `jira_sources` variable in your root `dbt_project.yml` file:
+
+```yml
+# dbt_project.yml
+
+vars:
+  jira:
+    jira_sources:
+      - database: connection_1_destination_name # Required
+        schema: connection_1_schema_name # Required
+        name: connection_1_source_name # Required only if following the step in the following subsection
+
+      - database: connection_2_destination_name
+        schema: connection_2_schema_name
+        name: connection_2_source_name
+```
+
+##### Recommended: Incorporate unioned sources into DAG
+> *If you are running the package through [Fivetran Transformations for dbt Core™](https://fivetran.com/docs/transformations/dbt#transformationsfordbtcore), the below step is necessary in order to synchronize model runs with your Jira connections. Alternatively, you may choose to run the package through Fivetran [Quickstart](https://fivetran.com/docs/transformations/quickstart), which would create separate sets of models for each Jira source rather than one set of unioned models.*
+
+By default, this package defines one single-connection source, called `jira`, which will be disabled if you are unioning multiple connections. This means that your DAG will not include your Jira sources, though the package will run successfully.
+
+To properly incorporate all of your Jira connections into your project's DAG:
+1. Define each of your sources in a `.yml` file in your project. Utilize the following template for the `source`-level configurations, and, **most importantly**, copy and paste the table and column-level definitions from the package's `src_jira.yml` [file](https://github.com/fivetran/dbt_jira/blob/main/models/staging/src_jira.yml).
+
+```yml
+# a .yml file in your root project
+
+version: 2
+
+sources:
+  - name: <name> # ex: Should match name in jira_sources
+    schema: <schema_name>
+    database: <database_name>
+    loader: fivetran
+    config:
+      loaded_at_field: _fivetran_synced
+      freshness: # feel free to adjust to your liking
+        warn_after: {count: 72, period: hour}
+        error_after: {count: 168, period: hour}
+
+    tables: # copy and paste from jira/models/staging/src_jira.yml - see https://support.atlassian.com/bitbucket-cloud/docs/yaml-anchors/ for how to use anchors to only do so once
+```
+
+> **Note**: If there are source tables you do not have (see [Step 5](https://github.com/fivetran/dbt_jira?tab=readme-ov-file#optional-step-5-additional-configurations)), you may still include them, as long as you have set the right variables to `False`.
+
+2. Set the `has_defined_sources` variable (scoped to the `jira` package) to `True`, like such:
+```yml
+# dbt_project.yml
+vars:
+  jira:
+    has_defined_sources: true
 ```
 
 ### Step 4: Disable models for non-existent sources

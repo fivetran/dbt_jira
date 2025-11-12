@@ -16,12 +16,13 @@ issue_multiselect_batch_history as (
         field_id,
         field_name,
         issue_id,
+        source_relation,
         updated_at,
         author_id,
         {{ fivetran_utils.string_agg('field_value', "', '") }} as field_values
 
     from issue_multiselect_history
-    {{ dbt_utils.group_by(5) }}
+    {{ dbt_utils.group_by(6) }}
 ),
 
 combine_field_history as (
@@ -29,6 +30,7 @@ combine_field_history as (
     select
         field_id,
         issue_id,
+        source_relation,
         updated_at,
         author_id,
         field_value,
@@ -40,6 +42,7 @@ combine_field_history as (
     select
         field_id,
         issue_id,
+        source_relation,
         updated_at,
         author_id,
         field_values as field_value,
@@ -63,6 +66,7 @@ int_jira__timestamp_field_history as (
     select
         field_id,
         issue_id,
+        source_relation,
         field_name,
         case when field_value is null then 'is_null' else field_value end as field_value,
         updated_at,
@@ -75,6 +79,7 @@ final as (
     select
         updated_at,
         issue_id,
+        source_relation,
         cast({{ dbt.date_trunc('week', 'updated_at') }} as date) as updated_at_week,
         author_id,
         max(case when lower(field_id) = 'status' then field_value end) as status
@@ -85,7 +90,7 @@ final as (
         {% endfor -%}
 
     from int_jira__timestamp_field_history
-    {{ dbt_utils.group_by(4) }}
+    {{ dbt_utils.group_by(5) }}
 )
 
 select *

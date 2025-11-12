@@ -4,10 +4,11 @@ models:
   - name: stg_jira__comment
     description: Table of comments made on issues.
     columns:
+      - name: source_relation
+        description: "{{ doc('source_relation') }}"
       - name: comment_id 
         description: Unique ID of the comment.
         tests:
-          - unique
           - not_null
       - name: author_user_id
         description: Foreign key referencing the `user` id of the comment's author.
@@ -27,10 +28,11 @@ models:
   - name: stg_jira__component
     description: Table of project components (subsections to group issues).
     columns:
+      - name: source_relation
+        description: "{{ doc('source_relation') }}"
       - name: component_id
         description: ID of the component.
         tests:
-          - unique
           - not_null
       - name: component_description
         description: Description given to the component.
@@ -39,15 +41,16 @@ models:
       - name: project_id
         description: Foreign key referencing the id of the component's `project`.
 
-  - name: stg_jira__field 
+  - name: stg_jira__field
     description: Table of all issue fields.
     columns:
+      - name: source_relation
+        description: "{{ doc('source_relation') }}"
       - name: field_id
         description: >
           Unique ID of the field. Default fields will have descriptive IDs, whereas custom
           field IDs will be `'customfield_#####'`.
         tests:
-          - unique
           - not_null
       - name: is_array
         description: Boolean that is true if a field can have multiple values (is multiselect).
@@ -61,6 +64,8 @@ models:
   - name: stg_jira__field_option
     description: Table of all options related to custom fields.
     columns:
+      - name: source_relation
+        description: "{{ doc('source_relation') }}"
       - name: field_id
         description: The ID of the custom field.
         tests:
@@ -70,10 +75,12 @@ models:
       - name: field_option_name
         description: Name of the field option.
 
-  - name: stg_jira__issue_link 
+  - name: stg_jira__issue_link
     description: >
       Table of relationships (links) created between issues. Issue links can include blockers, clones/duplicates, and general relationships.
     columns:
+      - name: source_relation
+        description: "{{ doc('source_relation') }}"
       - name: issue_id
         description: Foreign key referencing the ID of the `issue` that is the subject of this relationship (the linker).
       - name: related_issue_id
@@ -84,10 +91,11 @@ models:
   - name: stg_jira__issue
     description: Table of all issues in your organization's Jira (captures soft deletes).
     columns:
+      - name: source_relation
+        description: "{{ doc('source_relation') }}"
       - name: issue_id
         description: Unique ID of the issue. 
         tests:
-          - unique
           - not_null
       - name: assignee_user_id
         description: Foreign key referencing the ID of the `user` currently assigned to this task.
@@ -147,6 +155,8 @@ models:
   - name: stg_jira__issue_field_history
     description: Table of every value that each **custom non-array** (not multiselect) field has been set to.
     columns:
+      - name: source_relation
+        description: "{{ doc('source_relation') }}"
       - name: field_id
         description: Foreign key referencing the ID of the `field` that was changed.
       - name: issue_id
@@ -164,6 +174,8 @@ models:
     description: >
       Table of every value that each array-type (multiselect) field has been set to. Each row will pertain to **one** value.
     columns:
+      - name: source_relation
+        description: "{{ doc('source_relation') }}"
       - name: _fivetran_id 
         description: Fivetran-generated ID hashed on field, issue, and value.
       - name: updated_at
@@ -181,13 +193,14 @@ models:
 
   - name: stg_jira__issue_type
     description: >
-      Table containing information about issue types. Issue types can have identical names in different projects, but they may have 
+      Table containing information about issue types. Issue types can have identical names in different projects, but they may have
       differing descriptions.
     columns:
+      - name: source_relation
+        description: "{{ doc('source_relation') }}"
       - name: issue_type_id 
         description: Unique ID of the issue type. 
         tests:
-          - unique
           - not_null
       - name: description
         description: Project-level description given to the issue type.
@@ -199,10 +212,11 @@ models:
   - name: stg_jira__priority
     description: Table of issue priority levels (global).
     columns:
+      - name: source_relation
+        description: "{{ doc('source_relation') }}"
       - name: priority_id
         description: Unique ID of the priority level.
         tests:
-          - unique
           - not_null
       - name: priority_description
         description: Description of the priority level.
@@ -212,10 +226,11 @@ models:
   - name: stg_jira__project
     description: Table of all projects in your organization.
     columns:
+      - name: source_relation
+        description: "{{ doc('source_relation') }}"
       - name: project_id
         description: Unique ID of the project.
         tests:
-          - unique
           - not_null
       - name: project_description
         description: Description of the project, if given.
@@ -232,11 +247,12 @@ models:
 
   - name: stg_jira__resolution
     description: Table storing the types of resolutions used by your organization.
-    columns: 
+    columns:
+      - name: source_relation
+        description: "{{ doc('source_relation') }}"
       - name: resolution_id
         description: Unique ID of the resolution type.
         tests:
-          - unique
           - not_null
       - name: resolution_description
         description: Description given to the resolution.
@@ -246,10 +262,11 @@ models:
   - name: stg_jira__sprint
     description: Table of all sprints.
     columns:
+      - name: source_relation
+        description: "{{ doc('source_relation') }}"
       - name: sprint_id
         description: Unique ID of the sprint.
         tests:
-          - unique
           - not_null
       - name: board_id
         description: Foreign key referencing the ID of the `board` that the sprint lives in.
@@ -265,10 +282,11 @@ models:
   - name: stg_jira__status
     description: Table of project-level statuses (which may have the same umbrella `status_category`).
     columns:
+      - name: source_relation
+        description: "{{ doc('source_relation') }}"
       - name: status_id
         description: Unique ID of the project status.
         tests:
-          - unique
           - not_null
       - name: status_description
         description: >
@@ -282,10 +300,11 @@ models:
   - name: stg_jira__status_category
     description: Table of umbrella status categories.
     columns:
+      - name: source_relation
+        description: "{{ doc('source_relation') }}"
       - name: status_category_id
         description: Unique ID of the status category.
         tests:
-          - unique
           - not_null
       - name: status_category_name
         description: Title of the status category.
@@ -293,10 +312,11 @@ models:
   - name: stg_jira__team
     description: Table of teams associated with your organization.
     columns:
+      - name: source_relation
+        description: "{{ doc('source_relation') }}"
       - name: team_id
         description: Unique ID of the team.
         tests:
-          - unique
           - not_null
       - name: is_shared_team
         description: Boolean that is true if the team is shared with other teams in your organization.
@@ -310,10 +330,11 @@ models:
   - name: stg_jira__user
     description: Table of users associated with your organization.
     columns:
+      - name: source_relation
+        description: "{{ doc('source_relation') }}"
       - name: user_id  
         description: Unique ID of the user. 
         tests:
-          - unique
           - not_null
       - name: email
         description: Email associated with the user account.
@@ -331,6 +352,8 @@ models:
   - name: stg_jira__version
     description: Table of project versions in your organization.
     columns:
+      - name: source_relation
+        description: "{{ doc('source_relation') }}"
       - name: is_archived
         description: Boolean that is true if the project version has been archived.
       - name: description
@@ -338,7 +361,6 @@ models:
       - name: version_id
         description: Unique ID of the version.
         tests:
-          - unique
           - not_null
       - name: version_name
         description: Unique name of the version.

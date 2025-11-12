@@ -1,3 +1,31 @@
+# dbt_jira v1.2.0
+[PR #157](https://github.com/fivetran/dbt_jira/pull/157) includes the following updates:
+
+## Schema/Data Change
+** 6 total change • 5 possible breaking changes**
+
+| Data Model(s) | Change type | Old | New | Notes |
+| ------------- | ----------- | ----| --- | ----- |
+| All models | New column | | `source_relation` | Identifies the source connection when using multiple Jira connections |
+| `jira__daily_issue_field_history` | Updated surrogate key | `issue_day_id` = `issue_id` + `date_day` | `issue_day_id` = `issue_id` + `date_day` + `source_relation`  | Updated to include `source_relation` |
+| `jira__daily_sprint_issue_history` | Updated surrogate key | `sprint_issue_day_id` = `issue_id` + `sprint_id` + `date_day` | `sprint_issue_day_id` = `issue_id` + `sprint_id` + `date_day` + `source_relation`  | Updated to include `source_relation` |
+| `jira__timestamp_issue_field_history` | Updated surrogate key | `issue_timestamp_id` = `issue_id` + `valid_from` | `issue_timestamp_id` = `issue_id` + `valid_from` + `source_relation`  | Updated to include `source_relation` |
+| `int_jira__pivot_daily_field_history` <br> `int_jira__field_history_scd` | Updated surrogate key | `issue_day_id` = `issue_id` + `valid_starting_on` | `issue_day_id` =  `issue_id` + `valid_starting_on` + `source_relation` | Updated to include `source_relation` |
+
+## Feature Update
+- **Union Data Functionality**: This release supports running the package on multiple Jira source connections. See the [README](https://github.com/fivetran/dbt_jira/tree/main?tab=readme-ov-file#step-3-define-database-and-schema-variables) for details on how to leverage this feature.
+
+## Bug Fix
+- Removes `issue_type` from `exception_cols` set in `jira__timestamp_issue_field_history` to avoid compilation errors when the field is included in the `issue_field_history_columns` variable.
+
+## Tests Update
+- Removes uniqueness tests. The new unioning feature requires combination-of-column tests to consider the new `source_relation` column in addition to the existing primary key, but this is not supported across dbt versions.
+- These tests will be reintroduced once a version-agnostic solution is available.
+> We have kept uniqueness tests on the surrogate keys listed above.
+
+## Under the Hood
+- Consistency tests introduced and updated on all end models to validate that the above changes do not impact end model values. 
+
 # dbt_jira v1.1.0
 
 ## Schema/Data Change

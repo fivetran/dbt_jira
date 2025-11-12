@@ -7,25 +7,27 @@ with issue as (
 
 calculate_medians as (
 
-    select 
+    select
         assignee_user_id as user_id,
-        round(cast({{ fivetran_utils.percentile(percentile_field='case when resolved_at is not null then last_assignment_duration_seconds end', 
+        source_relation,
+        round(cast({{ fivetran_utils.percentile(percentile_field='case when resolved_at is not null then last_assignment_duration_seconds end',
                     partition_field='assignee_user_id', percent='0.5') }} as {{ dbt.type_numeric() }}), 0) as median_close_time_seconds,
-        round(cast({{ fivetran_utils.percentile(percentile_field='case when resolved_at is null then last_assignment_duration_seconds end', 
+        round(cast({{ fivetran_utils.percentile(percentile_field='case when resolved_at is null then last_assignment_duration_seconds end',
                     partition_field='assignee_user_id', percent='0.5') }} as {{ dbt.type_numeric() }}), 0) as median_age_currently_open_seconds
     from issue
-    {% if target.type == 'postgres' %} group by 1 {% endif %}
+    {% if target.type == 'postgres' %} group by 1, 2 {% endif %}
 ),
 
 -- grouping because the medians were calculated using window functions (except postgres)
 median_metrics as (
 
-    select 
-        user_id, 
-        median_close_time_seconds, 
+    select
+        user_id,
+        source_relation,
+        median_close_time_seconds,
         median_age_currently_open_seconds
     from calculate_medians
-    {{ dbt_utils.group_by(3) }}
+    {{ dbt_utils.group_by(4) }}
 ),
 
 
@@ -33,18 +35,20 @@ user_issues as (
 
     select
         assignee_user_id as user_id,
+        source_relation,
         sum(case when resolved_at is not null then 1 else 0 end) as count_closed_issues,
         sum(case when resolved_at is null then 1 else 0 end) as count_open_issues,
         sum(case when resolved_at is not null then last_assignment_duration_seconds end) as sum_close_time_seconds,
         sum(case when resolved_at is null then last_assignment_duration_seconds end) as sum_current_open_seconds
     from issue
-    group by 1
+    group by 1, 2
 ),
 
 calculate_avg_metrics as (
 
-    select 
+    select
         user_id,
+        source_relation,
         count_closed_issues,
         count_open_issues,
         case when count_closed_issues = 0 then 0 else
@@ -65,8 +69,9 @@ join_metrics as (
         round(cast(median_metrics.median_close_time_seconds / 86400.0 as {{ dbt.type_numeric() }} ), 0) as median_close_time_days,
         round(cast(median_metrics.median_age_currently_open_seconds / 86400.0 as {{ dbt.type_numeric() }} ), 0) as median_age_currently_open_days 
     from calculate_avg_metrics
-    left join median_metrics on 
+    left join median_metrics on
         calculate_avg_metrics.user_id = median_metrics.user_id
+        and calculate_avg_metrics.source_relation = median_metrics.source_relation
 )
 
 select * 

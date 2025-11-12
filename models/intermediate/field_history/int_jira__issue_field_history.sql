@@ -13,7 +13,7 @@ fields as (
 ), 
 
 joined as (
-  
+
   select
     field_history.*,
     lower(fields.field_name) as field_name
@@ -21,6 +21,7 @@ joined as (
   from field_history
   join fields
     on fields.field_id = field_history.field_id
+    and fields.source_relation = field_history.source_relation
 
 )
 

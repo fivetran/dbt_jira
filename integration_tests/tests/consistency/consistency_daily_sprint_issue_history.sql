@@ -1,14 +1,14 @@
 {{ config(
     tags="fivetran_validations",
-    enabled=var('fivetran_validation_tests_enabled', false) 
+    enabled=var('fivetran_validation_tests_enabled', false)
 ) }}
 
+-- source_relation is excluded as it will differ between prod and dev schemas
 with prod as (
     select
         date_day,
         issue_id,
-        sprint_id,
-        sprint_issue_day_id,
+        sprint_id, 
         story_point_estimate,
         story_points
     from {{ target.schema }}_jira_prod.jira__daily_sprint_issue_history
@@ -19,7 +19,6 @@ dev as (
         date_day,
         issue_id,
         sprint_id,
-        sprint_issue_day_id,
         story_point_estimate,
         story_points
     from {{ target.schema }}_jira_dev.jira__daily_sprint_issue_history

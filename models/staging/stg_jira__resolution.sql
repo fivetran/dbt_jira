@@ -14,12 +14,14 @@ fields as (
                 staging_columns=get_resolution_columns()
             )
         }}
+        {{ jira.apply_source_relation() }}
     from base
 ),
 
 final as (
-    
-    select 
+
+    select
+        source_relation,
         description as resolution_description,
         id as resolution_id,
         name as resolution_name,
