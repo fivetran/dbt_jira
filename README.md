@@ -74,7 +74,7 @@ Include the following jira package version in your `packages.yml` file:
 ```yaml
 packages:
   - package: fivetran/jira
-    version: [">=1.2.0", "<1.3.0"]
+    version: 1.2.1-a1
 ```
 
 > All required sources and staging models are now bundled into this transformation package. Do not include `fivetran/jira_source` in your `packages.yml` since this package has been deprecated.

@@ -27,7 +27,11 @@ sprint_field_history as (
         row_number() over (
                     partition by field_history.issue_id {{ jira.partition_by_source_relation(alias='field_history') }}
                     order by field_history.updated_at desc, sprint.started_at desc
-                    ) as row_num
+                    ) as row_num,
+        row_number() over (
+                    partition by field_history.issue_id {{ jira.partition_by_source_relation(alias='field_history') }}
+                    order by field_history.updated_at desc, sprint.started_at asc
+                    ) as reverse_row_num
     from field_history
     left join sprint
         on field_history.field_value = cast(sprint.sprint_id as {{ dbt.type_string() }})
@@ -47,8 +51,7 @@ sprint_rollovers as (
     select
         issue_id,
         source_relation,
-        -- If the issue was initialized without a sprint, don't count that as a sprint change (but do count later removals/NULLs)
-        count(distinct case when field_value is not null or row_num > 1 then field_value end) as count_sprint_changes
+        count(distinct case when field_value is not null then field_value end) as count_sprint_changes
     from sprint_field_history
     group by 1, 2
 ),
