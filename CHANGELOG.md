@@ -1,3 +1,9 @@
+# dbt_jira v1.2.1
+
+## Bug Fixes
+- Ensures that issues in `jira__issue_enhanced` properly reflect their current sprint assignments. Previously, if an issue was assigned to a sprint and later unassigned (leaving it with no sprint), the old sprint would persist as the issue's `current_sprint_name` and `current_sprint_id`.
+- Includes sprint removals in calculating `count_sprint_changes` for each issue in `jira__issue_enhanced`.
+
 # dbt_jira v1.2.0
 [PR #157](https://github.com/fivetran/dbt_jira/pull/157) includes the following updates:
 

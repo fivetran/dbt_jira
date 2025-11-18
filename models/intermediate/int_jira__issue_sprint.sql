@@ -29,7 +29,7 @@ sprint_field_history as (
                     order by field_history.updated_at desc, sprint.started_at desc
                     ) as row_num
     from field_history
-    inner join sprint
+    left join sprint
         on field_history.field_value = cast(sprint.sprint_id as {{ dbt.type_string() }})
         and field_history.source_relation = sprint.source_relation
     where lower(field_history.field_name) = 'sprint'
@@ -47,7 +47,8 @@ sprint_rollovers as (
     select
         issue_id,
         source_relation,
-        count(distinct case when field_value is not null then field_value end) as count_sprint_changes
+        -- If the issue was initialized without a sprint, don't count that as a sprint change (but do count later removals/NULLs)
+        case(distinct case when field_value is not null or row_number > 1 then field_value end) as count_sprint_changes
     from sprint_field_history
     group by 1, 2
 ),
