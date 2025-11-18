@@ -48,7 +48,7 @@ sprint_rollovers as (
         issue_id,
         source_relation,
         -- If the issue was initialized without a sprint, don't count that as a sprint change (but do count later removals/NULLs)
-        case(distinct case when field_value is not null or row_number > 1 then field_value end) as count_sprint_changes
+        count(distinct case when field_value is not null or row_num > 1 then field_value end) as count_sprint_changes
     from sprint_field_history
     group by 1, 2
 ),
