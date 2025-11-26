@@ -1,3 +1,9 @@
+# dbt_jira v1.VERSION.VERSION
+
+## Test Updates
+- Fixes `vertical_integrity_sprint_enhanced` test to filter out deleted issues (as done in `stg_jira__issue`) to align source/end model issue counts by sprint. 
+- Excludes more fields that are aggregated strings with non-deterministic orders to the exclude columns set in `consistency_issue_enhanced`.  
+
 # dbt_jira v1.2.0
 [PR #157](https://github.com/fivetran/dbt_jira/pull/157) includes the following updates:
 
