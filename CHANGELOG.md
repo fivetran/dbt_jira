@@ -1,18 +1,22 @@
-<<<<<<< HEAD
-# dbt_jira v1.2.1-a1
-
-[PR #158](https://github.com/fivetran/dbt_jira/pull/158) includes the following updates:
+# dbt_jira v1.3.1 
+[PR #161](https://github.com/fivetran/dbt_jira/pull/161) includes the following updates:
 
 ## Bug Fixes
 - Ensures that issues in `jira__issue_enhanced` properly reflect their current sprint assignments. Previously, if an issue was assigned to a sprint and later unassigned (leaving it with no sprint), the old sprint would persist as the issue's `current_sprint_name` and `current_sprint_id`.
-=======
+
 # dbt_jira v1.3.0
 
 [PR #159](https://github.com/fivetran/dbt_jira/pull/159) includes the following updates:
 
 ## Features
   - Increases the required dbt version upper limit to v3.0.0
->>>>>>> origin
+
+# dbt_jira v1.2.1-a1
+
+[PR #158](https://github.com/fivetran/dbt_jira/pull/158) includes the following updates:
+
+## Bug Fixes
+- Ensures that issues in `jira__issue_enhanced` properly reflect their current sprint assignments. Previously, if an issue was assigned to a sprint and later unassigned (leaving it with no sprint), the old sprint would persist as the issue's `current_sprint_name` and `current_sprint_id`.
 
 # dbt_jira v1.2.0
 [PR #157](https://github.com/fivetran/dbt_jira/pull/157) includes the following updates:
