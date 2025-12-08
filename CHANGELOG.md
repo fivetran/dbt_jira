@@ -1,3 +1,6 @@
+# dbt_jira v1.3.1
+
+
 # dbt_jira v1.3.0
 
 [PR #159](https://github.com/fivetran/dbt_jira/pull/159) includes the following updates:
