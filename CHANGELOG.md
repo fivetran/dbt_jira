@@ -4,6 +4,10 @@
 ## Bug Fixes
 - Ensures that issues in `jira__issue_enhanced` properly reflect their current sprint assignments. Previously, if an issue was assigned to a sprint and later unassigned (leaving it with no sprint), the old sprint would persist as the issue's `current_sprint_name` and `current_sprint_id`.
 
+## Test Updates
+- Fixes `vertical_integrity_sprint_enhanced` test to filter out deleted issues (as done in `stg_jira__issue`) to align source/end model issue counts by sprint. 
+- Excludes more fields that are aggregated strings with non-deterministic orders to the exclude columns set in `consistency_issue_enhanced`.  
+
 # dbt_jira v1.3.0
 
 [PR #159](https://github.com/fivetran/dbt_jira/pull/159) includes the following updates:

@@ -31,6 +31,12 @@ sprint as (
     from {{ ref('stg_jira__sprint') }}
 ),
 
+issue as (
+
+    select *
+    from {{ ref('stg_jira__issue') }}
+),
+
 issue_sprint_fields as (
 
     select 
@@ -40,6 +46,8 @@ issue_sprint_fields as (
     from issue_multiselect_history
     inner join field
         on field.field_id = issue_multiselect_history.field_id
+    inner join issue
+        on cast(issue.issue_id as string) = issue_multiselect_history.field_id
     where lower(field.field_name) = 'sprint'
 ),
 
