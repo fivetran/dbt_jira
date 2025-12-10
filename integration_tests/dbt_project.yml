@@ -1,15 +1,15 @@
 name: 'jira_integration_tests'
-version: '1.3.0'
+version: '1.3.1'
 config-version: 2
 profile: 'integration_tests'
 
 
 vars:
 # Comment out the below when generating docs
-  issue_field_history_columns: ['summary', 'components', 'team' ,'project']  # @docs-ignore
-  
+  issue_field_history_columns: ['team', 'assignee', 'labels', 'collaborators', 'quarter',  'project']  # @docs-ignore
+
   jira:
-    jira_schema: jira_integrations_tests_42
+    jira_schema: jira_integration_tests
     jira_comment_identifier: "comment"
     jira_component_identifier: "component"
     jira_epic_identifier: "epic"
