@@ -1,7 +1,9 @@
 {%- set custom_columns = [] -%}
 {%- for col in var('issue_field_history_columns', []) -%}
     {%- set clean_col = dbt_utils.slugify(col) | replace(' ', '_') | lower -%}
-    {%- do custom_columns.append(clean_col) -%}
+    {%- if clean_col not in ['sprint', 'story_points', 'story_point_estimate'] -%}
+        {%- do custom_columns.append(clean_col) -%}
+    {%- endif -%}
 {%- endfor -%}
 
 with timestamp_history_scd as (
@@ -78,7 +80,7 @@ create_validity_periods as (
         author_id
 
         -- list of exception columns
-        {% set exception_cols = ['issue_id', 'updated_at', 'updated_at_week', 'status', 'author_id', 'source_relation'] %}
+        {% set exception_cols = ['issue_id', 'updated_at', 'updated_at_week', 'status', 'author_id', 'sprint', 'story_points', 'story_point_estimate', 'source_relation'] %}
 
         {% for col in custom_columns %}
             {% if col|lower not in exception_cols %}
@@ -103,7 +105,7 @@ fix_null_values as (
         create_validity_periods.author_id
 
         -- list of exception columns
-        {% set exception_cols = ['issue_id', 'issue_timestamp_id', 'updated_at', 'updated_at_week', 'status', 'author_id', 'components', 'project', 'assignee', 'team', 'source_relation'] %}
+        {% set exception_cols = ['issue_id', 'issue_timestamp_id', 'updated_at', 'updated_at_week', 'status', 'author_id', 'components', 'project', 'assignee', 'team', 'sprint', 'story_points', 'story_point_estimate', 'source_relation'] %}
 
         {% for col in custom_columns %}
             {% if col|lower == 'components' and var('jira_using_components', True) %}

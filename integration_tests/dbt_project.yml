@@ -6,10 +6,10 @@ profile: 'integration_tests'
 
 vars:
 # Comment out the below when generating docs
-  issue_field_history_columns: ['team', 'assignee', 'labels', 'collaborators', 'quarter',  'project']  # @docs-ignore
+  issue_field_history_columns: ['team', 'assignee', 'labels', 'collaborators', 'quarter', 'project']  # @docs-ignore
 
   jira:
-    jira_schema: jira_integration_tests
+    jira_schema: zz_dbt_avinash_seed
     jira_comment_identifier: "comment"
     jira_component_identifier: "component"
     jira_epic_identifier: "epic"

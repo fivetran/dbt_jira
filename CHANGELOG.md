@@ -1,4 +1,19 @@
-# dbt_jira v1.3.1 
+# dbt_jira v1.4.0
+
+## Schema/Data Change
+**1 total change • 0 possible breaking changes**
+
+| Data Model(s) | Change type | Old | New | Notes |
+| ------------- | ----------- | ----| --- | ----- |
+| `jira__timestamp_issue_field_history` | New columns | | `sprint`, `story_points`, `story_point_estimate` | Default fields now included to match `jira__daily_issue_field_history` behavior |
+
+## Bug Fix
+- Fixed compilation error in `int_jira__pivot_daily_field_history` when `sprint` was included in the `issue_field_history_columns` variable. The model now properly excludes `sprint` from the custom columns loop since it's already included as a default field, preventing duplicate column errors.
+
+## Documentation
+- Updated README to clarify that both `jira__daily_issue_field_history` and `jira__timestamp_issue_field_history` models include the same default fields (`status`, `status_id`, `sprint`, `story_points`, `story_point_estimate`) and can be extended using the `issue_field_history_columns` variable.
+
+# dbt_jira v1.3.1
 [PR #161](https://github.com/fivetran/dbt_jira/pull/161) includes the following updates:
 
 ## Bug Fixes
