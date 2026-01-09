@@ -462,9 +462,11 @@ models:
       - name: status
         description: The ID of the status that an issue has on a given day.
       - name: story_points
-        description: The story points that an issue has on a given day. 
+        description: The story points that an issue has on a given day.
       - name: story_point_estimate
-        description: The story point estimate that an issue has on a given day.  
+        description: The story point estimate that an issue has on a given day.
+      - name: team
+        description: The team associated with an issue on a given day (when `jira_using_teams` is enabled).
       # plus any fields specified by `var('issue_field_history_columns')`
       - name: issue_day_id
         description: Unique ID hashed on `valid_starting_on`, `issue_id` and `source_relation`.
@@ -538,6 +540,8 @@ models:
         description: The story points value that was updated at this timestamp (if story points changed).
       - name: story_point_estimate
         description: The story point estimate that was updated at this timestamp (if story point estimate changed).
+      - name: team
+        description: The team value that was updated at this timestamp (if team changed, when `jira_using_teams` is enabled).
       # plus any fields specified by `var('issue_field_history_columns')`
 
   - name: int_jira__timestamp_field_history_scd
@@ -564,6 +568,8 @@ models:
         description: The complete story points value at this timestamp (backfilled from previous changes).
       - name: story_point_estimate
         description: The complete story point estimate at this timestamp (backfilled from previous changes).
+      - name: team
+        description: The complete team value at this timestamp (backfilled from previous changes, when `jira_using_teams` is enabled).
       # plus any fields specified by `var('issue_field_history_columns')`
 
   - name: int_jira__issue_assign_resolution
@@ -597,6 +603,8 @@ models:
         description: The ID of the sprint that an issue is slotted into on a given day.
       - name: status
         description: The ID of the status that an issue has on a given day.
+      - name: team
+        description: The team associated with an issue on a given day (when `jira_using_teams` is enabled).
       # plus any fields specified by `var('issue_field_history_columns')`
       - name: issue_day_id
         description: Unique ID hashed on `valid_starting_on`, `issue_id`, and `source_relation`.
