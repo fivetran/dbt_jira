@@ -15,7 +15,8 @@
 
 -- Hardcode 'team' into the issue_field_history_columns list if not already present
 {% set issue_field_history_columns = var('issue_field_history_columns', []) %}
-{% do issue_field_history_columns.append('team') if 'team' not in issue_field_history_columns | map('lower') | list %}
+{% do issue_field_history_columns.append('team') if var('jira_using_teams', True) 
+    and 'team' not in issue_field_history_columns | map('lower') | list %}
 
 with issue_field_history as (
 

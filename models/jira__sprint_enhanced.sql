@@ -13,7 +13,7 @@ sprint_metrics_grouped as (
     select
         source_relation,
         sprint_id,
-        team,
+        {{ "team," if using_teams }}
         sprint_name,
         sprint_started_at,
         sprint_ended_at,
@@ -23,7 +23,7 @@ sprint_metrics_grouped as (
         remaining_estimate_seconds,
         time_spent_seconds
     from daily_sprint_issue_history
-    {{ dbt_utils.group_by(11) }}
+    {{ dbt_utils.group_by(11 if using_teams else 10) }}
 ),
 
 sprint_issue_metrics as (
@@ -76,7 +76,7 @@ final as (
     select
         sprint_metrics_grouped.source_relation,
         sprint_metrics_grouped.sprint_id,
-        sprint_metrics_grouped.team,
+        {{ "sprint_metrics_grouped.team," if using_teams }}
         sprint_metrics_grouped.sprint_name,
         sprint_metrics_grouped.sprint_started_at,
         sprint_metrics_grouped.sprint_ended_at,
