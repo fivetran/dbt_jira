@@ -8,8 +8,10 @@ models:
     columns:
       - name: source_relation
         description: "{{ doc('source_relation') }}"
+      - name: _fivetran_synced
+        description: Timestamp of when Fivetran last synced this record.
       - name: issue_id
-        description: Unique ID of the issue. 
+        description: Unique ID of the issue.
         tests:
           - not_null
       - name: issue_name
@@ -262,6 +264,8 @@ models:
     columns:
       - name: source_relation
         description: "{{ doc('source_relation') }}"
+      - name: _fivetran_synced
+        description: Timestamp of when Fivetran last synced this record.
       - name: issue_id
         description: Unique ID of the issue.
         tests:
@@ -455,6 +459,8 @@ models:
         description: "{{ doc('source_relation') }}"
       - name: valid_starting_on
         description: Calendar date of when the field was changed to this value.
+      - name: valid_starting_at_week
+        description: The start date of the week corresponding to the valid_starting_on date.
       - name: issue_id
         description: Foreign key referencing the ID of the `issue` whose field was updated.
       - name: sprint
@@ -597,12 +603,22 @@ models:
         description: "{{ doc('source_relation') }}"
       - name: valid_starting_on
         description: Calendar date of when the field was changed to this value.
+      - name: valid_starting_at_week
+        description: The start date of the week corresponding to the valid_starting_on date.
       - name: issue_id
         description: Foreign key referencing the ID of the `issue` whose field was updated.
       - name: sprint
         description: The ID of the sprint that an issue is slotted into on a given day.
       - name: status
         description: The ID of the status that an issue has on a given day.
+      - name: status_id
+        description: >
+          Foreign key referencing the ID of the issue's `status` (the step that the issue is currently at
+          in the project's workflow).
+      - name: story_points
+        description: The story points that an issue has on a given day.
+      - name: story_point_estimate
+        description: The story point estimate that an issue has on a given day.
       - name: team
         description: The team associated with an issue on a given day (when `jira_using_teams` is enabled).
       # plus any fields specified by `var('issue_field_history_columns')`
