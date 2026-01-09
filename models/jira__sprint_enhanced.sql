@@ -74,8 +74,9 @@ sprint_end_metrics as (
 final as (
 
     select
-        sprint_metrics_grouped.sprint_id,
         sprint_metrics_grouped.source_relation,
+        sprint_metrics_grouped.sprint_id,
+        sprint_metrics_grouped.team,
         sprint_metrics_grouped.sprint_name,
         sprint_metrics_grouped.sprint_started_at,
         sprint_metrics_grouped.sprint_ended_at,
@@ -105,7 +106,7 @@ final as (
     left join sprint_end_metrics
         on sprint_metrics_grouped.sprint_id = sprint_end_metrics.sprint_id
         and sprint_metrics_grouped.source_relation = sprint_end_metrics.source_relation
-    {{ dbt_utils.group_by(18) }}
+    {{ dbt_utils.group_by(19) }}
 )
 
 select * 
