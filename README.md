@@ -65,16 +65,6 @@ To use this dbt package, you must have the following:
 - At least one Fivetran Jira connection syncing data into your destination.
 - A **BigQuery**, **Snowflake**, **Redshift**, **Databricks**, or **PostgreSQL** destination.
 
-#### Database Incremental Strategies
-Models in this package that are materialized incrementally are configured to work with the different strategies available to each supported warehouse.
-
-For **BigQuery** and **Databricks All Purpose Cluster runtime** destinations, we have chosen `insert_overwrite` as the default strategy, which benefits from the partitioning capability.
-> For Databricks SQL Warehouse destinations, models are materialized as tables without support for incremental runs.
-
-For **Snowflake**, **Redshift**, and **Postgres** databases, we have chosen `delete+insert` as the default strategy.
-
-> Regardless of strategy, we recommend that users periodically run a `--full-refresh` to ensure a high level of data quality.
-
 ## How do I use the dbt package?
 You can either add this dbt package in the Fivetran dashboard or import it into your dbt project:
 
@@ -101,6 +91,16 @@ dispatch:
   - macro_namespace: dbt_utils
     search_order: ['spark_utils', 'dbt_utils']
 ```
+
+#### Database Incremental Strategies
+Models in this package that are materialized incrementally are configured to work with the different strategies available to each supported warehouse.
+
+For **BigQuery** and **Databricks All Purpose Cluster runtime** destinations, we have chosen `insert_overwrite` as the default strategy, which benefits from the partitioning capability.
+> For Databricks SQL Warehouse destinations, models are materialized as tables without support for incremental runs.
+
+For **Snowflake**, **Redshift**, and **Postgres** databases, we have chosen `delete+insert` as the default strategy.
+
+> Regardless of strategy, we recommend that users periodically run a `--full-refresh` to ensure a high level of data quality.
 
 ### Define database and schema variables
 
