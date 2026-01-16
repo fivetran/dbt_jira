@@ -157,10 +157,22 @@ set_values as (
             order by date_day rows unbounded preceding) as status_id_field_partition
 
         -- list of exception columns
-        {% set exception_cols = ['issue_id', 'issue_day_id', 'valid_starting_on', 'valid_starting_at_week', 'status', 'status_id', 'components', 'issue_type', 'project', 'assignee', 'team', 'source_relation'] %}
+        {% set exception_cols = ['issue_id', 'issue_day_id', 'valid_starting_on', 'valid_starting_at_week', 'status', 'status_id', 'components', 'issue_type', 'project', 'assignee', 'team', 'sprint', 'story_points', 'story_point_estimate', 'source_relation'] %}
 
         {% for col in pivot_data_columns %}
-            {% if col.name|lower == 'components' and var('jira_using_components', True) %}
+            {% if col.name|lower == 'sprint' and var('jira_using_sprints', True) %}
+            , joined.sprint
+            , sum(case when joined.sprint is null then 0 else 1 end) over (partition by issue_id {{ jira.partition_by_source_relation(alias='joined') }} order by date_day rows unbounded preceding) as sprint_field_partition
+
+            {% elif col.name|lower == 'story_points' %}
+            , joined.story_points
+            , sum(case when joined.story_points is null then 0 else 1 end) over (partition by issue_id {{ jira.partition_by_source_relation(alias='joined') }} order by date_day rows unbounded preceding) as story_points_field_partition
+
+            {% elif col.name|lower == 'story_point_estimate' %}
+            , joined.story_point_estimate
+            , sum(case when joined.story_point_estimate is null then 0 else 1 end) over (partition by issue_id {{ jira.partition_by_source_relation(alias='joined') }} order by date_day rows unbounded preceding) as story_point_estimate_field_partition
+
+            {% elif col.name|lower == 'components' and var('jira_using_components', True) %}
             , coalesce(components.component_name, joined.components) as components
             , sum(case when joined.components is null then 0 else 1 end) over (partition by issue_id {{ jira.partition_by_source_relation(alias='joined') }} order by date_day rows unbounded preceding) as component_field_partition
 
@@ -238,7 +250,22 @@ fill_values as (
             order by date_day asc rows between unbounded preceding and current row) as status_id
 
         {% for col in pivot_data_columns %}
-            {% if col.name|lower == 'components' and var('jira_using_components', True) %}
+            {% if col.name|lower == 'sprint' and var('jira_using_sprints', True) %}
+            , first_value(sprint) over (
+                partition by issue_id, sprint_field_partition {{ jira.partition_by_source_relation() }}
+                order by date_day asc rows between unbounded preceding and current row) as sprint
+
+            {% elif col.name|lower == 'story_points' %}
+            , first_value(story_points) over (
+                partition by issue_id, story_points_field_partition {{ jira.partition_by_source_relation() }}
+                order by date_day asc rows between unbounded preceding and current row) as story_points
+
+            {% elif col.name|lower == 'story_point_estimate' %}
+            , first_value(story_point_estimate) over (
+                partition by issue_id, story_point_estimate_field_partition {{ jira.partition_by_source_relation() }}
+                order by date_day asc rows between unbounded preceding and current row) as story_point_estimate
+
+            {% elif col.name|lower == 'components' and var('jira_using_components', True) %}
             , first_value(components) over (
                 partition by issue_id, component_field_partition {{ jira.partition_by_source_relation() }}
                 order by date_day asc rows between unbounded preceding and current row) as components
@@ -258,7 +285,7 @@ fill_values as (
                 partition by issue_id, team_field_partition {{ jira.partition_by_source_relation() }}
                 order by date_day asc rows between unbounded preceding and current row) as team
 
-            {% elif col.name|lower not in ['issue_id', 'issue_day_id', 'valid_starting_on', 'valid_starting_at_week', 'status', 'status_id', 'components', 'project', 'assignee', 'team', 'source_relation'] %}
+            {% elif col.name|lower not in ['issue_id', 'issue_day_id', 'valid_starting_on', 'valid_starting_at_week', 'status', 'status_id', 'components', 'project', 'assignee', 'team', 'sprint', 'story_points', 'story_point_estimate', 'source_relation'] %}
 
             -- grab the value that started this batch/partition
             , first_value( {{ col.name }} ) over (
@@ -279,7 +306,16 @@ fix_null_values as (
         source_relation
 
         {% for col in pivot_data_columns %}
-            {% if col.name|lower == 'components' and var('jira_using_components', True) %}
+            {% if col.name|lower == 'sprint' and var('jira_using_sprints', True) %}
+            , case when sprint = 'is_null' then null else sprint end as sprint
+
+            {% elif col.name|lower == 'story_points' %}
+            , case when story_points = 'is_null' then null else story_points end as story_points
+
+            {% elif col.name|lower == 'story_point_estimate' %}
+            , case when story_point_estimate = 'is_null' then null else story_point_estimate end as story_point_estimate
+
+            {% elif col.name|lower == 'components' and var('jira_using_components', True) %}
             , case when components = 'is_null' then null else components end as components
 
             {% elif col.name|lower == 'project' %}
@@ -291,7 +327,7 @@ fix_null_values as (
             {% elif col.name|lower == 'team' and var('jira_using_teams', True) %}
             , case when team = 'is_null' then null else team end as team
 
-            {% elif col.name|lower not in ['issue_id','issue_day_id','valid_starting_on', 'valid_starting_at_week', 'status', 'components', 'project', 'assignee', 'team', 'source_relation'] %}
+            {% elif col.name|lower not in ['issue_id','issue_day_id','valid_starting_on', 'valid_starting_at_week', 'status', 'components', 'project', 'assignee', 'team', 'sprint', 'story_points', 'story_point_estimate', 'source_relation'] %}
             -- we de-nulled the true null values earlier in order to differentiate them from nulls that just needed to be backfilled
             , case when {{ col.name }} = 'is_null' then null else {{ col.name }} end as {{ col.name }}
 
@@ -310,6 +346,11 @@ surrogate_key as (
         fix_null_values.issue_id,
         fix_null_values.source_relation,
         statuses.status_name as status
+        {% if var('jira_using_sprints', True) %}
+        , fix_null_values.sprint
+        {% endif %}
+        , fix_null_values.story_points
+        , fix_null_values.story_point_estimate
 
         {% for col in pivot_data_columns %}
             {% if col.name|lower == 'components' and var('jira_using_components', True) %}
@@ -324,7 +365,7 @@ surrogate_key as (
             {% elif col.name|lower == 'team' and var('jira_using_teams', True) %}
             , fix_null_values.team as team
 
-            {% elif col.name|lower not in ['issue_id','issue_day_id','valid_starting_on', 'valid_starting_at_week', 'status', 'components', 'project', 'assignee', 'team', 'source_relation'] %}
+            {% elif col.name|lower not in ['issue_id','issue_day_id','valid_starting_on', 'valid_starting_at_week', 'status', 'components', 'project', 'assignee', 'team', 'sprint', 'story_points', 'story_point_estimate', 'source_relation'] %}
             , fix_null_values.{{ col.name }} as {{ col.name }}
 
             {% endif %}

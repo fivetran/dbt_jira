@@ -10,6 +10,55 @@ issue_multiselect_history as (
     from {{ ref('int_jira__issue_multiselect_history') }}
 ),
 
+{% if var('jira_using_sprints', True) %}
+sprints as (
+
+    select *
+    from {{ ref('stg_jira__sprint') }}
+),
+{% endif %}
+
+field_option as (
+
+    select *
+    from {{ ref('stg_jira__field_option') }}
+),
+
+resolve_multiselect_values as (
+    -- Resolve IDs to names BEFORE aggregation
+    select
+        issue_multiselect_history.field_id,
+        issue_multiselect_history.field_name,
+        issue_multiselect_history.issue_id,
+        issue_multiselect_history.source_relation,
+        issue_multiselect_history.updated_at,
+        issue_multiselect_history.author_id,
+        -- Replace IDs with human-readable names based on field type
+        {% if var('jira_using_sprints', True) %}
+        case
+            when lower(issue_multiselect_history.field_name) = 'sprint' then coalesce(sprints.sprint_name, issue_multiselect_history.field_value)
+            else coalesce(field_option.field_option_name, issue_multiselect_history.field_value)
+        end
+        {% else %}
+        coalesce(field_option.field_option_name, issue_multiselect_history.field_value)
+        {% endif %}
+        as field_value
+
+    from issue_multiselect_history
+
+    {% if var('jira_using_sprints', True) %}
+    left join sprints
+        on cast(sprints.sprint_id as {{ dbt.type_string() }}) = issue_multiselect_history.field_value
+        and sprints.source_relation = issue_multiselect_history.source_relation
+        and lower(issue_multiselect_history.field_name) = 'sprint'
+    {% endif %}
+
+    left join field_option
+        on cast(field_option.field_id as {{ dbt.type_string() }}) = issue_multiselect_history.field_value
+        and field_option.source_relation = issue_multiselect_history.source_relation
+        and lower(issue_multiselect_history.field_name) != 'sprint'
+),
+
 issue_multiselect_batch_history as (
     -- Aggregate multiselect field values into comma-separated strings
     select
@@ -19,9 +68,10 @@ issue_multiselect_batch_history as (
         source_relation,
         updated_at,
         author_id,
+        -- Now aggregating resolved names instead of IDs
         {{ fivetran_utils.string_agg('field_value', "', '") }} as field_values
 
-    from issue_multiselect_history
+    from resolve_multiselect_values
     {{ dbt_utils.group_by(6) }}
 ),
 

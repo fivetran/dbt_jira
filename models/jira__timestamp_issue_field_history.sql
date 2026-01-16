@@ -77,7 +77,10 @@ create_validity_periods as (
         issue_id,
         source_relation,
         status as status_id,
-        author_id
+        author_id,
+        sprint,
+        story_points,
+        story_point_estimate
 
         -- list of exception columns
         {% set exception_cols = ['issue_id', 'updated_at', 'updated_at_week', 'status', 'author_id', 'sprint', 'story_points', 'story_point_estimate', 'source_relation'] %}
@@ -102,7 +105,10 @@ fix_null_values as (
         create_validity_periods.status_id,
         statuses.status_name as status,
         status_categories.status_category_name,
-        create_validity_periods.author_id
+        create_validity_periods.author_id,
+        case when create_validity_periods.sprint = 'is_null' then null else create_validity_periods.sprint end as sprint,
+        case when create_validity_periods.story_points = 'is_null' then null else create_validity_periods.story_points end as story_points,
+        case when create_validity_periods.story_point_estimate = 'is_null' then null else create_validity_periods.story_point_estimate end as story_point_estimate
 
         -- list of exception columns
         {% set exception_cols = ['issue_id', 'issue_timestamp_id', 'updated_at', 'updated_at_week', 'status', 'author_id', 'components', 'project', 'assignee', 'team', 'sprint', 'story_points', 'story_point_estimate', 'source_relation'] %}
@@ -150,7 +156,10 @@ final as (
         fix_null_values.status_id,
         fix_null_values.status,
         fix_null_values.status_category_name,
-        fix_null_values.author_id
+        fix_null_values.author_id,
+        fix_null_values.sprint,
+        fix_null_values.story_points,
+        fix_null_values.story_point_estimate
 
         {% for col in custom_columns %}
             {% if col|lower == 'components' and var('jira_using_components', True) %}
