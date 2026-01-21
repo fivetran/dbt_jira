@@ -106,7 +106,7 @@ final as (
     left join sprint_end_metrics
         on sprint_metrics_grouped.sprint_id = sprint_end_metrics.sprint_id
         and sprint_metrics_grouped.source_relation = sprint_end_metrics.source_relation
-    {{ dbt_utils.group_by(19) }}
+    {{ dbt_utils.group_by(19 if using_teams else 18) }}
 )
 
 select * 
