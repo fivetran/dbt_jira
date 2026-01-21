@@ -1,3 +1,16 @@
+# dbt_jira v1.4.0
+
+[PR #165](https://github.com/fivetran/dbt_jira/pull/165) includes the following updates:
+
+## Documentation
+- Updates README with standardized Fivetran formatting.
+- Removes duplicative column yml definitions.
+
+## Under the Hood
+- In the `quickstart.yml` file:
+  - Adds `table_variables` for relevant sources to prevent missing sources from blocking downstream Quickstart models.
+  - Adds `supported_vars` for Quickstart UI customization.
+
 # dbt_jira v1.3.1 
 [PR #161](https://github.com/fivetran/dbt_jira/pull/161) includes the following updates:
 

@@ -1,4 +1,5 @@
-# Jira dbt Package ([Docs](https://fivetran.github.io/dbt_jira/))
+<!--section="jira_transformation_model"-->
+# Jira dbt Package
 
 <p align="left">
     <a alt="License"
@@ -11,44 +12,77 @@
     <a alt="PRs">
         <img src="https://img.shields.io/badge/Contributions-welcome-blueviolet" /></a>
     <a alt="Fivetran Quickstart Compatible"
-        href="https://fivetran.com/docs/transformations/dbt/quickstart">
+        href="https://fivetran.com/docs/transformations/data-models/quickstart-management#quickstartmanagement">
         <img src="https://img.shields.io/badge/Fivetran_Quickstart_Compatible%3F-yes-green.svg" /></a>
 </p>
 
+This dbt package transforms data from Fivetran's Jira connector into analytics-ready tables.
+
+## Resources
+
+- Number of materialized models¹: 48
+- Connector documentation
+  - [Jira connector documentation](https://fivetran.com/docs/connectors/applications/jira)
+  - [Jira ERD](https://fivetran.com/docs/connectors/applications/jira#schemainformation)
+- dbt package documentation
+  - [GitHub repository](https://github.com/fivetran/dbt_jira)
+  - [dbt Docs](https://fivetran.github.io/dbt_jira/#!/overview)
+  - [DAG](https://fivetran.github.io/dbt_jira/#!/overview?g_v=1)
+  - [Changelog](https://github.com/fivetran/dbt_jira/blob/main/CHANGELOG.md)
+
 ## What does this dbt package do?
-- Produces modeled tables that leverage Jira data from [Fivetran's connector](https://fivetran.com/docs/applications/jira) in the format described by [this ERD](https://fivetran.com/docs/applications/jira#schemainformation).
-- Enables you to better understand the workload, performance, and velocity of your team's work using Jira issues. It performs the following actions:
-  - Creates a daily issue history table so you can quickly create agile reports, such as burndown charts, along any issue field.
-  - Enriches the core issue table with relevant data regarding its workflow and current state.
-  - Aggregates bandwidth and issue velocity metrics along projects, users and sprints.
-- Generates a comprehensive data dictionary of your source and modeled Jira data through the [dbt docs site](https://fivetran.github.io/dbt_jira/).
+This package enables you to better understand the workload, performance, and velocity of your team's work using Jira issues. It creates enriched models with metrics focused on daily issue history, workflow analysis, and team performance.
 
-<!--section="jira_transformation_model"-->
-The following table provides a detailed list of all tables materialized within this package by default.
-> TIP: See more details about these tables in the package's [dbt docs site](https://fivetran.github.io/dbt_jira/#!/overview?g_v=1&g_e=seeds).
+### Output schema
+Final output tables are generated in the following target schema:
 
-| **Table**                | **Description**                                                                                                                                |
-| ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------- |
-| [jira__daily_issue_field_history](https://fivetran.github.io/dbt_jira/#!/model/model.jira.jira__daily_issue_field_history)             | History table with one row for each day an issue remained open, with additional details about the issue sprint, status, and story points (if enabled).  The `jira__daily_issue_status_category_analysis` is built on top to gather a daily view of issues in their work state; [see the README for more details](https://github.com/fivetran/dbt_jira/blob/main/analysis/README.md). <br><br>**Example Analytics Questions:**<br>• How many issues, by sprint, were Closed or Blocked each week in Q1, 2025? <br>• How many days, on average, does it take an issue to go from 'Accepted' to either 'Closed' or 'Blocked'?|
-| [jira__timestamp_issue_field_history](https://fivetran.github.io/dbt_jira/#!/model/model.jira.jira__timestamp_issue_field_history)             | Table tracking field changes at timestamp level with validity periods. Each record shows complete field state during a time period with `valid_from`/`valid_until` timestamps. The `jira__issue_transition_cumulative_flow_analysis` is built on top of this to track the workflow of issues from creation to completion; [see the README for more details](https://github.com/fivetran/dbt_jira/blob/main/analysis/README.md). <br><br>**Example Analytics Questions:**<br>• What was the exact sequence of field changes for a specific issue? <br>• How long did an issue spend in each status with precise timing?|
-| [jira__issue_status_transitions](https://fivetran.github.io/dbt_jira/#!/model/model.jira.jira__issue_status_transitions)             | Issue status transition tracking with workflow analysis. Provides chronological view of status changes with timing metrics, transition direction analysis, and lifecycle indicators.  <br><br>**Example Analytics Questions:**<br>• What is the average time spent in each status across all issues? <br>• Which is the lead time and cycle time for issues based on when work is added/started/completed? <br>• What are the most common workflow transition paths?|
-| [jira__issue_enhanced](https://fivetran.github.io/dbt_jira/#!/model/model.jira.jira__issue_enhanced)            | One row per Jira issue with enriched details about assignee, reporter, sprint, project, and current status, plus metrics on assignments and re-openings. <br><br>**Example Analytics Questions:** <br>• How many issues are currently blocked and who owns them? <br>• What's the average time to resolution for high-priority bugs by assignee? |
-| [jira__project_enhanced](https://fivetran.github.io/dbt_jira/#!/model/model.jira.jira__project_enhanced)            | One row per project with team member details, issue counts, work velocity metrics, and project scope information. <br><br>**Example Analytics Questions:**<br>• Which projects have the highest velocity in terms of issues closed per sprint? <br>• What is the ratio of unassigned open tickets to assigned open tickets by project? |
-| [jira__user_enhanced](https://fivetran.github.io/dbt_jira/#!/model/model.jira.jira__user_enhanced)            | One row per user with metrics on open and completed issues, and individual work velocity. <br><br>**Example Analytics Questions:**<br>• Who are the top performers in terms of issues resolved per month? <br>• Which team members have the highest workload based on open issue count and how long, on average, have those issues been open? <br> |
-| [jira__sprint_enhanced](https://fivetran.github.io/dbt_jira/#!/model/model.jira.jira__sprint_enhanced)            | One row per sprint with metrics on issues created, resolved, and carried over, plus story point estimates. <br><br>**Example Analytics Questions:**<br>• Which sprints had the highest velocity and what made them successful? <br>• How many story points were planned vs. completed across recent sprints? <br>• What percentage of issues are typically carried over from sprint to sprint? |
-| [jira__daily_sprint_issue_history](https://fivetran.github.io/dbt_jira/#!/model/model.jira.jira__daily_sprint_issue_history)            | Daily snapshot of each sprint showing all associated issues from sprint start to completion, useful for tracking progress over time. <br><br>**Example Analytics Questions:**<br>• How many issues were active in each sprint on any given day? <br>• What's the daily count of open vs. completed issues per sprint? <br>• Which sprints had issues added or removed mid-sprint? |
+```
+<your_database>.<connector/schema_name>_jira
+```
 
-### Materialized Models
-Each Quickstart transformation job run materializes 48 models if all components of this data model are enabled. This count includes all staging, intermediate, and final models materialized as `view`, `table`, or `incremental`.
-<!--section-end-->
+### Final output tables
 
-## How do I use the dbt package?
+By default, this package materializes the following final tables:
 
-### Step 1: Prerequisites
+| Table | Description |
+| :---- | :---- |
+| [jira__daily_issue_field_history](https://fivetran.github.io/dbt_jira/#!/model/model.jira.jira__daily_issue_field_history) | History table with one row for each day an issue remained open, with additional details about the issue sprint, status, and story points (if enabled). For an example of how this data can be used, see [this analysis query](https://fivetran.github.io/dbt_jira/#!/analysis/analysis.jira.jira__daily_issue_status_category_analysis), which demonstrates how you might build a daily issue status category analysis on top of this table. <br><br>**Example Analytics Questions:**<br><ul><li>How many issues, by sprint, were Closed or Blocked each week in Q1, 2025?</li><li>How many days, on average, does it take an issue to go from 'Accepted' to either 'Closed' or 'Blocked'?</li></ul> |
+| [jira__timestamp_issue_field_history](https://fivetran.github.io/dbt_jira/#!/model/model.jira.jira__timestamp_issue_field_history) | Table tracking field changes at timestamp level with validity periods. Each record shows complete field state during a time period with `valid_from`/`valid_until` timestamps. For an example of how this data can be used, see [this analysis query](https://fivetran.github.io/dbt_jira/#!/analysis/analysis.jira.jira__issue_transition_cumulative_flow_analysis), which demonstrates building an issue transition cumulative flow analysis. <br><br>**Example Analytics Questions:**<br><ul><li>What was the exact sequence of field changes for a specific issue?</li><li>How long did an issue spend in each status with precise timing?</li></ul> |
+| [jira__issue_status_transitions](https://fivetran.github.io/dbt_jira/#!/model/model.jira.jira__issue_status_transitions) | Issue status transition tracking with workflow analysis. Provides chronological view of status changes with timing metrics, transition direction analysis, and lifecycle indicators. <br><br>**Example Analytics Questions:**<br><ul><li>What is the average time spent in each status across all issues?</li><li>Which is the lead time and cycle time for issues based on when work is added/started/completed?</li><li>What are the most common workflow transition paths?</li></ul> |
+| [jira__issue_enhanced](https://fivetran.github.io/dbt_jira/#!/model/model.jira.jira__issue_enhanced) | One row per Jira issue with enriched details about assignee, reporter, sprint, project, and current status, plus metrics on assignments and re-openings. <br><br>**Example Analytics Questions:**<br><ul><li>How many issues are currently blocked and who owns them?</li><li>What's the average time to resolution for high-priority bugs by assignee?</li></ul> |
+| [jira__project_enhanced](https://fivetran.github.io/dbt_jira/#!/model/model.jira.jira__project_enhanced) | One row per project with team member details, issue counts, work velocity metrics, and project scope information. <br><br>**Example Analytics Questions:**<br><ul><li>Which projects have the highest velocity in terms of issues closed per sprint?</li><li>What is the ratio of unassigned open tickets to assigned open tickets by project?</li></ul> |
+| [jira__user_enhanced](https://fivetran.github.io/dbt_jira/#!/model/model.jira.jira__user_enhanced) | One row per user with metrics on open and completed issues, and individual work velocity. <br><br>**Example Analytics Questions:**<br><ul><li>Who are the top performers in terms of issues resolved per month?</li><li>Which team members have the highest workload based on open issue count and how long, on average, have those issues been open?</li></ul> |
+| [jira__sprint_enhanced](https://fivetran.github.io/dbt_jira/#!/model/model.jira.jira__sprint_enhanced) | One row per sprint with metrics on issues created, resolved, and carried over, plus story point estimates. <br><br>**Example Analytics Questions:**<br><ul><li>Which sprints had the highest velocity and what made them successful?</li><li>How many story points were planned vs. completed across recent sprints?</li><li>What percentage of issues are typically carried over from sprint to sprint?</li></ul> |
+| [jira__daily_sprint_issue_history](https://fivetran.github.io/dbt_jira/#!/model/model.jira.jira__daily_sprint_issue_history) | Daily snapshot of each sprint showing all associated issues from sprint start to completion, useful for tracking progress over time. <br><br>**Example Analytics Questions:**<br><ul><li>How many issues were active in each sprint on any given day?</li><li>What's the daily count of open vs. completed issues per sprint?</li><li>Which sprints had issues added or removed mid-sprint?</li></ul> |
+
+¹ Each Quickstart transformation job run materializes these models if all components of this data model are enabled. This count includes all staging, intermediate, and final models materialized as `view`, `table`, or `incremental`.
+
+---
+
+## Prerequisites
 To use this dbt package, you must have the following:
 
 - At least one Fivetran Jira connection syncing data into your destination.
 - A **BigQuery**, **Snowflake**, **Redshift**, **Databricks**, or **PostgreSQL** destination.
+
+## How do I use the dbt package?
+You can either add this dbt package in the Fivetran dashboard or import it into your dbt project:
+
+- To add the package in the Fivetran dashboard, follow our [Quickstart guide](https://fivetran.com/docs/transformations/data-models/quickstart-management).
+- To add the package to your dbt project, follow the setup instructions in the dbt package's [README file](https://github.com/fivetran/dbt_jira/blob/main/README.md#how-do-i-use-the-dbt-package) to use this package.
+
+<!--section-end-->
+
+### Install the package
+Include the following jira package version in your `packages.yml` file:
+> TIP: Check [dbt Hub](https://hub.getdbt.com/) for the latest installation instructions or [read the dbt docs](https://docs.getdbt.com/docs/package-management) for more information on installing packages.
+```yaml
+packages:
+  - package: fivetran/jira
+    version: [">=1.4.0", "<1.5.0"]
+```
+
+> All required sources and staging models are now bundled into this transformation package. Do not include `fivetran/jira_source` in your `packages.yml` since this package has been deprecated.
 
 #### Databricks Dispatch Configuration
 If you are using a Databricks destination with this package you will need to add the below (or a variation of the below) dispatch configuration within your `dbt_project.yml`. This is required in order for the package to accurately search for macros within the `dbt-labs/spark_utils` then the `dbt-labs/dbt_utils` packages respectively.
@@ -68,18 +102,7 @@ For **Snowflake**, **Redshift**, and **Postgres** databases, we have chosen `del
 
 > Regardless of strategy, we recommend that users periodically run a `--full-refresh` to ensure a high level of data quality.
 
-### Step 2: Install the package
-Include the following jira package version in your `packages.yml` file:
-> TIP: Check [dbt Hub](https://hub.getdbt.com/) for the latest installation instructions or [read the dbt docs](https://docs.getdbt.com/docs/package-management) for more information on installing packages.
-```yaml
-packages:
-  - package: fivetran/jira
-    version: [">=1.3.0", "<1.4.0"]
-```
-
-> All required sources and staging models are now bundled into this transformation package. Do not include `fivetran/jira_source` in your `packages.yml` since this package has been deprecated.
-
-### Step 3: Define database and schema variables
+### Define database and schema variables
 
 #### Option A: Single connection
 By default, this package runs using your destination and the `jira` schema. If this is not where your Jira data is (for example, if your Jira schema is named `jira_fivetran`), add the following configuration to your root `dbt_project.yml` file:
@@ -137,7 +160,7 @@ sources:
     tables: # copy and paste from jira/models/staging/src_jira.yml - see https://support.atlassian.com/bitbucket-cloud/docs/yaml-anchors/ for how to use anchors to only do so once
 ```
 
-> **Note**: If there are source tables you do not have (see [Step 5](https://github.com/fivetran/dbt_jira?tab=readme-ov-file#optional-step-5-additional-configurations)), you may still include them, as long as you have set the right variables to `False`.
+> **Note**: If there are source tables you do not have (see [Disable models for non existent sources](https://github.com/fivetran/dbt_jira?tab=readme-ov-file#disable-models-for-non-existent-sources)), you may still include them, as long as you have set the right variables to `False`.
 
 2. Set the `has_defined_sources` variable (scoped to the `jira` package) to `True`, like such:
 ```yml
@@ -147,7 +170,7 @@ vars:
     has_defined_sources: true
 ```
 
-### Step 4: Disable models for non-existent sources
+### Disable models for non-existent sources
 Your Jira connection may not sync every table that this package expects. If you do not have the `SPRINT`, `COMPONENT`, `VERSION`, `PRIORITY` or `TEAM` tables synced, add the respective variables to your root `dbt_project.yml` file. Additionally, if you want to remove comment aggregations from your `jira__issue_enhanced` model,  add the `jira_include_comments` variable to your root `dbt_project.yml`:
 ```yml
 vars:
@@ -159,7 +182,7 @@ vars:
     jira_include_comments: false # Enabled by default. Disabling will remove the aggregation of comments via the `count_comments` and `conversations` columns in the `jira__issue_enhanced` table.
 ```
 
-### (Optional) Step 5: Additional configurations
+### (Optional) Additional configurations
 
 #### Controlling conversation aggregations in `jira__issue_enhanced`
 
@@ -238,11 +261,11 @@ vars:
     lookback_window: number_of_weeks # default is 1
 ```
 
-### (Optional) Step 6: Orchestrate your models with Fivetran Transformations for dbt Core™
+### (Optional) Orchestrate your models with Fivetran Transformations for dbt Core™
 <details><summary>Expand for details</summary>
 <br>
 
-Fivetran offers the ability for you to orchestrate your dbt project through [Fivetran Transformations for dbt Core™](https://fivetran.com/docs/transformations/dbt). Learn how to set up your project for orchestration through Fivetran in our [Transformations for dbt Core setup guides](https://fivetran.com/docs/transformations/dbt#setupguide).
+Fivetran offers the ability for you to orchestrate your dbt project through [Fivetran Transformations for dbt Core™](https://fivetran.com/docs/transformations/dbt#transformationsfordbtcore). Learn how to set up your project for orchestration through Fivetran in our [Transformations for dbt Core setup guides](https://fivetran.com/docs/transformations/dbt/setup-guide#transformationsfordbtcoresetupguide).
 </details>
 
 ## Does this package have dependencies?
@@ -261,14 +284,18 @@ packages:
       version: [">=0.3.0", "<0.4.0"]
 ```
 
+<!--section="jira_maintenance"-->
 ## How is this package maintained and can I contribute?
+
 ### Package Maintenance
-The Fivetran team maintaining this package _only_ maintains the latest version of the package. We highly recommend you stay consistent with the [latest version](https://hub.getdbt.com/fivetran/jira/latest/) of the package and refer to the [CHANGELOG](https://github.com/fivetran/dbt_jira/blob/main/CHANGELOG.md) and release notes for more information on changes across versions.
+The Fivetran team maintaining this package only maintains the [latest version](https://hub.getdbt.com/fivetran/jira/latest/) of the package. We highly recommend you stay consistent with the latest version of the package and refer to the [CHANGELOG](https://github.com/fivetran/dbt_jira/blob/main/CHANGELOG.md) and release notes for more information on changes across versions.
 
 ### Contributions
 A small team of analytics engineers at Fivetran develops these dbt packages. However, the packages are made better by community contributions.
 
-We highly encourage and welcome contributions to this package. Check out [this dbt Discourse article](https://discourse.getdbt.com/t/contributing-to-a-dbt-package/657) on the best workflow for contributing to a package.
+We highly encourage and welcome contributions to this package. Learn how to contribute to a package in dbt's [Contributing to an external dbt package article](https://discourse.getdbt.com/t/contributing-to-a-dbt-package/657).
+
+<!--section-end-->
 
 ## Are there any resources available?
 - If you have questions or want to reach out for help, see the [GitHub Issue](https://github.com/fivetran/dbt_jira/issues/new/choose) section to find the right avenue of support for you.

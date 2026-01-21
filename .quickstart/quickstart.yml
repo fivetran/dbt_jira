@@ -15,6 +15,9 @@ table_variables:
   jira_using_teams:
     - team
 
+  _fivetran_quickstart_issue_link:
+    - issue_link
+
 destination_configurations:
   databricks:
     dispatch:
@@ -29,3 +32,22 @@ public_models: [
   "jira__project_enhanced",
   "jira__sprint_enhanced"
 ]
+
+supported_vars:
+  issue_field_history_columns:
+    type: list
+    description: "Issue field names from `ISSUE_FIELD_HISTORY` and `ISSUE_MULTISELECT_HISTORY` tracked daily in `jira__daily_issue_field_history` and `jira__timestamp_issue_field_history`. The latest value of each field will be surfaced in `jira__issue_enhanced` as well"
+    display_name: "Issue Field History Columns"
+
+  jira_issue_history_buffer:
+    type: integer
+    value: 1
+    description: "Number of weeks that `jira__daily_issue_field_history` and `jira__daily_sprint_issue_history` will track for each issue after it has been closed"
+    display_name: "Post-Close Issue History Extension (Weeks)"
+
+  lookback_window:
+    type: integer
+    value: 1
+    description: "Number of weeks into the past that the models will look back to capture late-arriving records on incremental runs"
+    display_name: "Incremental Run Lookback Window (Days)"
+

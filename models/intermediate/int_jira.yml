@@ -304,8 +304,6 @@ models:
         description: Text field describing the environment in which the issue occurred (ie "IE9 on Windows 7").
       - name: issue_type_id
         description: Foreign key referencing the ID of the `issue_type`. 
-      - name: issue_key
-        description: UI-facing id of the issue.
       - name: original_estimate_seconds
         description: The original estimate of how long working on this issue would take, in seconds.
       - name: priority_id
@@ -330,8 +328,6 @@ models:
           in the project's workflow).
       - name: status_changed_at
         description: Timestamp of when the status was last changed.
-      - name: issue_name
-        description: Title of the issue.
       - name: time_spent_seconds
         description: The time that was spent working on this issue, in seconds.
       - name: updated_at
@@ -394,8 +390,6 @@ models:
         description: Text field describing the environment in which the issue occurred (ie "IE9 on Windows 7").
       - name: issue_type_id
         description: Foreign key referencing the ID of the `issue_type`. 
-      - name: issue_key
-        description: UI-facing id of the issue.
       - name: original_estimate_seconds
         description: The original estimate of how long working on this issue would take, in seconds.
       - name: priority_id
@@ -420,8 +414,6 @@ models:
           in the project's workflow).
       - name: status_changed_at
         description: Timestamp of when the status was last changed.
-      - name: issue_name
-        description: Title of the issue.
       - name: time_spent_seconds
         description: The time that was spent working on this issue, in seconds.
       - name: updated_at
