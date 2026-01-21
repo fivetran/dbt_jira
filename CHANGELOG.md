@@ -1,3 +1,19 @@
+# dbt_jira v1.5.0
+
+[PR #168](https://github.com/fivetran/dbt_jira/pull/168) includes the following updates:
+
+## Schema/Data Change (--full-refresh required after upgrading)
+**1 total change • 1 possible breaking change**
+
+| Data Model(s) | Change type | Old | New | Notes |
+| ---------- | ----------- | -------- | -------- | ----- |
+| [jira__daily_issue_field_history](https://fivetran.github.io/dbt_jira/#!/model/model.jira.jira__daily_issue_field_history)<br>[jira__daily_sprint_issue_history](https://fivetran.github.io/dbt_jira/#!/model/model.jira.jira__daily_sprint_issue_history)<br>[jira__sprint_enhanced](https://fivetran.github.io/dbt_jira/#!/model/model.jira.jira__sprint_enhanced)<br>[jira__issue_enhanced](https://fivetran.github.io/dbt_jira/#!/model/model.jira.jira__issue_enhanced)<br>[jira__timestamp_issue_field_history](https://fivetran.github.io/dbt_jira/#!/model/model.jira.jira__timestamp_issue_field_history)<br>[int_jira__pivot_daily_field_history](https://fivetran.github.io/dbt_jira/#!/model/model.jira.int_jira__pivot_daily_field_history) | New Column |  | `team` | Adds team column across all major models when `jira_using_teams` is enabled (default: true) |
+
+## Features
+- Added comprehensive support for Jira teams functionality by introducing team tracking across all major models.
+- Team field is automatically included in field history tracking when `jira_using_teams` is enabled (default: true).
+  - You can disable team functionality by setting `jira_using_teams: false` in your `dbt_project.yml`. See the [README](https://github.com/fivetran/dbt_jira#disable-models-for-non-existent-sources) for configuration details.
+
 # dbt_jira v1.4.0
 
 [PR #165](https://github.com/fivetran/dbt_jira/pull/165) includes the following updates:
@@ -11,7 +27,7 @@
   - Adds `table_variables` for relevant sources to prevent missing sources from blocking downstream Quickstart models.
   - Adds `supported_vars` for Quickstart UI customization.
 
-# dbt_jira v1.3.1 
+# dbt_jira v1.3.1
 [PR #161](https://github.com/fivetran/dbt_jira/pull/161) includes the following updates:
 
 ## Bug Fixes
