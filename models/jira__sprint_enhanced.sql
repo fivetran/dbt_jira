@@ -37,7 +37,7 @@ sprint_issue_metrics as (
             then issue_id end)) as resolved_sprint_issues
     from daily_sprint_issue_history
     {{ dbt_utils.group_by(3 if using_teams else 2) }}
-)
+),
 
 sprint_start_metrics as (
 
