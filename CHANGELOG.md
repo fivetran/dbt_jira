@@ -7,7 +7,7 @@
 
 | Data Model(s) | Change type | Old | New | Notes |
 | ---------- | ----------- | -------- | -------- | ----- |
-| [jira__daily_issue_field_history](https://fivetran.github.io/dbt_jira/#!/model/model.jira.jira__daily_issue_field_history)<br>[jira__daily_sprint_issue_history](https://fivetran.github.io/dbt_jira/#!/model/model.jira.jira__daily_sprint_issue_history)<br>[jira__sprint_enhanced](https://fivetran.github.io/dbt_jira/#!/model/model.jira.jira__sprint_enhanced)<br>[jira__issue_enhanced](https://fivetran.github.io/dbt_jira/#!/model/model.jira.jira__issue_enhanced)<br>[jira__timestamp_issue_field_history](https://fivetran.github.io/dbt_jira/#!/model/model.jira.jira__timestamp_issue_field_history)<br>[int_jira__pivot_daily_field_history](https://fivetran.github.io/dbt_jira/#!/model/model.jira.int_jira__pivot_daily_field_history) | New Column |  | `team` | Adds team column across all major models when `jira_using_teams` is enabled (default: true) |
+[jira__daily_sprint_issue_history](https://fivetran.github.io/dbt_jira/#!/model/model.jira.jira__daily_sprint_issue_history)<br>[jira__sprint_enhanced](https://fivetran.github.io/dbt_jira/#!/model/model.jira.jira__sprint_enhanced)<br> | New Column |  | `team` | Adds team column across all major models when `jira_using_teams` is enabled (default: true) |
 
 ## Features
 - Added comprehensive support for Jira teams functionality by introducing team tracking across all major models.

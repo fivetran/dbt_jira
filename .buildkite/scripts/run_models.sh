@@ -24,8 +24,8 @@ dbt compile --vars '{jira_schema: jira_integrations_tests_sqlw}' --target "$db"
 dbt run --vars '{jira_schema: jira_integrations_tests_sqlw}' --target "$db" --full-refresh
 dbt run --vars '{jira_schema: jira_integrations_tests_sqlw}' --target "$db"
 dbt test --vars '{jira_schema: jira_integrations_tests_sqlw}' --target "$db"
-dbt run --vars '{jira_schema: jira_integrations_tests_sqlw, jira_using_teams: false,jira_using_priorities: false, jira_using_sprints: false, jira_using_components: false, jira_using_versions: false, jira_field_grain: 'field_name'}' --target "$db" --full-refresh
-dbt run --vars '{jira_schema: jira_integrations_tests_sqlw, jira_using_teams: false,jira_using_priorities: false, jira_using_sprints: false, jira_using_components: false, jira_using_versions: false, jira_field_grain: 'field_name'}' --target "$db"
+dbt run --vars '{jira_schema: jira_integrations_tests_sqlw, jira_using_teams: false, jira_using_priorities: false, jira_using_sprints: false, jira_using_components: false, jira_using_versions: false, jira_field_grain: 'field_name'}' --target "$db" --full-refresh
+dbt run --vars '{jira_schema: jira_integrations_tests_sqlw, jira_using_teams: false, jira_using_priorities: false, jira_using_sprints: false, jira_using_components: false, jira_using_versions: false, jira_field_grain: 'field_name'}' --target "$db"
 dbt test --vars '{jira_schema: jira_integrations_tests_sqlw}' --target "$db"
 
 else
