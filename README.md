@@ -79,7 +79,7 @@ Include the following jira package version in your `packages.yml` file:
 ```yaml
 packages:
   - package: fivetran/jira
-    version: [">=1.4.0", "<1.5.0"]
+    version: [">=1.5.0", "<1.6.0"]
 ```
 
 > All required sources and staging models are now bundled into this transformation package. Do not include `fivetran/jira_source` in your `packages.yml` since this package has been deprecated.
@@ -102,18 +102,7 @@ For **Snowflake**, **Redshift**, and **Postgres** databases, we have chosen `del
 
 > Regardless of strategy, we recommend that users periodically run a `--full-refresh` to ensure a high level of data quality.
 
-### Step 2: Install the package
-Include the following jira package version in your `packages.yml` file:
-> TIP: Check [dbt Hub](https://hub.getdbt.com/) for the latest installation instructions or [read the dbt docs](https://docs.getdbt.com/docs/package-management) for more information on installing packages.
-```yaml
-packages:
-  - package: fivetran/jira
-    version: [">=1.5.0", "<1.6.0"]
-```
-
-> All required sources and staging models are now bundled into this transformation package. Do not include `fivetran/jira_source` in your `packages.yml` since this package has been deprecated.
-
-### Step 3: Define database and schema variables
+### Define database and schema variables
 
 #### Option A: Single connection
 By default, this package runs using your destination and the `jira` schema. If this is not where your Jira data is (for example, if your Jira schema is named `jira_fivetran`), add the following configuration to your root `dbt_project.yml` file:

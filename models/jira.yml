@@ -413,7 +413,7 @@ models:
       - name: avg_close_time_seconds
         description: The average time taken to close issues since assignment, in seconds.
       - name: avg_age_currently_open_seconds 
-        description: Tjhe average age of a user's currently open issues.
+        description: The average age of a user's currently open issues.
       - name: median_close_time_seconds
         description: The median time taken to close issues since assignment, in seconds.
       - name: median_age_currently_open_seconds
