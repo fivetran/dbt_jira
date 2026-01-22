@@ -109,7 +109,7 @@ final as (
         on sprint_metrics_grouped.sprint_id = sprint_end_metrics.sprint_id
         and sprint_metrics_grouped.source_relation = sprint_end_metrics.source_relation
         {{ "and sprint_metrics_grouped.team = sprint_end_metrics.team" if using_teams }}
-    {{ dbt_utils.group_by(18) }}
+    {{ dbt_utils.group_by(19 if using_teams else 18) }}
 )
 
 select * 
