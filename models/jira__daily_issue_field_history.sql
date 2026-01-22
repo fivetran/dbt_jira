@@ -160,7 +160,7 @@ set_values as (
         {% set exception_cols = ['issue_id', 'issue_day_id', 'valid_starting_on', 'valid_starting_at_week', 'status', 'status_id', 'components', 'issue_type', 'project', 'assignee', 'team', 'sprint', 'story_points', 'story_point_estimate', 'source_relation'] %}
 
         {% for col in pivot_data_columns %}
-            {% if col.name|lower == 'sprint' and var('jira_using_sprints', True) %}
+            {% if col.name|lower == 'sprint' %}
             , joined.sprint
             , sum(case when joined.sprint is null then 0 else 1 end) over (partition by issue_id {{ jira.partition_by_source_relation(alias='joined') }} order by date_day rows unbounded preceding) as sprint_field_partition
 
@@ -250,7 +250,7 @@ fill_values as (
             order by date_day asc rows between unbounded preceding and current row) as status_id
 
         {% for col in pivot_data_columns %}
-            {% if col.name|lower == 'sprint' and var('jira_using_sprints', True) %}
+            {% if col.name|lower == 'sprint' %}
             , first_value(sprint) over (
                 partition by issue_id, sprint_field_partition {{ jira.partition_by_source_relation() }}
                 order by date_day asc rows between unbounded preceding and current row) as sprint
@@ -306,7 +306,7 @@ fix_null_values as (
         source_relation
 
         {% for col in pivot_data_columns %}
-            {% if col.name|lower == 'sprint' and var('jira_using_sprints', True) %}
+            {% if col.name|lower == 'sprint' %}
             , case when sprint = 'is_null' then null else sprint end as sprint
 
             {% elif col.name|lower == 'story_points' %}
@@ -345,12 +345,10 @@ surrogate_key as (
         cast({{ dbt.date_trunc('week', 'fix_null_values.date_day') }} as date) as date_week,
         fix_null_values.issue_id,
         fix_null_values.source_relation,
-        statuses.status_name as status
-        {% if var('jira_using_sprints', True) %}
-        , fix_null_values.sprint
-        {% endif %}
-        , fix_null_values.story_points
-        , fix_null_values.story_point_estimate
+        statuses.status_name as status,
+        fix_null_values.sprint,
+        fix_null_values.story_points,
+        fix_null_values.story_point_estimate
 
         {% for col in pivot_data_columns %}
             {% if col.name|lower == 'components' and var('jira_using_components', True) %}

@@ -1,14 +1,23 @@
-# dbt_jira v1.4.0
+# dbt_jira v1.5.0
 
-## Schema/Data Change
-**1 total change • 0 possible breaking changes**
+## Schema/Data Changes
+**3 total changes • 0 possible breaking changes**
 
-| Data Model(s) | Change type | Old | New | Notes |
-| ------------- | ----------- | ----| --- | ----- |
-| `jira__timestamp_issue_field_history` | New columns | | `sprint`, `story_points`, `story_point_estimate` | Default fields now included to match `jira__daily_issue_field_history` behavior |
+| Data Model(s) | Change type | Main Branch Behavior | New Branch Behavior | Notes |
+| ------------- | ----------- | -------------------- | ------------------- | ----- |
+| `jira__timestamp_issue_field_history` | New columns | Only tracked `status` as a default field | Now tracks `sprint`, `story_points`, `story_point_estimate` as default fields alongside `status` | Brings timestamp model into parity with daily model |
+| `jira__daily_issue_field_history` | New columns | Only tracked `status` and `status_id` as default fields | Now tracks `sprint`, `story_points`, `story_point_estimate` as default fields alongside `status` and `status_id` | - |
+| `jira__daily_issue_field_history`, `jira__timestamp_issue_field_history` | Behavior change for `sprint` column | `sprint` column only included when `jira_using_sprints: true` (daily model only) | `sprint` column always included in both models regardless of `jira_using_sprints` setting | When `jira_using_sprints: true`, sprint contains resolved sprint names. When `jira_using_sprints: false`, sprint contains raw field values (typically sprint IDs). |
 
-## Bug Fix
+## Bug Fixes
 - Fixed compilation error in `int_jira__pivot_daily_field_history` when `sprint` was included in the `issue_field_history_columns` variable. The model now properly excludes `sprint` from the custom columns loop since it's already included as a default field, preventing duplicate column errors.
+- Fixed compilation error in `int_jira__pivot_timestamp_field_history` when `sprint`, `story points`, or `story point estimate` were included in the `issue_field_history_columns` variable. These fields are now properly excluded from the custom columns loop to prevent duplicate columns.
+- Fixed bug in `jira__daily_issue_field_history` where the `sprint` column was incorrectly dropped from the final output when `jira_using_sprints: false`. The column is now consistently included regardless of the `jira_using_sprints` setting.
+- Updated `int_jira__timestamp_field_history_scd` to properly handle `sprint`, `story_points`, and `story_point_estimate` as default fields with SCD (slowly changing dimension) logic, ensuring these fields are tracked over time like other default fields.
+
+## Under the Hood
+- Refactored intermediate field history models (`int_jira__pivot_daily_field_history`, `int_jira__pivot_timestamp_field_history`, `int_jira__timestamp_field_history_scd`) to treat `sprint`, `story_points`, and `story_point_estimate` as default fields alongside `status`.
+- Updated exception column lists across field history models to consistently include the new default fields, ensuring proper handling throughout the transformation pipeline.
 
 ## Documentation
 - Updated README to clarify that both `jira__daily_issue_field_history` and `jira__timestamp_issue_field_history` models include the same default fields (`status`, `status_id`, `sprint`, `story_points`, `story_point_estimate`) and can be extended using the `issue_field_history_columns` variable.

@@ -12,6 +12,10 @@ with prod as (
         status,
         status_id,
         author_id
+-- Bring in after PR approval
+--      , sprint
+--      , story_points
+--      , story_point_estimate
     from {{ target.schema }}_jira_prod.jira__timestamp_issue_field_history
 ),
 
@@ -22,6 +26,10 @@ dev as (
         status,
         status_id,
         author_id
+-- Bring in after PR approval
+--      , sprint
+--      , story_points
+--      , story_point_estimate
     from {{ target.schema }}_jira_dev.jira__timestamp_issue_field_history
 ),
 
