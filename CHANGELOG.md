@@ -23,7 +23,7 @@
 - Updates `int_jira__timestamp_field_history_scd` to properly handle `sprint`, `story_points`, and `story_point_estimate` as default fields with SCD (slowly changing dimension) logic, ensuring these fields are tracked over time like other default fields. [PR #162](https://github.com/fivetran/dbt_jira/pull/162) 
 
 ## Under the Hood
-- Updates the consistency tests for `jira__daily_issue_field_history` and `jira__timestamp_issue_field_history` to compare development branch and production values of `sprint`, `story points`, and `story_point_estimate`. [PR #162](https://github.com/fivetran/dbt_jira/pull/162) 
+- Updates the consistency tests for `jira__daily_issue_field_history` and `jira__timestamp_issue_field_history` to compare development branch and production values of `sprint`, `story points`, and `story_point_estimate`. [PR #162](https://github.com/fivetran/dbt_jira/pull/162)
 
 ## Documentation
 - Updates README to clarify that both `jira__daily_issue_field_history` and `jira__timestamp_issue_field_history` models include the same default fields (`status`, `status_id`, `sprint`, `story_points`, `story_point_estimate`) and can be extended using the `issue_field_history_columns` variable. [PR #162](https://github.com/fivetran/dbt_jira/pull/162) 
