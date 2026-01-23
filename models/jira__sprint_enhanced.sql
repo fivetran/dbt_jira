@@ -1,16 +1,18 @@
 {{ config(enabled=var('jira_using_sprints', True)) }}
 
+{% set using_teams = var('jira_using_teams', True) %}
+
 with daily_sprint_issue_history as (
 
     select *
     from {{ ref('jira__daily_sprint_issue_history') }}
 ),
-
 sprint_metrics_grouped as (
 
     select
-        sprint_id,
         source_relation,
+        sprint_id,
+        {{ "team," if using_teams }}
         sprint_name,
         sprint_started_at,
         sprint_ended_at,
@@ -20,7 +22,7 @@ sprint_metrics_grouped as (
         remaining_estimate_seconds,
         time_spent_seconds
     from daily_sprint_issue_history
-    {{ dbt_utils.group_by(10) }}
+    {{ dbt_utils.group_by(11 if using_teams else 10) }}
 ),
 
 sprint_issue_metrics as (
