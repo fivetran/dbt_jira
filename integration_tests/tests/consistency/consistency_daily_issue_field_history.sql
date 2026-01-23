@@ -10,11 +10,10 @@ with prod as (
         date_day,
         issue_id,
         status,
-        status_id
--- Bring in after PR approval
---      , sprint
---      , story_points
---      , story_point_estimate
+        status_id,
+        sprint,
+        story_points,
+        story_point_estimate
 
     from {{ target.schema }}_jira_prod.jira__daily_issue_field_history
 ),
@@ -25,7 +24,10 @@ dev as (
         date_day,
         issue_id,
         status,
-        status_id
+        status_id,
+        sprint,
+        story_points,
+        story_point_estimate 
 -- Bring in after PR approval
 --      , sprint
 --      , story_points
