@@ -7,6 +7,8 @@
     )
 }}
 
+{% set using_teams = var('jira_using_teams', True) %}
+
 with daily_issue_field_history as (
 
     select *
@@ -48,6 +50,7 @@ ranked_sprint_updates as (
         daily_issue_field_history.date_day,
         daily_issue_field_history.date_week,
         daily_issue_field_history.status,
+        {{ "daily_issue_field_history.team," if using_teams }}
         cast(daily_issue_field_history.story_points as {{ dbt.type_float() }}) as story_points,
         cast(daily_issue_field_history.story_point_estimate as {{ dbt.type_float() }}) as story_point_estimate,
         -- Rank updates within each `sprint_id, issue_id, date_day`
@@ -100,6 +103,7 @@ issue_sprint_daily_history as (
 
     select
         filtered_issue_sprint_history.sprint_id,
+        {{ "filtered_issue_sprint_history.team," if using_teams }}
         filtered_issue_sprint_history.issue_id,
         filtered_issue_sprint_history.source_relation,
         filtered_issue_sprint_history.issue_key,

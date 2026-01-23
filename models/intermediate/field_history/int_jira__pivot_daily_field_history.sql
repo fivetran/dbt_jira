@@ -13,6 +13,11 @@
 -- issue_multiselect_history splits out an array-type field into multiple rows with unique individual values
 -- to combine with issue_field_history we need to aggregate the multiselect field values.
 
+-- Hardcode 'team' into the issue_field_history_columns list if not already present
+{% set issue_field_history_columns = var('issue_field_history_columns', []) %}
+{% do issue_field_history_columns.append('team') if var('jira_using_teams', True) 
+    and 'team' not in issue_field_history_columns | map('lower') | list %}
+
 with issue_field_history as (
 
     select *
@@ -153,7 +158,7 @@ limit_to_relevant_fields as (
 
     where lower(field_id) = 'status'
         or lower(field_name) in ('sprint', 'story points', 'story point estimate'
-        {%- for col in var('issue_field_history_columns', []) -%}
+        {%- for col in issue_field_history_columns -%}
             ,'{{ (col|lower) }}'
         {%- endfor -%} )
 ),
@@ -212,7 +217,7 @@ pivot_out as (
         max(case when lower(field_name) = 'story points' then field_value end) as story_points,
         max(case when lower(field_name) = 'story point estimate' then field_value end) as story_point_estimate
 
-        {% for col in var('issue_field_history_columns', []) -%}
+        {% for col in issue_field_history_columns -%}
         {% if col|lower not in ['sprint', 'story points', 'story point estimate'] %}
             , max(case when lower(field_name) = '{{ col|lower }}' then field_value end) as {{ dbt_utils.slugify(col) | replace(' ', '_') | lower }}
         {% endif %}
