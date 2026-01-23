@@ -62,13 +62,13 @@ limit_to_relevant_fields as (
 ),
 
 int_jira__timestamp_field_history as (
-    -- Convert null values to 'is_null' for consistent partitioning
+    -- Convert null values to '-is_null' for consistent partitioning
     select
         field_id,
         issue_id,
         source_relation,
         field_name,
-        case when field_value is null then 'is_null' else field_value end as field_value,
+        case when field_value is null then '-is_null' else field_value end as field_value,
         updated_at,
         author_id
     from limit_to_relevant_fields

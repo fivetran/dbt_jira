@@ -11,9 +11,15 @@ with daily_issue_field_history as (
 
     select *
     from {{ ref('jira__daily_issue_field_history') }}
+    where sprint is not null
 ),
 
-sprint_issue_pairing as (
+split_issue_field_history_sprints as (
+
+    {{ jira.split_sprint_ids() }}
+),
+
+{# sprint_issue_pairing as (
 
     select
         issue_id,
@@ -24,9 +30,9 @@ sprint_issue_pairing as (
     from {{ ref('int_jira__issue_multiselect_history') }}
     where field_name = 'sprint'
         and field_value is not null
-),
+), #}
 
-sprint_activity_window as (
+{# sprint_activity_window as (
 
     select
         sprint_id,
@@ -35,9 +41,9 @@ sprint_activity_window as (
         max(cast(updated_at as date)) as last_change_date
     from sprint_issue_pairing
     group by 1, 2
-),
+), #}
 
-ranked_sprint_updates as (
+{# split_issue_field_history_sprints as (
 
     select
         sprint_issue_pairing.sprint_id,
@@ -50,13 +56,8 @@ ranked_sprint_updates as (
         daily_issue_field_history.status,
         cast(daily_issue_field_history.story_points as {{ dbt.type_float() }}) as story_points,
         cast(daily_issue_field_history.story_point_estimate as {{ dbt.type_float() }}) as story_point_estimate,
-        -- Rank updates within each `sprint_id, issue_id, date_day`
-        row_number() over (
-            partition by sprint_issue_pairing.sprint_id,
-                        sprint_issue_pairing.issue_id {{ jira.partition_by_source_relation(alias='sprint_issue_pairing') }},
-                        daily_issue_field_history.date_day
-            order by sprint_issue_pairing.updated_at desc
-        ) as row_num
+
+
     from sprint_issue_pairing
     left join sprint_activity_window
         on cast(sprint_activity_window.sprint_id as {{ dbt.type_string() }}) = sprint_issue_pairing.sprint_id
@@ -67,12 +68,12 @@ ranked_sprint_updates as (
         -- Ensure tracking starts at the correct earliest date
         and cast(sprint_issue_pairing.updated_at as date) <= daily_issue_field_history.date_day
     where daily_issue_field_history.date_day <= {{ dbt.dateadd('month', 1, 'sprint_activity_window.last_change_date') }}
-),
+), #}
 
-filtered_issue_sprint_history as (
+issue_sprint_history_join as (
 
     select 
-        ranked_sprint_updates.*,
+        split_issue_field_history_sprints.*,
         sprint.sprint_name,
         sprint.started_at as sprint_started_at,
         sprint.ended_at as sprint_ended_at,
@@ -86,48 +87,23 @@ filtered_issue_sprint_history as (
         issue.original_estimate_seconds,
         issue.remaining_estimate_seconds,
         issue.time_spent_seconds
-    from ranked_sprint_updates
+    from split_issue_field_history_sprints
     inner join {{ ref('jira__issue_enhanced') }} issue
-        on ranked_sprint_updates.issue_id = issue.issue_id
-        and ranked_sprint_updates.source_relation = issue.source_relation
-    inner join {{ ref('stg_jira__sprint') }} sprint
-        on ranked_sprint_updates.sprint_id = cast(sprint.sprint_id as {{ dbt.type_string() }})
-        and ranked_sprint_updates.source_relation = sprint.source_relation
-    where row_num = 1 --Keep only the last update per sprint-issue-date_day
-),
+        on split_issue_field_history_sprints.issue_id = issue.issue_id
+        and split_issue_field_history_sprints.source_relation = issue.source_relation
+    inner join {{ ref('stg_jira__sprint') }} sprint -- leave deleted sprints in or no?
+        on split_issue_field_history_sprints.sprint_id = cast(sprint.sprint_id as {{ dbt.type_string() }})
+        and split_issue_field_history_sprints.source_relation = sprint.source_relation
 
-issue_sprint_daily_history as (
-
-    select
-        filtered_issue_sprint_history.sprint_id,
-        filtered_issue_sprint_history.issue_id,
-        filtered_issue_sprint_history.source_relation,
-        filtered_issue_sprint_history.issue_key,
-        filtered_issue_sprint_history.date_day,
-        filtered_issue_sprint_history.date_week,
-        filtered_issue_sprint_history.updated_at,
-        filtered_issue_sprint_history.sprint_name,
-        filtered_issue_sprint_history.sprint_started_at,
-        filtered_issue_sprint_history.sprint_ended_at,
-        filtered_issue_sprint_history.sprint_completed_at,
-        filtered_issue_sprint_history.board_id,
-        filtered_issue_sprint_history.issue_created_at,
-        filtered_issue_sprint_history.issue_resolved_at,
-        filtered_issue_sprint_history.assignee_user_id,
-        filtered_issue_sprint_history.assignee_name,
-        filtered_issue_sprint_history.original_estimate_seconds,
-        filtered_issue_sprint_history.remaining_estimate_seconds,
-        filtered_issue_sprint_history.time_spent_seconds,
-        filtered_issue_sprint_history.status,
-        filtered_issue_sprint_history.story_points,
-        filtered_issue_sprint_history.story_point_estimate 
-    from filtered_issue_sprint_history
+    where 
+        date_day >= cast(sprint.started_at as date)
+        and (sprint.ended_at is null or date_day <= cast(sprint.ended_at as date))
 ),
 
 issue_sprint_statuses as (
 
     select 
-        issue_sprint_daily_history.*,
+        issue_sprint_history_join.*,
         case when date_day >= cast(sprint_started_at as date) 
             and (sprint_ended_at is null or date_day <= cast(sprint_ended_at as date)) 
             then true else false 
@@ -148,7 +124,7 @@ issue_sprint_statuses as (
             and date_day <= cast(sprint_ended_at as date)
             then {{ dbt.datediff('date_day', 'sprint_ended_at', 'day') }} else null 
         end as days_left_in_sprint
-    from issue_sprint_daily_history
+    from issue_sprint_history_join
 ),
 
 surrogate_key as (

@@ -107,19 +107,19 @@ fix_null_values as (
 
         {% for col in custom_columns %}
             {% if col|lower == 'components' and var('jira_using_components', True) %}
-            , case when create_validity_periods.components = 'is_null' then null else create_validity_periods.components end as components
+            , case when create_validity_periods.components = '-is_null' then null else create_validity_periods.components end as components
 
             {% elif col|lower == 'project' %}
-            , case when create_validity_periods.project = 'is_null' then null else create_validity_periods.project end as project
+            , case when create_validity_periods.project = '-is_null' then null else create_validity_periods.project end as project
 
             {% elif col|lower == 'assignee' %}
-            , case when create_validity_periods.assignee = 'is_null' then null else create_validity_periods.assignee end as assignee
+            , case when create_validity_periods.assignee = '-is_null' then null else create_validity_periods.assignee end as assignee
 
             {% elif col|lower == 'team' and var('jira_using_teams', True) %}
-            , case when create_validity_periods.team = 'is_null' then null else create_validity_periods.team end as team
+            , case when create_validity_periods.team = '-is_null' then null else create_validity_periods.team end as team
 
             {% elif col|lower not in exception_cols %}
-            , case when create_validity_periods.{{ col }} = 'is_null' then null else create_validity_periods.{{ col }} end as {{ col }}
+            , case when create_validity_periods.{{ col }} = '-is_null' then null else create_validity_periods.{{ col }} end as {{ col }}
 
             {% endif %}
         {% endfor %}
