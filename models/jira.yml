@@ -25,7 +25,7 @@ models:
           - unique
           - not_null
       - name: sprint
-        description: The ID of the sprint that an issue is slotted into on a given day.
+        description: The name of the sprint that an issue is slotted into on a given day.
       - name: status_id
         description: The ID of the status that an issue has on a given day.
       - name: status
@@ -60,6 +60,12 @@ models:
         description: The name of the status that an issue has during this period.
       - name: status_category_name
         description: The category of the status (To Do, In Progress, Done).
+      - name: sprint
+        description: The name of the sprint that an issue is slotted into during this period.
+      - name: story_points
+        description: The story points that an issue has during this period.
+      - name: story_point_estimate
+        description: The story point estimate that an issue has during this period.
       - name: author_id
         description: Foreign key referencing the ID of the `user` who made the field changes.
       - name: is_current_record
@@ -435,7 +441,7 @@ models:
       - name: avg_close_time_seconds
         description: The average time taken to close issues since assignment, in seconds.
       - name: avg_age_currently_open_seconds 
-        description: Tjhe average age of a user's currently open issues.
+        description: The average age of a user's currently open issues.
       - name: median_close_time_seconds
         description: The median time taken to close issues since assignment, in seconds.
       - name: median_age_currently_open_seconds
