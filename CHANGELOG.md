@@ -10,10 +10,10 @@
 | `jira__timestamp_issue_field_history` | New columns | Only tracked `status` as a default field | Now tracks `sprint`, `story_points`, `story_point_estimate` as default fields alongside `status` | Brings timestamp model into parity with daily model. [PR #162](https://github.com/fivetran/dbt_jira/pull/162)  |
 | `jira__daily_issue_field_history` | New columns | Only tracked `status` and `status_id` as default fields | Now tracks `sprint`, `story_points`, `story_point_estimate` as default fields alongside `status` and `status_id` | This ensures sprint values are being properly tracked for the most analytical value tracking issues across sprints. [PR #162](https://github.com/fivetran/dbt_jira/pull/162)   |
 | `jira__daily_issue_field_history`, `jira__timestamp_issue_field_history` | Potential data change for `sprint` column | `sprint` column only included when `jira_using_sprints: true` (daily model only) | `sprint` column always included in both models regardless of `jira_using_sprints` setting | When `jira_using_sprints: true`, sprint contains resolved sprint names. When `jira_using_sprints: false`, sprint contains raw field values (typically sprint IDs). [PR #162](https://github.com/fivetran/dbt_jira/pull/162) |
-| `jira__daily_sprint_issue_history`<br>`jira__sprint_enhanced` | New Column |  | `team` | Adds `team` column when `jira_using_teams` is enabled (default: true) |
+| `jira__daily_sprint_issue_history`<br>`jira__sprint_enhanced` | New Column |  | `team` | Adds `team` column when `jira_using_teams` is enabled (default: true) [PR #163](https://github.com/fivetran/dbt_jira/pull/163) |
 
 ## Features
-- Adds support for Jira teams functionality by introducing team tracking across all final models.
+- Adds support for Jira teams functionality by introducing team tracking across all final models. [PR #163](https://github.com/fivetran/dbt_jira/pull/163) 
   - The `team` field is automatically included in field history tracking when `jira_using_teams` is enabled (default: true).
   - You can disable team functionality by setting `jira_using_teams: false` in your `dbt_project.yml`. See the [README](https://github.com/fivetran/dbt_jira#disable-models-for-non-existent-sources) for configuration details.
 
