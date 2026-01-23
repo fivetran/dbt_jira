@@ -1,5 +1,27 @@
 # dbt_jira v1.5.0
 
+[PR #168](https://github.com/fivetran/dbt_jira/pull/168) includes the following updates:
+
+## Schema/Data Changes
+**3 total changes • 1 possible breaking change**
+
+| Data Model(s) | Change type | Main Branch Behavior | New Branch Behavior | Notes |
+| ------------- | ----------- | -------------------- | ------------------- | ----- |
+| `jira__timestamp_issue_field_history` | New columns | Only tracked `status` as a default field | Now tracks `sprint`, `story_points`, `story_point_estimate` as default fields alongside `status` | Brings timestamp model into parity with daily model. [PR #162](https://github.com/fivetran/dbt_jira/pull/162)  |
+| `jira__daily_issue_field_history` | New columns | Only tracked `status` and `status_id` as default fields | Now tracks `sprint`, `story_points`, `story_point_estimate` as default fields alongside `status` and `status_id` | This ensures sprint values are being properly tracked for the most analytical value tracking issues across sprints. [PR #162](https://github.com/fivetran/dbt_jira/pull/162)   |
+| `jira__daily_issue_field_history`, `jira__timestamp_issue_field_history` | Potential data change for `sprint` column | `sprint` column only included when `jira_using_sprints: true` (daily model only) | `sprint` column always included in both models regardless of `jira_using_sprints` setting | When `jira_using_sprints: true`, sprint contains resolved sprint names. When `jira_using_sprints: false`, sprint contains raw field values (typically sprint IDs). [PR #162](https://github.com/fivetran/dbt_jira/pull/162) |
+
+## Bug Fixes
+- Fixes compilation error in `int_jira__pivot_daily_field_history` when `sprint` was included in the `issue_field_history_columns` variable. The model now properly excludes `sprint` from the custom columns loop since it's already included as a default field, preventing duplicate column errors. [PR #162](https://github.com/fivetran/dbt_jira/pull/162) 
+- Fixes compilation error in `int_jira__pivot_timestamp_field_history` when `sprint`, `story points`, or `story point estimate` were included in the `issue_field_history_columns` variable. These fields are now properly excluded from the custom columns loop to prevent duplicate columns. [PR #162](https://github.com/fivetran/dbt_jira/pull/162) 
+- Updates `int_jira__timestamp_field_history_scd` to properly handle `sprint`, `story_points`, and `story_point_estimate` as default fields with SCD (slowly changing dimension) logic, ensuring these fields are tracked over time like other default fields. [PR #162](https://github.com/fivetran/dbt_jira/pull/162) 
+
+## Under the Hood
+- Update the consistency tests for `jira__daily_issue_field_history` and `jira__timestamp_issue_field_history` to compare development branch and production values of `sprint`, `story points`, and `story_point_estimate`. [PR #162](https://github.com/fivetran/dbt_jira/pull/162) 
+
+## Documentation
+- Updated README to clarify that both `jira__daily_issue_field_history` and `jira__timestamp_issue_field_history` models include the same default fields (`status`, `status_id`, `sprint`, `story_points`, `story_point_estimate`) and can be extended using the `issue_field_history_columns` variable. [PR #162](https://github.com/fivetran/dbt_jira/pull/162) 
+ 
 # dbt_jira v1.4.0
 
 [PR #165](https://github.com/fivetran/dbt_jira/pull/165) includes the following updates:
@@ -13,7 +35,7 @@
   - Adds `table_variables` for relevant sources to prevent missing sources from blocking downstream Quickstart models.
   - Adds `supported_vars` for Quickstart UI customization.
 
-# dbt_jira v1.3.1 
+# dbt_jira v1.3.1
 [PR #161](https://github.com/fivetran/dbt_jira/pull/161) includes the following updates:
 
 ## Bug Fixes

@@ -11,7 +11,10 @@ with prod as (
         issue_id,
         status,
         status_id,
-        author_id
+        author_id,
+        sprint,
+        story_points,
+        story_point_estimate 
     from {{ target.schema }}_jira_prod.jira__timestamp_issue_field_history
 ),
 
@@ -21,7 +24,10 @@ dev as (
         issue_id,
         status,
         status_id,
-        author_id
+        author_id,
+        sprint,
+        story_points,
+        story_point_estimate 
     from {{ target.schema }}_jira_dev.jira__timestamp_issue_field_history
 ),
 

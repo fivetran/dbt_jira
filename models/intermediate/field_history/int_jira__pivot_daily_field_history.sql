@@ -36,6 +36,55 @@ issue_multiselect_history as (
     {% endif %}
 ),
 
+{% if var('jira_using_sprints', True) %}
+sprints as (
+
+    select *
+    from {{ ref('stg_jira__sprint') }}
+),
+{% endif %}
+
+field_option as (
+
+    select *
+    from {{ ref('stg_jira__field_option') }}
+),
+
+resolve_multiselect_values as (
+    -- Resolve identifiers to names BEFORE aggregation
+    select
+        issue_multiselect_history.field_id,
+        issue_multiselect_history.field_name,
+        issue_multiselect_history.issue_id,
+        issue_multiselect_history.source_relation,
+        issue_multiselect_history.updated_at,
+        cast({{ dbt.date_trunc('day', 'issue_multiselect_history.updated_at') }} as date) as date_day,
+        -- Replace identifiers with human-readable names based on field type
+        {% if var('jira_using_sprints', True) %}
+        case
+            when lower(issue_multiselect_history.field_name) = 'sprint' then coalesce(sprints.sprint_name, issue_multiselect_history.field_value)
+            else coalesce(field_option.field_option_name, issue_multiselect_history.field_value)
+        end
+        {% else %}
+        coalesce(field_option.field_option_name, issue_multiselect_history.field_value)
+        {% endif %}
+        as field_value
+
+    from issue_multiselect_history
+
+    {% if var('jira_using_sprints', True) %}
+    left join sprints
+        on cast(sprints.sprint_id as {{ dbt.type_string() }}) = issue_multiselect_history.field_value
+        and sprints.source_relation = issue_multiselect_history.source_relation
+        and lower(issue_multiselect_history.field_name) = 'sprint'
+    {% endif %}
+
+    left join field_option
+        on cast(field_option.field_id as {{ dbt.type_string() }}) = issue_multiselect_history.field_value
+        and field_option.source_relation = issue_multiselect_history.source_relation
+        and lower(issue_multiselect_history.field_name) != 'sprint'
+),
+
 issue_multiselect_batch_history as (
 
     select
@@ -44,13 +93,11 @@ issue_multiselect_batch_history as (
         issue_id,
         source_relation,
         updated_at,
-        cast( {{ dbt.date_trunc('day', 'updated_at') }} as date) as date_day,
-
-        -- if the field refers to an object captured in a table elsewhere (ie sprint, users, field_option for custom fields),
-        -- the value is actually a foreign key to that table.
+        date_day,
+        -- Now aggregating resolved names instead of IDs
         {{ fivetran_utils.string_agg('field_value', "', '") }} as field_values
 
-    from issue_multiselect_history
+    from resolve_multiselect_values
 
     {{ dbt_utils.group_by(6) }}
 ),
@@ -166,7 +213,7 @@ pivot_out as (
         max(case when lower(field_name) = 'story point estimate' then field_value end) as story_point_estimate
 
         {% for col in var('issue_field_history_columns', []) -%}
-        {% if col|lower not in ['story points', 'story point estimate'] %}
+        {% if col|lower not in ['sprint', 'story points', 'story point estimate'] %}
             , max(case when lower(field_name) = '{{ col|lower }}' then field_value end) as {{ dbt_utils.slugify(col) | replace(' ', '_') | lower }}
         {% endif %}
         {% endfor -%}
