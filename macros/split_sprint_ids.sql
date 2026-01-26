@@ -35,7 +35,7 @@
     
     from daily_issue_field_history
     cross join 
-        table(flatten(STRTOK_TO_ARRAY(sprint, ', '))) as merges
+        table(flatten(STRTOK_TO_ARRAY(sprint, ', '))) as sprints
 
 {% endmacro %}
 
