@@ -58,7 +58,7 @@
             daily_issue_field_history.status,
             cast(daily_issue_field_history.story_points as {{ dbt.type_float() }}) as story_points,
             cast(daily_issue_field_history.story_point_estimate as {{ dbt.type_float() }}) as story_point_estimate,
-            split_to_array(sprint, ';') as super_sprint_ids
+            split_to_array(sprint, ', ') as super_sprint_ids
 
         from daily_issue_field_history
     ) as unnest_sprint_id_array, unnest_sprint_id_array.super_sprint_ids as sprint_id
@@ -78,7 +78,7 @@
 
     from daily_issue_field_history
     cross join 
-        unnest(string_to_array(sprint, ';')) as sprints
+        unnest(string_to_array(sprint, ', ')) as sprints
 
 {% endmacro %}
 
@@ -99,7 +99,7 @@
             source_relation,
             issue_id, 
             date_day,
-            explode(split(sprint, ';')) as sprints from daily_issue_field_history
+            explode(split(sprint, ', ')) as sprints from daily_issue_field_history
     ) as sprints_subquery 
     where daily_issue_field_history.issue_id = sprints_subquery.issue_id
     and daily_issue_field_history.date_day = sprints_subquery.date_day

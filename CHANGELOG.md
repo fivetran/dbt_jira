@@ -2,9 +2,22 @@
 
 [PR #169](https://github.com/fivetran/dbt_jira/pull/169) includes the following updates:
 
+## Schema/Data Change
+**1 total change • 1 possible breaking change**
+
+| Data Model(s) | Change type | Old | New | Notes |
+| ------------- | ----------- | ----| --- | ----- |
+| `jira__daily_sprint_issue_history` | Date range | From the start of the sprint to the last day an issue was added to it | From the start of the sprint to its end | If no end date is provided, sprints will be tracked up to the current date. |
+
 ## Bug Fixes
-- Ensures `jira__daily_sprint_issue_history` provide an accurate history of sprints and the issues associated with them at the time. Previously, if an issue were removed from a sprint, the model would continue to track them together.
+- Ensures `jira__daily_sprint_issue_history` provide an accurate history of sprints and the issues associated with them at the time. Previously:
+  - When an issue was removed from a sprint, the model would continue to track them together.
+  - If a sprint ended over a month after an issue was last added to it, the model omitted the days in between these dates.
 - Optimizes joins in `jira__daily_sprint_issue_history` to allow for quicker full refresh runs.
+
+## Under the Hood
+- Creates `split_sprint_ids()` macro to unnest the `jira__daily_issue_field_history.sprint` field.
+- Adjusts the issue field history null placeholder from `is_null` to `-is_null` for more consistent aggregations.
 
 # dbt_jira v1.4.0
 

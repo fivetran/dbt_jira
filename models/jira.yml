@@ -71,7 +71,7 @@ models:
 
   - name: jira__daily_sprint_issue_history
     description: >
-      Each record represents a snapshot of a sprint and its assorted issues on a given day between the sprint start date and the most recent update to the sprint.
+      Each record represents a daily snapshot of a sprint and each of its assigned issues at the time. Sprints are tracked from their start date to their end date (or current date if no end date is provided).
     columns:
       - name: source_relation
         description: "{{ doc('source_relation') }}"
