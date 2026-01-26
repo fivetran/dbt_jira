@@ -1,3 +1,11 @@
+# dbt_jira v1.5.1-a1
+
+[PR #169](https://github.com/fivetran/dbt_jira/pull/169) includes the following updates:
+
+## Bug Fixes
+- Ensures `jira__daily_sprint_issue_history` provide an accurate history of sprints and the issues associated with them at the time. Previously, if an issue were removed from a sprint, the model would continue to track them together.
+- Optimizes joins in `jira__daily_sprint_issue_history` to allow for quicker full refresh runs.
+
 # dbt_jira v1.4.0
 
 [PR #165](https://github.com/fivetran/dbt_jira/pull/165) includes the following updates:
