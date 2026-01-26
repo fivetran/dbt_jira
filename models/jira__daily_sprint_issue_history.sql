@@ -19,57 +19,6 @@ split_issue_field_history_sprints as (
     {{ jira.split_sprint_ids() }}
 ),
 
-{# sprint_issue_pairing as (
-
-    select
-        issue_id,
-        source_relation,
-        field_value as sprint_id,
-        updated_at,
-        is_active
-    from {{ ref('int_jira__issue_multiselect_history') }}
-    where field_name = 'sprint'
-        and field_value is not null
-), #}
-
-{# sprint_activity_window as (
-
-    select
-        sprint_id,
-        source_relation,
-        min(cast(updated_at as date)) as first_change_date,
-        max(cast(updated_at as date)) as last_change_date
-    from sprint_issue_pairing
-    group by 1, 2
-), #}
-
-{# split_issue_field_history_sprints as (
-
-    select
-        sprint_issue_pairing.sprint_id,
-        sprint_issue_pairing.issue_id,
-        sprint_issue_pairing.source_relation,
-        sprint_issue_pairing.updated_at,
-        sprint_issue_pairing.is_active,
-        daily_issue_field_history.date_day,
-        daily_issue_field_history.date_week,
-        daily_issue_field_history.status,
-        cast(daily_issue_field_history.story_points as {{ dbt.type_float() }}) as story_points,
-        cast(daily_issue_field_history.story_point_estimate as {{ dbt.type_float() }}) as story_point_estimate,
-
-
-    from sprint_issue_pairing
-    left join sprint_activity_window
-        on cast(sprint_activity_window.sprint_id as {{ dbt.type_string() }}) = sprint_issue_pairing.sprint_id
-        and sprint_activity_window.source_relation = sprint_issue_pairing.source_relation
-    left join daily_issue_field_history
-        on sprint_issue_pairing.issue_id = daily_issue_field_history.issue_id
-        and sprint_issue_pairing.source_relation = daily_issue_field_history.source_relation
-        -- Ensure tracking starts at the correct earliest date
-        and cast(sprint_issue_pairing.updated_at as date) <= daily_issue_field_history.date_day
-    where daily_issue_field_history.date_day <= {{ dbt.dateadd('month', 1, 'sprint_activity_window.last_change_date') }}
-), #}
-
 issue_sprint_history_join as (
 
     select 
@@ -91,7 +40,7 @@ issue_sprint_history_join as (
     inner join {{ ref('jira__issue_enhanced') }} issue
         on split_issue_field_history_sprints.issue_id = issue.issue_id
         and split_issue_field_history_sprints.source_relation = issue.source_relation
-    inner join {{ ref('stg_jira__sprint') }} sprint -- leave deleted sprints in or no?
+    inner join {{ ref('stg_jira__sprint') }} sprint -- this will remove deleted sprints from the history
         on split_issue_field_history_sprints.sprint_id = cast(sprint.sprint_id as {{ dbt.type_string() }})
         and split_issue_field_history_sprints.source_relation = sprint.source_relation
 

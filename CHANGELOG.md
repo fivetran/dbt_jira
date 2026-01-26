@@ -1,4 +1,4 @@
-# dbt_jira v1.5.1-a1
+# dbt_jira v1.4.1-a1
 
 [PR #169](https://github.com/fivetran/dbt_jira/pull/169) includes the following updates:
 
