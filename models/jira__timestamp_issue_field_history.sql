@@ -1,7 +1,7 @@
 {%- set custom_columns = [] -%}
 {%- for col in var('issue_field_history_columns', []) -%}
     {%- set clean_col = dbt_utils.slugify(col) | replace(' ', '_') | lower -%}
-    {%- if clean_col not in ['sprint', 'story_points', 'story_point_estimate'] -%}
+    {%- if clean_col not in ['sprint', 'sprint_name', 'story_points', 'story_point_estimate'] -%}
         {%- do custom_columns.append(clean_col) -%}
     {%- endif -%}
 {%- endfor -%}
@@ -79,11 +79,16 @@ create_validity_periods as (
         status as status_id,
         author_id,
         sprint,
-        story_points,
-        story_point_estimate
+        sprint_name
+        {% if 'story points' in var('issue_field_history_columns', []) | map('lower') | list %}
+        , story_points
+        {% endif %}
+        {% if 'story point estimate' in var('issue_field_history_columns', []) | map('lower') | list %}
+        , story_point_estimate
+        {% endif %}
 
         -- list of exception columns
-        {% set exception_cols = ['issue_id', 'updated_at', 'updated_at_week', 'status', 'author_id', 'sprint', 'story_points', 'story_point_estimate', 'source_relation'] %}
+        {% set exception_cols = ['issue_id', 'updated_at', 'updated_at_week', 'status', 'author_id', 'sprint', 'sprint_name', 'story_points', 'story_point_estimate', 'source_relation'] %}
 
         {% for col in custom_columns %}
             {% if col|lower not in exception_cols %}
@@ -107,11 +112,16 @@ fix_null_values as (
         status_categories.status_category_name,
         create_validity_periods.author_id,
         case when create_validity_periods.sprint = 'is_null' then null else create_validity_periods.sprint end as sprint,
-        case when create_validity_periods.story_points = 'is_null' then null else create_validity_periods.story_points end as story_points,
-        case when create_validity_periods.story_point_estimate = 'is_null' then null else create_validity_periods.story_point_estimate end as story_point_estimate
+        case when create_validity_periods.sprint_name = 'is_null' then null else create_validity_periods.sprint_name end as sprint_name
+        {% if 'story points' in var('issue_field_history_columns', []) | map('lower') | list %}
+        , case when create_validity_periods.story_points = 'is_null' then null else create_validity_periods.story_points end as story_points
+        {% endif %}
+        {% if 'story point estimate' in var('issue_field_history_columns', []) | map('lower') | list %}
+        , case when create_validity_periods.story_point_estimate = 'is_null' then null else create_validity_periods.story_point_estimate end as story_point_estimate
+        {% endif %}
 
         -- list of exception columns
-        {% set exception_cols = ['issue_id', 'issue_timestamp_id', 'updated_at', 'updated_at_week', 'status', 'author_id', 'components', 'project', 'assignee', 'team', 'sprint', 'story_points', 'story_point_estimate', 'source_relation'] %}
+        {% set exception_cols = ['issue_id', 'issue_timestamp_id', 'updated_at', 'updated_at_week', 'status', 'author_id', 'components', 'project', 'assignee', 'team', 'sprint', 'sprint_name', 'story_points', 'story_point_estimate', 'source_relation'] %}
 
         {% for col in custom_columns %}
             {% if col|lower == 'components' and var('jira_using_components', True) %}
@@ -158,8 +168,13 @@ final as (
         fix_null_values.status_category_name,
         fix_null_values.author_id,
         fix_null_values.sprint,
-        fix_null_values.story_points,
-        fix_null_values.story_point_estimate
+        fix_null_values.sprint_name
+        {% if 'story points' in var('issue_field_history_columns', []) | map('lower') | list %}
+        , fix_null_values.story_points
+        {% endif %}
+        {% if 'story point estimate' in var('issue_field_history_columns', []) | map('lower') | list %}
+        , fix_null_values.story_point_estimate
+        {% endif %}
 
         {% for col in custom_columns %}
             {% if col|lower == 'components' and var('jira_using_components', True) %}
