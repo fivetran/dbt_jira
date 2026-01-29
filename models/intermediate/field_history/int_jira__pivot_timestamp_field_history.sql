@@ -149,7 +149,7 @@ final as (
         issue_id,
         source_relation,
         cast({{ dbt.date_trunc('week', 'updated_at') }} as date) as updated_at_week,
-        max(author_id) as author_id,
+        author_id,
         max(case when lower(field_id) = 'status' then field_value end) as status,
         max(case when lower(field_name) = 'sprint' then field_value end) as sprint,
         max(case when lower(field_name) = 'sprint_name' then field_value end) as sprint_name
@@ -162,7 +162,7 @@ final as (
         {% endfor -%}
 
     from int_jira__timestamp_field_history
-    {{ dbt_utils.group_by(4) }}
+    {{ dbt_utils.group_by(5) }}
 )
 
 select *
