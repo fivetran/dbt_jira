@@ -27,7 +27,6 @@
 - Removes field_option resolution for multiselect fields in pivot models (`int_jira__pivot_timestamp_field_history` and `int_jira__pivot_daily_field_history`). Multiselect fields now kept as IDs until field_option mapping can be properly scoped. Sprint names are still resolved via dedicated sprint table join. [PR #162](https://github.com/fivetran/dbt_jira/pull/162)
 - Simplifies `jira__daily_issue_field_history` by removing explicit field handling for sprint, sprint_name, story_points, and story_point_estimate. These fields now flow through dynamically from the pivot model, following the same pattern as other fields. [PR #162](https://github.com/fivetran/dbt_jira/pull/162)
 - Creates synthetic `sprint_name` rows in pivot models by joining to sprint table and generating field_name='sprint_name' records that flow through the existing aggregation pipeline. [PR #162](https://github.com/fivetran/dbt_jira/pull/162)
-- Updates the consistency tests for `jira__daily_issue_field_history` and `jira__timestamp_issue_field_history` to compare development branch and production values of `sprint`, `sprint_name`, `story points`, and `story_point_estimate`. [PR #162](https://github.com/fivetran/dbt_jira/pull/162)
 
 ## Documentation
 - Updates README to clarify default fields in `jira__daily_issue_field_history` (includes `sprint`, `sprint_name`, `story_points`, `story_point_estimate`) and `jira__timestamp_issue_field_history` (includes `sprint`, `sprint_name` by default; story points fields are configurable). [PR #162](https://github.com/fivetran/dbt_jira/pull/162)
