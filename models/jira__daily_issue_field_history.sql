@@ -280,20 +280,20 @@ fix_null_values as (
 
         {% for col in pivot_data_columns %}
             {% if col.name|lower == 'components' and var('jira_using_components', True) %}
-            , case when components = 'is_null' then null else components end as components
+            , case when components = '-is_null' then null else components end as components
 
             {% elif col.name|lower == 'project' %}
-            , case when project = 'is_null' then null else project end as project
+            , case when project = '-is_null' then null else project end as project
 
             {% elif col.name|lower == 'assignee' %}
-            , case when assignee = 'is_null' then null else assignee end as assignee
+            , case when assignee = '-is_null' then null else assignee end as assignee
 
             {% elif col.name|lower == 'team' and var('jira_using_teams', True) %}
-            , case when team = 'is_null' then null else team end as team
+            , case when team = '-is_null' then null else team end as team
 
             {% elif col.name|lower not in ['issue_id','issue_day_id','valid_starting_on', 'valid_starting_at_week', 'status', 'components', 'project', 'assignee', 'team', 'source_relation'] %}
             -- we de-nulled the true null values earlier in order to differentiate them from nulls that just needed to be backfilled
-            , case when {{ col.name }} = 'is_null' then null else {{ col.name }} end as {{ col.name }}
+            , case when {{ col.name }} = '-is_null' then null else {{ col.name }} end as {{ col.name }}
 
             {% endif %}
         {% endfor %}
