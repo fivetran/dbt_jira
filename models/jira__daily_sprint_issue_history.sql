@@ -16,7 +16,7 @@ with daily_issue_field_history as (
 
 split_issue_field_history_sprints as (
 
-    {{ jira.split_sprint_ids() }}
+    {{ jira.split_sprint_ids(using_teams=var('jira_using_teams', True)) }}
 ),
 
 issue_sprint_history_join as (

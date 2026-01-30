@@ -1,12 +1,12 @@
 name: 'jira_integration_tests'
-version: '1.4.1'
+version: '1.5.0'
 config-version: 2
 profile: 'integration_tests'
 
 
 vars:
 # Comment out the below when generating docs
-  issue_field_history_columns: ['team', 'assignee', 'labels', 'collaborators', 'quarter',  'project']  # @docs-ignore
+  issue_field_history_columns: ['team', 'assignee', 'labels', 'collaborators', 'quarter', 'project']  # @docs-ignore
 
   jira:
     jira_schema: jira_integration_tests
@@ -36,8 +36,8 @@ vars:
 
 models:
   jira:
-    +schema: "{{ 'jira_integrations_tests_sqlw' if target.name == 'databricks-sql' else 'jira' }}"
-    # +schema: "jira_{{ var('directed_schema','dev') }}"
+    # +schema: "{{ 'jira_integrations_tests_sqlw' if target.name == 'databricks-sql' else 'jira' }}"
+    +schema: "jira_{{ var('directed_schema','dev') }}"
 
 seeds:
   +docs:
