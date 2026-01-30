@@ -1,6 +1,6 @@
 {% macro split_sprint_ids(using_teams) %}
 
-{{ adapter.dispatch('split_sprint_ids', 'jira') () }}
+{{ adapter.dispatch('split_sprint_ids', 'jira') (using_teams) }}
 
 {% endmacro %}
 
