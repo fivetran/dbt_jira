@@ -16,13 +16,11 @@ sprints as (
     select *
     from {{ ref('stg_jira__sprint') }}
 ),
-{% endif %}
 
-{% if var('jira_using_sprints', True) %}
 sprint_name_multiselect_history as (
-    -- Create synthetic sprint_name rows by resolving sprint IDs to names
+    -- Create synthetic sprint_name rows by resolving sprint IDs to names (rename field_id to avoid confusion with sprint id)
     select
-        issue_multiselect_history.field_id,
+        'sprint_field' as field_id,
         'sprint_name' as field_name,
         issue_multiselect_history.issue_id,
         issue_multiselect_history.source_relation,
@@ -38,6 +36,7 @@ sprint_name_multiselect_history as (
 
     where lower(issue_multiselect_history.field_name) = 'sprint'
 ),
+{% endif %}
 
 combined_multiselect_history as (
     -- Union original multiselect fields (IDs) with synthetic sprint_name field
@@ -51,6 +50,7 @@ combined_multiselect_history as (
         field_value
     from issue_multiselect_history
 
+    {% if var('jira_using_sprints', True) %}
     union all
 
     select
@@ -62,20 +62,8 @@ combined_multiselect_history as (
         author_id,
         field_value
     from sprint_name_multiselect_history
+    {% endif %}
 ),
-{% else %}
-combined_multiselect_history as (
-    select
-        field_id,
-        field_name,
-        issue_id,
-        source_relation,
-        updated_at,
-        author_id,
-        field_value
-    from issue_multiselect_history
-),
-{% endif %}
 
 issue_multiselect_batch_history as (
     -- Aggregate multiselect field values into comma-separated strings
