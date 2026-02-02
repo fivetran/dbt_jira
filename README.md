@@ -171,7 +171,7 @@ vars:
 ```
 
 ### Disable models for non-existent sources
-Your Jira connection may not sync every table that this package expects. If you do not have the `SPRINT`, `COMPONENT`, `VERSION`, `PRIORITY` or `TEAM` tables synced, add the respective variables to your root `dbt_project.yml` file.  Additionally, if you want to remove comment aggregations from your `jira__issue_enhanced` model,  add the `jira_include_comments` variable to your root `dbt_project.yml`:
+Your Jira connection may not sync every table that this package expects. If you do not have the `SPRINT`, `COMPONENT`, `VERSION`, `PRIORITY` or `TEAM` tables synced, add the respective variables to your root `dbt_project.yml` file. Additionally, if you want to remove comment aggregations from your `jira__issue_enhanced` model,  add the `jira_include_comments` variable to your root `dbt_project.yml`:
 ```yml
 vars:
     jira_using_sprints: false    # Enabled by default. Disable if you do not have the sprint table or do not want sprint-related metrics reported.

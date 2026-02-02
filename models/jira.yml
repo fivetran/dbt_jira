@@ -25,6 +25,8 @@ models:
           - unique
           - not_null
       - name: sprint
+        description: The ID of the sprint that an issue is slotted into on a given day.
+      - name: sprint_name
         description: The name of the sprint that an issue is slotted into on a given day.
       - name: status_id
         description: The ID of the status that an issue has on a given day.
@@ -61,7 +63,9 @@ models:
       - name: status_category_name
         description: The category of the status (To Do, In Progress, Done).
       - name: sprint
-        description: The name of the sprint that an issue is slotted into during this period.
+        description: The ID of the sprint that an issue is slotted into during this period.
+      - name: sprint_name
+        description: The name of the sprint that an issue is slotted into on a given day
       - name: story_points
         description: The story points that an issue has during this period.
       - name: story_point_estimate
@@ -226,6 +230,8 @@ models:
         description: Timestamp of when the sprint began. 
       - name: sprint
         description: List of associated sprint IDs.
+      - name: sprint_name
+        description: List of associated sprint names.
       - name: status
         description: ID of the associated status.
       - name: original_estimate_seconds

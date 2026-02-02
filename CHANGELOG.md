@@ -3,13 +3,12 @@
 [PR #168](https://github.com/fivetran/dbt_jira/pull/168) includes the following updates:
 
 ## Schema/Data Change (--full-refresh required after upgrading)
-**4 total changes**
+**3 total changes**
 
 | Data Model(s) | Change type | Old | New | Notes |
 | ---------- | ----------- | -------- | -------- | ----- |
 | `jira__timestamp_issue_field_history` | New columns | Only tracked `status` as a default field | Now tracks `sprint` (sprint IDs), `sprint_name` (resolved names) as default fields alongside `status` | Brings timestamp model closer to parity with daily model. Story points fields are configurable via `issue_field_history_columns` variable. [PR #162](https://github.com/fivetran/dbt_jira/pull/162) |
 | `jira__daily_issue_field_history` | New column | Already tracked `status`, `sprint` (IDs), `story_points`, `story_point_estimate` | Now also tracks `sprint_name` (resolved sprint names) | Provides human-readable sprint names alongside sprint IDs. [PR #162](https://github.com/fivetran/dbt_jira/pull/162) |
-| `jira__timestamp_issue_field_history` | New column | | `sprint_name` | Contains resolved sprint names (comma-separated list for multiselect). Sprint IDs remain in `sprint` column. [PR #162](https://github.com/fivetran/dbt_jira/pull/162) |
 | `jira__daily_sprint_issue_history`<br>`jira__sprint_enhanced` | New column | | `team` | Adds `team` column when `jira_using_teams` is enabled (default: true). [PR #163](https://github.com/fivetran/dbt_jira/pull/163) |
 
 ## Bug Fixes
@@ -18,15 +17,11 @@
 - Updates `int_jira__timestamp_field_history_scd` to properly handle `sprint`, `sprint_name`, and conditionally handle `story_points` and `story_point_estimate` with SCD (slowly changing dimension) logic. [PR #162](https://github.com/fivetran/dbt_jira/pull/162)
 
 ## Features
-- Adds support for Jira teams functionality by introducing team tracking across all final models. [PR #163](https://github.com/fivetran/dbt_jira/pull/163)
-  - The `team` field is automatically included in field history tracking when `jira_using_teams` is enabled (default: true).
-  - You can disable team functionality by setting `jira_using_teams: false` in your `dbt_project.yml`. See the [README](https://github.com/fivetran/dbt_jira#disable-models-for-non-existent-sources) for configuration details.
-- Adds `sprint_name` column to both `jira__daily_issue_field_history` and `jira__timestamp_issue_field_history` models to provide human-readable sprint names alongside sprint IDs. [PR #162](https://github.com/fivetran/dbt_jira/pull/162)
+- Adds support for Jira teams functionality. You can disable team functionality by setting `jira_using_teams: false` in your `dbt_project.yml`. See the [README](https://github.com/fivetran/dbt_jira#disable-models-for-non-existent-sources) for configuration details. [PR #163](https://github.com/fivetran/dbt_jira/pull/163)
 
 ## Under the Hood
 - Removes field_option resolution for multiselect fields in pivot models (`int_jira__pivot_timestamp_field_history` and `int_jira__pivot_daily_field_history`). Multiselect fields now kept as IDs until field_option mapping can be properly scoped. Sprint names are still resolved via dedicated sprint table join. [PR #162](https://github.com/fivetran/dbt_jira/pull/162)
 - Simplifies `jira__daily_issue_field_history` by removing explicit field handling for sprint, sprint_name, story_points, and story_point_estimate. These fields now flow through dynamically from the pivot model, following the same pattern as other fields. [PR #162](https://github.com/fivetran/dbt_jira/pull/162)
-- Creates synthetic `sprint_name` rows in pivot models by joining to sprint table and generating field_name='sprint_name' records that flow through the existing aggregation pipeline. [PR #162](https://github.com/fivetran/dbt_jira/pull/162)
 
 ## Documentation
 - Updates README to clarify default fields in `jira__daily_issue_field_history` (includes `sprint`, `sprint_name`, `story_points`, `story_point_estimate`) and `jira__timestamp_issue_field_history` (includes `sprint`, `sprint_name` by default; story points fields are configurable). [PR #162](https://github.com/fivetran/dbt_jira/pull/162)
