@@ -111,13 +111,13 @@ fix_null_values as (
         statuses.status_name as status,
         status_categories.status_category_name,
         create_validity_periods.author_id,
-        case when create_validity_periods.sprint = 'is_null' then null else create_validity_periods.sprint end as sprint,
-        case when create_validity_periods.sprint_name = 'is_null' then null else create_validity_periods.sprint_name end as sprint_name
+        case when create_validity_periods.sprint = '-is_null' then null else create_validity_periods.sprint end as sprint,
+        case when create_validity_periods.sprint_name = '-is_null' then null else create_validity_periods.sprint_name end as sprint_name
         {% if 'story points' in var('issue_field_history_columns', []) | map('lower') | list %}
-        , case when create_validity_periods.story_points = 'is_null' then null else create_validity_periods.story_points end as story_points
+        , case when create_validity_periods.story_points = '-is_null' then null else create_validity_periods.story_points end as story_points
         {% endif %}
         {% if 'story point estimate' in var('issue_field_history_columns', []) | map('lower') | list %}
-        , case when create_validity_periods.story_point_estimate = 'is_null' then null else create_validity_periods.story_point_estimate end as story_point_estimate
+        , case when create_validity_periods.story_point_estimate = '-is_null' then null else create_validity_periods.story_point_estimate end as story_point_estimate
         {% endif %}
 
         -- list of exception columns
@@ -125,19 +125,19 @@ fix_null_values as (
 
         {% for col in custom_columns %}
             {% if col|lower == 'components' and var('jira_using_components', True) %}
-            , case when create_validity_periods.components = 'is_null' then null else create_validity_periods.components end as components
+            , case when create_validity_periods.components = '-is_null' then null else create_validity_periods.components end as components
 
             {% elif col|lower == 'project' %}
-            , case when create_validity_periods.project = 'is_null' then null else create_validity_periods.project end as project
+            , case when create_validity_periods.project = '-is_null' then null else create_validity_periods.project end as project
 
             {% elif col|lower == 'assignee' %}
-            , case when create_validity_periods.assignee = 'is_null' then null else create_validity_periods.assignee end as assignee
+            , case when create_validity_periods.assignee = '-is_null' then null else create_validity_periods.assignee end as assignee
 
             {% elif col|lower == 'team' and var('jira_using_teams', True) %}
-            , case when create_validity_periods.team = 'is_null' then null else create_validity_periods.team end as team
+            , case when create_validity_periods.team = '-is_null' then null else create_validity_periods.team end as team
 
             {% elif col|lower not in exception_cols %}
-            , case when create_validity_periods.{{ col }} = 'is_null' then null else create_validity_periods.{{ col }} end as {{ col }}
+            , case when create_validity_periods.{{ col }} = '-is_null' then null else create_validity_periods.{{ col }} end as {{ col }}
 
             {% endif %}
         {% endfor %}

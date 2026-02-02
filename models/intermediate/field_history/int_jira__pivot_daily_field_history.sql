@@ -199,7 +199,7 @@ int_jira__daily_field_history as (
         field_name,
 
         -- doing this to figure out what values are actually null and what needs to be backfilled in jira__daily_issue_field_history
-        case when field_value is null then 'is_null' else field_value end as field_value,
+        case when field_value is null then '-is_null' else field_value end as field_value,
         valid_starting_at,
         valid_ending_at,
         valid_starting_on
