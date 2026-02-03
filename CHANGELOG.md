@@ -1,3 +1,50 @@
+# dbt_jira v1.5.0
+
+[PR #168](https://github.com/fivetran/dbt_jira/pull/168) includes the following updates:
+
+## Schema/Data Change (--full-refresh required after upgrading)
+**5 total changes • 3 possible breaking changes**
+
+| Data Model(s) | Change type | Old | New | Notes |
+| ---------- | ----------- | -------- | -------- | ----- |
+| `jira__daily_sprint_issue_history` | Date range (**Breaking Change**) | From the start of the sprint to the last day an issue was added to it | From the start of the sprint to its end | Initially, model incorrectly tracked issues after being removed from sprint or days missing in sprint when issues were added early. Extends tracking period to full sprint lifecycle, creating additional daily records and changing historical data structure. If no end date is provided, sprints will be tracked up to the current date.  [PR #169](https://github.com/fivetran/dbt_jira/pull/169) |
+| `jira__daily_sprint_issue_history` | Removed column (**Breaking Change**) | Included `updated_at` column | Column removed | Previously model tracked timestamp when sprint assignment was updated. New logic uses sprint date ranges instead of tracking individual update events. [PR #169](https://github.com/fivetran/dbt_jira/pull/169) |
+| `jira__daily_issue_field_history` | New column (**Breaking Change**) | Tracked `sprint` (sprint IDs) as a default field. | Now also tracks `sprint_name` (sprint names) | Provides human-readable sprint names alongside sprint IDs. [PR #162](https://github.com/fivetran/dbt_jira/pull/162) |
+| `jira__timestamp_issue_field_history` | New columns | Only tracked `status` as a default field | Now tracks `sprint` (sprint IDs), `sprint_name` (sprint names) as default fields alongside `status` | Brings timestamp model closer to parity with daily model. Story points fields are configurable via `issue_field_history_columns` variable. [PR #162](https://github.com/fivetran/dbt_jira/pull/162) |
+| `jira__daily_sprint_issue_history`<br>`jira__sprint_enhanced` | New column | | `team` | Adds `team` column. You can disable team functionality by leveraging the `jira_using_teams` variable in dbt Core (Quickstart will handle enable/disable automatically). See the [README](https://github.com/fivetran/dbt_jira#disable-models-for-non-existent-sources) for configuration details. [PR #163](https://github.com/fivetran/dbt_jira/pull/163) |
+
+## Bug Fixes
+- Fixes compilation errors in `int_jira__pivot_daily_field_history`, `int_jira__pivot_timestamp_field_history` when `sprint` or `sprint_name` were included in the `issue_field_history_columns` variable. `int_jira__timestamp_field_history_scd` also handles this logic, along with `story_points` and `story_point_estimate`. These fields are now properly excluded from the custom columns loop since they're handled as default fields. [PR #162](https://github.com/fivetran/dbt_jira/pull/162)
+- Optimizes joins in `jira__daily_sprint_issue_history` to allow for quicker full refresh runs. [PR #169](https://github.com/fivetran/dbt_jira/pull/169)
+
+## Under the Hood
+- Creates `split_sprint_ids()` macro to unnest the `jira__daily_issue_field_history.sprint` field. [PR #169](https://github.com/fivetran/dbt_jira/pull/169)
+- Adjusts the issue field history null placeholder from `is_null` to `-is_null` for more consistent aggregations. [PR #169](https://github.com/fivetran/dbt_jira/pull/169)
+
+## Documentation
+- Adds missing field descriptions.
+
+# dbt_jira v1.4.1-a1
+
+[PR #169](https://github.com/fivetran/dbt_jira/pull/169) includes the following updates:
+
+## Schema/Data Change
+**1 total change • 1 possible breaking change**
+
+| Data Model(s) | Change type | Old | New | Notes |
+| ------------- | ----------- | ----| --- | ----- |
+| `jira__daily_sprint_issue_history` | Date range | From the start of the sprint to the last day an issue was added to it | From the start of the sprint to its end | If no end date is provided, sprints will be tracked up to the current date. |
+
+## Bug Fixes
+- Ensures `jira__daily_sprint_issue_history` provide an accurate history of sprints and the issues associated with them at the time. Previously:
+  - When an issue was removed from a sprint, the model would continue to track them together.
+  - If a sprint ended over a month after an issue was last added to it, the model omitted the days in between these dates.
+- Optimizes joins in `jira__daily_sprint_issue_history` to allow for quicker full refresh runs.
+
+## Under the Hood
+- Creates `split_sprint_ids()` macro to unnest the `jira__daily_issue_field_history.sprint` field.
+- Adjusts the issue field history null placeholder from `is_null` to `-is_null` for more consistent aggregations.
+
 # dbt_jira v1.4.0
 
 [PR #165](https://github.com/fivetran/dbt_jira/pull/165) includes the following updates:
@@ -11,7 +58,7 @@
   - Adds `table_variables` for relevant sources to prevent missing sources from blocking downstream Quickstart models.
   - Adds `supported_vars` for Quickstart UI customization.
 
-# dbt_jira v1.3.1 
+# dbt_jira v1.3.1
 [PR #161](https://github.com/fivetran/dbt_jira/pull/161) includes the following updates:
 
 ## Bug Fixes

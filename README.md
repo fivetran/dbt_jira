@@ -53,7 +53,7 @@ By default, this package materializes the following final tables:
 | [jira__project_enhanced](https://fivetran.github.io/dbt_jira/#!/model/model.jira.jira__project_enhanced) | One row per project with team member details, issue counts, work velocity metrics, and project scope information. <br><br>**Example Analytics Questions:**<br><ul><li>Which projects have the highest velocity in terms of issues closed per sprint?</li><li>What is the ratio of unassigned open tickets to assigned open tickets by project?</li></ul> |
 | [jira__user_enhanced](https://fivetran.github.io/dbt_jira/#!/model/model.jira.jira__user_enhanced) | One row per user with metrics on open and completed issues, and individual work velocity. <br><br>**Example Analytics Questions:**<br><ul><li>Who are the top performers in terms of issues resolved per month?</li><li>Which team members have the highest workload based on open issue count and how long, on average, have those issues been open?</li></ul> |
 | [jira__sprint_enhanced](https://fivetran.github.io/dbt_jira/#!/model/model.jira.jira__sprint_enhanced) | One row per sprint with metrics on issues created, resolved, and carried over, plus story point estimates. <br><br>**Example Analytics Questions:**<br><ul><li>Which sprints had the highest velocity and what made them successful?</li><li>How many story points were planned vs. completed across recent sprints?</li><li>What percentage of issues are typically carried over from sprint to sprint?</li></ul> |
-| [jira__daily_sprint_issue_history](https://fivetran.github.io/dbt_jira/#!/model/model.jira.jira__daily_sprint_issue_history) | Daily snapshot of each sprint showing all associated issues from sprint start to completion, useful for tracking progress over time. <br><br>**Example Analytics Questions:**<br><ul><li>How many issues were active in each sprint on any given day?</li><li>What's the daily count of open vs. completed issues per sprint?</li><li>Which sprints had issues added or removed mid-sprint?</li></ul> |
+| [jira__daily_sprint_issue_history](https://fivetran.github.io/dbt_jira/#!/model/model.jira.jira__daily_sprint_issue_history) | Daily snapshot of each sprint showing all associated issues from sprint start to end, useful for tracking progress over time. <br><br>**Example Analytics Questions:**<br><ul><li>How many issues were active in each sprint on any given day?</li><li>What's the daily count of open vs. completed issues per sprint?</li><li>Which sprints had issues added or removed mid-sprint?</li></ul> |
 
 ¹ Each Quickstart transformation job run materializes these models if all components of this data model are enabled. This count includes all staging, intermediate, and final models materialized as `view`, `table`, or `incremental`.
 
@@ -79,7 +79,7 @@ Include the following jira package version in your `packages.yml` file:
 ```yaml
 packages:
   - package: fivetran/jira
-    version: [">=1.4.0", "<1.5.0"]
+    version: [">=1.5.0", "<1.6.0"]
 ```
 
 > All required sources and staging models are now bundled into this transformation package. Do not include `fivetran/jira_source` in your `packages.yml` since this package has been deprecated.
@@ -200,7 +200,7 @@ vars:
 ```
 
 #### Define daily issue field history columns
-The `jira__daily_issue_field_history` model generates historical data for the columns specified by the `issue_field_history_columns` variable. By default, the only columns tracked are `status`, `status_id`,`sprint`, `story_points` and `story_point_estimate`, but all fields found in the Jira `FIELD` table's `field_name` column can be included in this model. The most recent value of any tracked column is also captured in `jira__issue_enhanced`.
+The `jira__daily_issue_field_history` and `jira__timestamp_issue_field_history` models generate historical data for the columns specified by the `issue_field_history_columns` variable. By default, the columns tracked in `jira__daily_issue_field_history` are `status`, `status_id`, `sprint`, `story_points` and `story_point_estimate`; and in `jira__timestamp_issue_field_history`, it's `status`, `status_id` and `sprint`. But all fields found in the Jira `FIELD` table's `field_name` column can be included in these models. The most recent value of any tracked column is also captured in `jira__issue_enhanced`.
 
 If you would like to change these columns, add the following configuration to your `dbt_project.yml` file. After adding the columns to your `dbt_project.yml` file, run the `dbt run --full-refresh` command to fully refresh any existing models:
 

@@ -17,6 +17,7 @@ target/
 *.swo
 
 # Claude instructions
+.claude/
 CLAUDE.md
 
 # Jupyter Notebook

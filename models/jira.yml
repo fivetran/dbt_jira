@@ -26,14 +26,18 @@ models:
           - not_null
       - name: sprint
         description: The ID of the sprint that an issue is slotted into on a given day.
+      - name: sprint_name
+        description: The name of the sprint that an issue is slotted into on a given day.
       - name: status_id
         description: The ID of the status that an issue has on a given day.
       - name: status
         description: The name of the status that an issue has on a given day.
       - name: story_points
-        description: The story points that an issue has on a given day. 
+        description: The story points that an issue has on a given day.
       - name: story_point_estimate
-        description: The story point estimate that an issue has on a given day.  
+        description: The story point estimate that an issue has on a given day.
+      - name: team
+        description: The team associated with an issue on a given day (when `jira_using_teams` is enabled).
         # other fields included in var(issue_history_columns)
 
   - name: jira__timestamp_issue_field_history
@@ -58,6 +62,14 @@ models:
         description: The name of the status that an issue has during this period.
       - name: status_category_name
         description: The category of the status (To Do, In Progress, Done).
+      - name: sprint
+        description: The ID of the sprint that an issue is slotted into during this period.
+      - name: sprint_name
+        description: The name of the sprint that an issue is slotted into on a given day
+      - name: story_points
+        description: The story points that an issue has during this period.
+      - name: story_point_estimate
+        description: The story point estimate that an issue has during this period.
       - name: author_id
         description: Foreign key referencing the ID of the `user` who made the field changes.
       - name: is_current_record
@@ -71,7 +83,7 @@ models:
 
   - name: jira__daily_sprint_issue_history
     description: >
-      Each record represents a snapshot of a sprint and its assorted issues on a given day between the sprint start date and the most recent update to the sprint.
+      Each record represents a daily snapshot of a sprint and each of its assigned issues at the time. Sprints are tracked from their start date to their end date (or current date if no end date is provided).
     columns:
       - name: source_relation
         description: "{{ doc('source_relation') }}"
@@ -83,13 +95,13 @@ models:
       - name: sprint_id
         description: Foreign key referencing the ID of the `sprint` with these values.
       - name: issue_id
-        description: The ID of the issue that 
+        description: Foreign key referencing the ID of the `issue` with these sprint values.
+      - name: issue_key
+        description: UI-facing id of the issue.
       - name: date_day
         description: Date on which the sprint and issue had these field values.
       - name: date_week
         description: The start date of the week corresponding to `date_day`.
-      - name: updated_at
-        description: Timestamp capturing the most recent sprint update to an issue.
       - name: sprint_name
         description: Title of the sprint. 
       - name: sprint_started_at
@@ -106,6 +118,8 @@ models:
         description: Timestamp of when the issue was resolved (in UTC).
       - name: assignee_user_id
         description: Foreign key referencing the ID of the `user` currently assigned to this task.
+      - name: assignee_name
+        description: User display name of the person currently assigned this issue.
       - name: original_estimate_seconds
         description: The original estimate of how long working on this issue would take, in seconds.
       - name: remaining_estimate_seconds
@@ -113,11 +127,23 @@ models:
       - name: time_spent_seconds
         description: The time that was spent working on this issue, in seconds.
       - name: status
-        description: The name of the status that an issue has on a given day. 
+        description: The name of the status that an issue has on a given day.
+      - name: team
+        description: The team associated with an issue on a given day (when `jira_using_teams` is enabled).
       - name: story_points
         description: The story points that an issue has on a given day.
       - name: story_point_estimate
         description: The story point estimate that an issue has on a given day.
+      - name: is_sprint_active
+        description: Boolean indicating if the sprint is currently active (started but not completed).
+      - name: is_sprint_completed
+        description: Boolean indicating if the sprint has been completed.
+      - name: is_issue_open
+        description: Boolean indicating if the issue is currently open (not resolved).
+      - name: is_issue_resolved_in_sprint
+        description: Boolean indicating if the issue was resolved during this sprint.
+      - name: days_left_in_sprint
+        description: Number of days remaining in the sprint from the given date (null if sprint is completed or date is after sprint end).
 
   - name: jira__issue_enhanced
     description: >
@@ -126,6 +152,8 @@ models:
     columns:
       - name: source_relation
         description: "{{ doc('source_relation') }}"
+      - name: _fivetran_synced
+        description: Timestamp of when Fivetran last synced this record.
       - name: issue_id
         description: Unique ID of the issue.
         tests:
@@ -200,6 +228,8 @@ models:
         description: Timestamp of when the sprint began. 
       - name: sprint
         description: List of associated sprint IDs.
+      - name: sprint_name
+        description: List of associated sprint names.
       - name: status
         description: ID of the associated status.
       - name: original_estimate_seconds
@@ -255,16 +285,20 @@ models:
       - name: current_status_category
         description: Title of the umbrella status category that the issue is currently in. 
       - name: story_points
-        description: The story points that an issue has on a given day. 
+        description: The story points that an issue has on a given day.
       - name: story_point_estimate
         description: The story point estimate that an issue has on a given day.
-        
+      - name: team
+        description: The team associated with an issue (when `jira_using_teams` is enabled).
+
   - name: jira__project_enhanced
     description: >
       Table of projects enriched with data about its lead, epics, components, and volume and velocity of worktime.
     columns:
       - name: source_relation
         description: "{{ doc('source_relation') }}"
+      - name: _fivetran_synced
+        description: Timestamp of when Fivetran last synced this record.
       - name: project_id
         description: Unique ID of the project.
         tests:
@@ -339,6 +373,8 @@ models:
         description: Unique ID of the sprint.
         tests:
           - not_null
+      - name: team
+        description: The team associated with the sprint (when `jira_using_teams` is enabled).
       - name: sprint_name
         description: Name of the sprint.
       - name: board_id
@@ -384,6 +420,8 @@ models:
     columns:
       - name: source_relation
         description: "{{ doc('source_relation') }}"
+      - name: _fivetran_synced
+        description: Timestamp of when Fivetran last synced this record.
       - name: user_id
         description: Unique ID of the user.
         tests:
@@ -407,7 +445,7 @@ models:
       - name: avg_close_time_seconds
         description: The average time taken to close issues since assignment, in seconds.
       - name: avg_age_currently_open_seconds 
-        description: Tjhe average age of a user's currently open issues.
+        description: The average age of a user's currently open issues.
       - name: median_close_time_seconds
         description: The median time taken to close issues since assignment, in seconds.
       - name: median_age_currently_open_seconds
