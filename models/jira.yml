@@ -102,8 +102,6 @@ models:
         description: Date on which the sprint and issue had these field values.
       - name: date_week
         description: The start date of the week corresponding to `date_day`.
-      - name: updated_at
-        description: Timestamp capturing the most recent sprint update to an issue.
       - name: sprint_name
         description: Title of the sprint. 
       - name: sprint_started_at
