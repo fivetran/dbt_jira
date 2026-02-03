@@ -108,7 +108,7 @@
             explode(split(sprint, ', ')) as sprints from daily_issue_field_history
     ) as sprints_subquery 
     where daily_issue_field_history.issue_id = sprints_subquery.issue_id
-    and daily_issue_field_history.date_day = sprints_subquery.date_day
-    and daily_issue_field_history.source_relation = sprints_subquery.source_relation
+        and daily_issue_field_history.date_day = sprints_subquery.date_day
+        and daily_issue_field_history.source_relation = sprints_subquery.source_relation
 
 {% endmacro %}
