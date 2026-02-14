@@ -26,7 +26,7 @@ with issue_field_history as (
 
     {% if is_incremental() %}
     {% set max_valid_starting_at_week = jira.jira_lookback(from_date='max(valid_starting_on)', datepart='week', interval=var('lookback_window', 1)) %}
-    where cast(updated_at as date) >= {{ max_valid_starting_at_week }}
+    where cast({{ dbt.date_trunc('week', 'updated_at') }} as date) >= {{ max_valid_starting_at_week }}
     {% endif %}
 ),
 
@@ -37,7 +37,7 @@ issue_multiselect_history as (
     from {{ ref('int_jira__issue_multiselect_history') }}
 
     {% if is_incremental() %}
-    where cast(updated_at as date) >= {{ max_valid_starting_at_week }}
+    where cast({{ dbt.date_trunc('week', 'updated_at') }} as date) >= {{ max_valid_starting_at_week }}
     {% endif %}
 ),
 
