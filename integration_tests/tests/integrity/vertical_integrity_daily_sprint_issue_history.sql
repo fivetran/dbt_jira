@@ -33,27 +33,68 @@ sprint as (
     from {{ ref('stg_jira__sprint') }}
 ),
 
-issue_sprint_fields as (
+all_issue_sprint_updates as (
 
-    select 
-        distinct issue_multiselect_history.issue_id, 
-        cast(issue_multiselect_history.field_value as int64) as sprint_id,  
-        cast(issue_multiselect_history.updated_at as date) as updated_date
+    select
+        issue_multiselect_history.issue_id,
+        issue_multiselect_history.field_value as sprint_id,
+        cast(issue_multiselect_history.updated_at as date) as updated_date,
+        issue_multiselect_history.updated_at
     from issue_multiselect_history
     inner join field
         on field.field_id = issue_multiselect_history.field_id
     where lower(field.field_name) = 'sprint'
-        and field_value is not null
 ),
 
+latest_timestamp_per_day as (
+
+    select
+        issue_id,
+        updated_date,
+        max(updated_at) as last_updated_at
+    from all_issue_sprint_updates
+    group by 1, 2
+),
+
+final_daily_sprint_assignment as (
+
+    select
+        all_issue_sprint_updates.issue_id,
+        cast(all_issue_sprint_updates.sprint_id as int64) as sprint_id,
+        all_issue_sprint_updates.updated_date
+    from all_issue_sprint_updates
+    inner join latest_timestamp_per_day
+        on all_issue_sprint_updates.issue_id = latest_timestamp_per_day.issue_id
+        and all_issue_sprint_updates.updated_date = latest_timestamp_per_day.updated_date
+        and all_issue_sprint_updates.updated_at = latest_timestamp_per_day.last_updated_at
+    where all_issue_sprint_updates.sprint_id is not null
+),
 
 source_model as (
 
-    select issue_id,
-        sprint_id,
-        min(updated_date) as first_date_source
-    from issue_sprint_fields 
-    group by 1, 2
+    select
+        final_daily_sprint_assignment.issue_id,
+        final_daily_sprint_assignment.sprint_id,
+        case
+            -- If the issue was assigned to this sprint on or before it started, use sprint start date
+            when min(case
+                when final_daily_sprint_assignment.updated_date <= cast(sprint.started_at as date)
+                then final_daily_sprint_assignment.updated_date
+                else null
+            end) is not null
+            then cast(sprint.started_at as date)
+            -- Otherwise use the first assignment date after sprint start within the sprint's active period
+            else min(case
+                when final_daily_sprint_assignment.updated_date > cast(sprint.started_at as date)
+                     and (sprint.ended_at is null or final_daily_sprint_assignment.updated_date <= cast(sprint.ended_at as date))
+                then final_daily_sprint_assignment.updated_date
+                else null
+            end)
+        end as first_date_source
+    from final_daily_sprint_assignment
+    inner join sprint
+        on final_daily_sprint_assignment.sprint_id = sprint.sprint_id
+    group by 1, 2, sprint.started_at, sprint.ended_at
 )
 
 select 

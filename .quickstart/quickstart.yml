@@ -42,12 +42,12 @@ supported_vars:
   jira_issue_history_buffer:
     type: integer
     value: 1
-    description: "Number of weeks that `jira__daily_issue_field_history` and `jira__daily_sprint_issue_history` will track for each issue after it has been closed"
-    display_name: "Post-Close Issue History Extension (Weeks)"
+    description: "Number of months that `jira__daily_issue_field_history` and `jira__daily_sprint_issue_history` will track for each issue after it has been closed"
+    display_name: "Post-Close Issue History Extension (Months)"
 
   lookback_window:
     type: integer
     value: 1
     description: "Number of weeks into the past that the models will look back to capture late-arriving records on incremental runs"
-    display_name: "Incremental Run Lookback Window (Days)"
+    display_name: "Incremental Run Lookback Window (Weeks)"
 

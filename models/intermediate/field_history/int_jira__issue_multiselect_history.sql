@@ -16,7 +16,8 @@ joined as (
 
   select
     issue_multiselect_history.*,
-    lower(fields.field_name) as field_name
+    lower(fields.field_name) as field_name,
+    cast({{ dbt.date_trunc('week', 'issue_multiselect_history.updated_at') }} as date) as updated_at_week
 
   from issue_multiselect_history
   join fields
