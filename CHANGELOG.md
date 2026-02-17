@@ -4,7 +4,7 @@
 ## Bug Fixes
 - Fixed incremental filtering in `jira__daily_issue_field_history` and `int_jira__pivot_daily_field_history` to align with the model's weekly partition key, preventing potential data loss during partition overwrites. `updated_at_week` is now calculated in upstream models (`int_jira__issue_field_history` and `int_jira__issue_multiselect_history`).
 
-## Quickstart Updates
+## Documentation
 - Made several corrections to Quickstart `supported_vars` descriptions.
 
 ## Under the Hood
