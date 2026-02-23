@@ -9,9 +9,10 @@ with end_model as (
     select 
         sprint_id, 
         issue_id,
+        sprint_started_at,
         min(date_day) as first_date_end
     from {{ ref('jira__daily_sprint_issue_history') }}
-    group by 1,2
+    group by 1,2,3
 ),
 
 
@@ -37,7 +38,7 @@ issue_sprint_fields as (
 
     select 
         distinct issue_multiselect_history.issue_id, 
-        cast(issue_multiselect_history.field_value as int64) as sprint_id,  
+        cast(issue_multiselect_history.field_value as {{ dbt.type_int() }}) as sprint_id,  
         cast(issue_multiselect_history.updated_at as date) as updated_date
     from issue_multiselect_history
     inner join field
@@ -66,3 +67,4 @@ full outer join source_model
     on end_model.sprint_id = cast(source_model.sprint_id as string)
     and end_model.issue_id = source_model.issue_id
 where first_date_source != first_date_end 
+and first_date_source >= sprint_started_at

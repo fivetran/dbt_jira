@@ -100,15 +100,6 @@
         cast(daily_issue_field_history.story_point_estimate as {{ dbt.type_float() }}) as story_point_estimate,
         sprints as sprint_id
     from daily_issue_field_history
-    cross join (
-        select 
-            source_relation,
-            issue_id, 
-            date_day,
-            explode(split(sprint, ', ')) as sprints from daily_issue_field_history
-    ) as sprints_subquery 
-    where daily_issue_field_history.issue_id = sprints_subquery.issue_id
-        and daily_issue_field_history.date_day = sprints_subquery.date_day
-        and daily_issue_field_history.source_relation = sprints_subquery.source_relation
+    lateral view explode(split(sprint, ', ')) sprints_view as sprints
 
 {% endmacro %}
