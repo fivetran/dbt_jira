@@ -1,6 +1,6 @@
 # dbt_jira v1.5.1
 
-[PR #169](https://github.com/fivetran/dbt_jira/pull/169) includes the following updates:
+[PR #171](https://github.com/fivetran/dbt_jira/pull/171) includes the following updates:
 
 ## Feature Update
 - Optimizes the `jira__daily_sprint_issue_history` model for Databricks destinations by adjusting the `split_sprint_ids()` macro.
