@@ -2,14 +2,15 @@
 
 [PR #170](https://github.com/fivetran/dbt_jira/pull/170) includes the following updates:
 
-## Bug Fixes
-- Fixed incremental filtering in `jira__daily_issue_field_history` and `int_jira__pivot_daily_field_history` to align with the model's weekly partition key, preventing potential data loss during partition overwrites. `updated_at_week` is now calculated in upstream models (`int_jira__issue_field_history` and `int_jira__issue_multiselect_history`).
+## Schema/Data Change (--full-refresh required after upgrading)
+**1 total change • 1 possible breaking change**
+
+| Data Model(s) | Change type | Old | New | Notes |
+| ---------- | ----------- | -------- | -------- | ----- |
+| `jira__daily_issue_field_history` | Incremental filter fix (**Breaking Change**) | Filtered by `date_day >= max_date_week` | Filtered by `date_week >= max_date_week` | Aligns the incremental filter with the model's weekly partition key. Previously, the wrong column was used, which could cause data loss during partition overwrites on incremental runs. A full refresh is recommended to backfill any records that may have been missed. |
 
 ## Documentation
-- Made several corrections to Quickstart `supported_vars` descriptions.
-
-## Under the Hood
-- Updates `vertical_integrity_daily_sprint_issue_history` test to remove plurality of sprint start matching errors. 
+- Corrects several Quickstart `supported_vars` descriptions.
 
 # dbt_jira v1.5.1
 
@@ -29,9 +30,6 @@
 
 ## Documentation
 - Made several corrections to Quickstart `supported_vars` descriptions.
-
-## Under the Hood
-- Updates `vertical_integrity_daily_sprint_issue_history` test to remove plurality of sprint start matching errors. 
 
 # dbt_jira v1.5.0
 
