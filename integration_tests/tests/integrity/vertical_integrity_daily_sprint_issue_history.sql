@@ -67,4 +67,4 @@ full outer join source_model
     on end_model.sprint_id = cast(source_model.sprint_id as string)
     and end_model.issue_id = source_model.issue_id
 where first_date_source != first_date_end 
-and first_date_source >= sprint_started_at
+and first_date_source >= cast(sprint_started_at as date)
