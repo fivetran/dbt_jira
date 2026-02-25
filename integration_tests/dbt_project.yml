@@ -1,5 +1,5 @@
 name: 'jira_integration_tests'
-version: '1.5.0'
+version: '1.5.1'
 config-version: 2
 profile: 'integration_tests'
 
@@ -47,47 +47,47 @@ seeds:
       _fivetran_synced: timestamp
     comment:
       +column_types:
-        id: "{{ 'int64' if target.name == 'bigquery' else 'bigint' }}"
+        id: "{{ 'int64' if target.type == 'bigquery' else 'bigint' }}"
         created: timestamp
-        issue_id: "{{ 'int64' if target.name == 'bigquery' else 'bigint' }}"
+        issue_id: "{{ 'int64' if target.type == 'bigquery' else 'bigint' }}"
         updated: timestamp
     component:
       +column_types:
-        id: "{{ 'int64' if target.name == 'bigquery' else 'bigint' }}"
-        project_id: "{{ 'int64' if target.name == 'bigquery' else 'bigint' }}"
+        id: "{{ 'int64' if target.type == 'bigquery' else 'bigint' }}"
+        project_id: "{{ 'int64' if target.type == 'bigquery' else 'bigint' }}"
     epic: 
       +column_types:
-        id: "{{ 'int64' if target.name == 'bigquery' else 'bigint' }}"
+        id: "{{ 'int64' if target.type == 'bigquery' else 'bigint' }}"
     field_option:
       +column_types:
-        id: "{{ 'int64' if target.name == 'bigquery' else 'bigint' }}"
+        id: "{{ 'int64' if target.type == 'bigquery' else 'bigint' }}"
     issue:
       +column_types:
-        id: "{{ 'int64' if target.name == 'bigquery' else 'bigint' }}"
+        id: "{{ 'int64' if target.type == 'bigquery' else 'bigint' }}"
         created: timestamp
         work_ratio: float
         resolved: timestamp
         updated: timestamp
-        assignee: "{{ 'string' if target.name in ('bigquery', 'spark', 'databricks', 'databricks-sql') else 'varchar' }}"
+        assignee: "{{ 'string' if target.type in ('bigquery', 'spark', 'databricks', 'databricks-sql') else 'varchar' }}"
     issue_multiselect_history:
       +column_types:
         time: timestamp
-        issue_id: "{{ 'int64' if target.name == 'bigquery' else 'bigint' }}"
-        value: "{{ 'string' if target.name in ('bigquery', 'spark', 'databricks', 'databricks-sql') else 'varchar' }}"
+        issue_id: "{{ 'int64' if target.type == 'bigquery' else 'bigint' }}"
+        value: "{{ 'string' if target.type in ('bigquery', 'spark', 'databricks', 'databricks-sql') else 'varchar' }}"
     issue_field_history:
       +column_types:
         time: timestamp
-        issue_id: "{{ 'int64' if target.name == 'bigquery' else 'bigint' }}"
-        value: "{{ 'string' if target.name in ('bigquery', 'spark', 'databricks', 'databricks-sql') else 'varchar' }}"
+        issue_id: "{{ 'int64' if target.type == 'bigquery' else 'bigint' }}"
+        value: "{{ 'string' if target.type in ('bigquery', 'spark', 'databricks', 'databricks-sql') else 'varchar' }}"
     sprint: 
       +column_types:
-        id: "{{ 'int64' if target.name == 'bigquery' else 'bigint' }}"
+        id: "{{ 'int64' if target.type == 'bigquery' else 'bigint' }}"
         complete_date: timestamp
         end_date: timestamp
         start_date: timestamp
     field: 
       +column_types:
-        id: "{{ 'string' if target.name in ('bigquery', 'spark', 'databricks', 'databricks-sql') else 'varchar' }}"
+        id: "{{ 'string' if target.type in ('bigquery', 'spark', 'databricks', 'databricks-sql') else 'varchar' }}"
 
 dispatch:
   - macro_namespace: dbt_utils
