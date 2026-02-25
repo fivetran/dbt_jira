@@ -6,8 +6,8 @@
 
 with end_model as (
 
-    select
-        sprint_id,
+    select 
+        sprint_id, 
         issue_id,
         sprint_started_at,
         min(date_day) as first_date_end
@@ -36,9 +36,9 @@ sprint as (
 
 issue_sprint_fields as (
 
-    select
-        distinct issue_multiselect_history.issue_id,
-        cast(issue_multiselect_history.field_value as {{ dbt.type_int() }}) as sprint_id,
+    select 
+        distinct issue_multiselect_history.issue_id, 
+        cast(issue_multiselect_history.field_value as {{ dbt.type_int() }}) as sprint_id,  
         cast(issue_multiselect_history.updated_at as date) as updated_date
     from issue_multiselect_history
     inner join field
@@ -53,11 +53,11 @@ source_model as (
     select issue_id,
         sprint_id,
         min(updated_date) as first_date_source
-    from issue_sprint_fields
+    from issue_sprint_fields 
     group by 1, 2
 )
 
-select
+select 
     end_model.sprint_id,
     end_model.issue_id,
     first_date_source,
@@ -66,5 +66,5 @@ from end_model
 full outer join source_model
     on end_model.sprint_id = cast(source_model.sprint_id as string)
     and end_model.issue_id = source_model.issue_id
-where first_date_source != first_date_end
+where first_date_source != first_date_end 
 and first_date_source >= cast(sprint_started_at as date)
