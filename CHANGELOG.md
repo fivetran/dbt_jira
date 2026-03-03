@@ -7,8 +7,7 @@
 
 | Data Model(s) | Change type | Old | New | Notes |
 | ---------- | ----------- | -------- | -------- | ----- |
-| `jira__daily_issue_field_history` | Incremental filter fix (**Breaking Change**) | Filtered by `date_day >= max_date_week` | Filtered by `date_week >= max_date_week` | Aligns the incremental filter with the model's weekly partition key. Previously, the wrong column was used, which could cause data loss during partition overwrites on incremental runs. A full refresh is recommended to backfill any records that may have been missed. |
- 
+| `jira__daily_issue_field_history` | Incremental filter fix (**Breaking Change**) | Filtered by `date_day >= max_date_week` | Filtered by `date_week >= max_date_week` | Aligns the incremental filter with the model's weekly partition key. The previous filter could cause data loss during partition overwrites in BigQuery and Databricks destinations on incremental runs.  could cause data loss during partition overwrites on incremental runs. A full refresh is recommended to backfill any records that may have been missed. |
 
 # dbt_jira v1.5.2
 
