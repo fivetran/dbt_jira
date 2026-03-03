@@ -1,3 +1,11 @@
+# dbt_jira v1.5.2
+
+[PR #174](https://github.com/fivetran/dbt_jira/pull/171) includes the following updates: 
+
+## Documentation
+- In the `quickstart.yml` file: 
+  - Made several corrections to Quickstart `supported_vars` descriptions to reflect correct time granularity for `jira_issue_history_buffer` and `lookback_window` variables. 
+
 # dbt_jira v1.5.1
 
 [PR #171](https://github.com/fivetran/dbt_jira/pull/171) includes the following updates:
