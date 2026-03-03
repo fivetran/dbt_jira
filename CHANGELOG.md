@@ -8,9 +8,15 @@
 | Data Model(s) | Change type | Old | New | Notes |
 | ---------- | ----------- | -------- | -------- | ----- |
 | `jira__daily_issue_field_history` | Incremental filter fix (**Breaking Change**) | Filtered by `date_day >= max_date_week` | Filtered by `date_week >= max_date_week` | Aligns the incremental filter with the model's weekly partition key. Previously, the wrong column was used, which could cause data loss during partition overwrites on incremental runs. A full refresh is recommended to backfill any records that may have been missed. |
+ 
+
+# dbt_jira v1.5.2
+
+[PR #174](https://github.com/fivetran/dbt_jira/pull/171) includes the following updates: 
 
 ## Documentation
-- Corrects several Quickstart `supported_vars` descriptions.
+- In the `quickstart.yml` file: 
+  - Made several corrections to Quickstart `supported_vars` descriptions to reflect correct time granularity for `jira_issue_history_buffer` and `lookback_window` variables. 
 
 # dbt_jira v1.5.1
 
