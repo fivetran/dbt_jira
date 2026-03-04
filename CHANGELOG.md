@@ -1,6 +1,6 @@
 # dbt_jira v1.6.0
 
-[PR #170](https://github.com/fivetran/dbt_jira/pull/170) includes the following updates:
+[PR #170](https://github.com/fivetran/dbt_jira/pull/170) includes the following update:
 
 ## Schema/Data Change (--full-refresh required after upgrading)
 **1 total change • 1 possible breaking change**
