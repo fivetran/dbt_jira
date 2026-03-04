@@ -36,7 +36,7 @@ most_recent_data as (
     select 
         *
     from {{ this }}
-    where date_day >= {{ max_date_week }}
+    where date_week >= {{ max_date_week }}
 {% endif %}
 ), 
 

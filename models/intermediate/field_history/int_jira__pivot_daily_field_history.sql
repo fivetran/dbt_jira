@@ -26,7 +26,7 @@ with issue_field_history as (
 
     {% if is_incremental() %}
     {% set max_valid_starting_at_week = jira.jira_lookback(from_date='max(valid_starting_on)', datepart='week', interval=var('lookback_window', 1)) %}
-    where cast(updated_at as date) >= {{ max_valid_starting_at_week }}
+    where updated_at_week >= {{ max_valid_starting_at_week }}
     {% endif %}
 ),
 
@@ -37,7 +37,7 @@ issue_multiselect_history as (
     from {{ ref('int_jira__issue_multiselect_history') }}
 
     {% if is_incremental() %}
-    where cast(updated_at as date) >= {{ max_valid_starting_at_week }}
+    where updated_at_week >= {{ max_valid_starting_at_week }}
     {% endif %}
 ),
 
@@ -56,6 +56,7 @@ sprint_name_multiselect_history as (
         issue_multiselect_history.issue_id,
         issue_multiselect_history.source_relation,
         issue_multiselect_history.updated_at,
+        issue_multiselect_history.updated_at_week,
         cast({{ dbt.date_trunc('day', 'issue_multiselect_history.updated_at') }} as date) as date_day,
         coalesce(sprints.sprint_name, issue_multiselect_history.field_value) as field_value
 
@@ -77,6 +78,7 @@ combined_multiselect_history as (
         issue_id,
         source_relation,
         updated_at,
+        updated_at_week,
         cast({{ dbt.date_trunc('day', 'updated_at') }} as date) as date_day,
         field_value
     from issue_multiselect_history
@@ -90,6 +92,7 @@ combined_multiselect_history as (
         issue_id,
         source_relation,
         updated_at,
+        updated_at_week,
         date_day,
         field_value
     from sprint_name_multiselect_history
@@ -104,12 +107,13 @@ issue_multiselect_batch_history as (
         issue_id,
         source_relation,
         updated_at,
+        updated_at_week,
         date_day,
         {{ fivetran_utils.string_agg('field_value', "', '") }} as field_values
 
     from combined_multiselect_history
 
-    {{ dbt_utils.group_by(6) }}
+    {{ dbt_utils.group_by(7) }}
 ),
 
 combine_field_history as (
@@ -119,6 +123,7 @@ combine_field_history as (
         issue_id,
         source_relation,
         updated_at,
+        updated_at_week,
         field_value,
         field_name
 
@@ -131,6 +136,7 @@ combine_field_history as (
         issue_id,
         source_relation,
         updated_at,
+        updated_at_week,
         field_values as field_value, -- this is an aggregated list but we'll just call it field_value
         field_name
 
@@ -146,6 +152,7 @@ get_valid_dates as (
         field_value,
         field_name,
         updated_at as valid_starting_at,
+        updated_at_week as valid_starting_at_week,
 
         -- this value is valid until the next value is updated
         lead(updated_at, 1) over(partition by issue_id, {{ var('jira_field_grain', 'field_id') }} {{ jira.partition_by_source_relation() }} order by updated_at asc) as valid_ending_at,
@@ -201,6 +208,7 @@ int_jira__daily_field_history as (
         -- doing this to figure out what values are actually null and what needs to be backfilled in jira__daily_issue_field_history
         case when field_value is null then '-is_null' else field_value end as field_value,
         valid_starting_at,
+        valid_starting_at_week,
         valid_ending_at,
         valid_starting_on
 
@@ -216,7 +224,7 @@ pivot_out as (
         valid_starting_on,
         issue_id,
         source_relation,
-        cast({{ dbt.date_trunc('week', 'valid_starting_at') }} as date) as valid_starting_at_week,
+        valid_starting_at_week,
         max(case when lower(field_id) = 'status' then field_value end) as status,
         max(case when lower(field_name) = 'sprint' then field_value end) as sprint,
         max(case when lower(field_name) = 'sprint_name' then field_value end) as sprint_name,

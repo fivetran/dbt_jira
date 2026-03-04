@@ -16,7 +16,8 @@ joined as (
 
   select
     field_history.*,
-    lower(fields.field_name) as field_name
+    lower(fields.field_name) as field_name,
+    cast({{ dbt.date_trunc('week', 'field_history.updated_at') }} as date) as updated_at_week
 
   from field_history
   join fields
