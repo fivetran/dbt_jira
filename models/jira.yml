@@ -3,6 +3,8 @@ version: 2
 models:
   - name: jira__daily_issue_field_history
     description: >
+      Each record represents a daily snapshot of an issue's field values (status and sprint by default,
+      plus any fields added to the `issue_field_history_columns` variable).
       Each issue will have a record for every day in which it was open and/or being updated.
       For currently open issues, the latest date will be the current date, and for closed issues,
       this will be the last time the issue was resolved OR updated in any way (plus a configurable buffer afterward,
@@ -113,7 +115,7 @@ models:
       - name: time_spent_seconds
         description: The time that was spent working on this issue, in seconds.
       - name: status
-        description: The name of the status that an issue has on a given day. 
+        description: The name of the status that an issue has on a given day.
       - name: is_sprint_active
         description: Boolean indicating if the sprint is currently active (started but not completed).
       - name: is_sprint_completed

@@ -17,10 +17,10 @@
         daily_issue_field_history.status,
         {{ "daily_issue_field_history.team," if using_teams }}
         {% if include_story_points %}
-        cast(daily_issue_field_history.story_points as {{ dbt.type_float() }}) as story_points,
+        cast(daily_issue_field_history.story_points as {{ dbt.type_numeric() }}) as story_points,
         {% endif %}
         {% if include_story_point_estimate %}
-        cast(daily_issue_field_history.story_point_estimate as {{ dbt.type_float() }}) as story_point_estimate,
+        cast(daily_issue_field_history.story_point_estimate as {{ dbt.type_numeric() }}) as story_point_estimate,
         {% endif %}
         sprints as sprint_id
 
@@ -42,10 +42,10 @@
         daily_issue_field_history.status,
         {{ "daily_issue_field_history.team," if using_teams }}
         {% if include_story_points %}
-        cast(daily_issue_field_history.story_points as {{ dbt.type_float() }}) as story_points,
+        cast(daily_issue_field_history.story_points as {{ dbt.type_numeric() }}) as story_points,
         {% endif %}
         {% if include_story_point_estimate %}
-        cast(daily_issue_field_history.story_point_estimate as {{ dbt.type_float() }}) as story_point_estimate,
+        cast(daily_issue_field_history.story_point_estimate as {{ dbt.type_numeric() }}) as story_point_estimate,
         {% endif %}
         sprints.value as sprint_id
 
@@ -67,10 +67,10 @@
         unnest_sprint_id_array.status,
         {{ "unnest_sprint_id_array.team," if using_teams }}
         {% if include_story_points %}
-        unnest_sprint_id_array.story_points,
+        cast(unnest_sprint_id_array.story_points as {{ dbt.type_numeric() }}) as story_points,
         {% endif %}
         {% if include_story_point_estimate %}
-        unnest_sprint_id_array.story_point_estimate,
+        cast(unnest_sprint_id_array.story_point_estimate as {{ dbt.type_numeric() }}) as story_point_estimate,
         {% endif %}
         cast(sprint_id as {{ dbt.type_string() }}) as sprint_id
     from (
@@ -82,10 +82,10 @@
             daily_issue_field_history.status,
             {{ "daily_issue_field_history.team," if using_teams }}
             {% if include_story_points %}
-            cast(daily_issue_field_history.story_points as {{ dbt.type_float() }}) as story_points,
+            cast(daily_issue_field_history.story_points as {{ dbt.type_numeric() }}) as story_points,
             {% endif %}
             {% if include_story_point_estimate %}
-            cast(daily_issue_field_history.story_point_estimate as {{ dbt.type_float() }}) as story_point_estimate,
+            cast(daily_issue_field_history.story_point_estimate as {{ dbt.type_numeric() }}) as story_point_estimate,
             {% endif %}
             split_to_array(sprint, ', ') as super_sprint_ids
 
@@ -106,10 +106,10 @@
         daily_issue_field_history.status,
         {{ "daily_issue_field_history.team," if using_teams }}
         {% if include_story_points %}
-        cast(daily_issue_field_history.story_points as {{ dbt.type_float() }}) as story_points,
+        cast(daily_issue_field_history.story_points as {{ dbt.type_numeric() }}) as story_points,
         {% endif %}
         {% if include_story_point_estimate %}
-        cast(daily_issue_field_history.story_point_estimate as {{ dbt.type_float() }}) as story_point_estimate,
+        cast(daily_issue_field_history.story_point_estimate as {{ dbt.type_numeric() }}) as story_point_estimate,
         {% endif %}
         sprints as sprint_id
 
@@ -132,10 +132,10 @@
         daily_issue_field_history.status,
         {{ "daily_issue_field_history.team," if using_teams }}
         {% if include_story_points %}
-        cast(daily_issue_field_history.story_points as {{ dbt.type_float() }}) as story_points,
+        cast(daily_issue_field_history.story_points as {{ dbt.type_numeric() }}) as story_points,
         {% endif %}
         {% if include_story_point_estimate %}
-        cast(daily_issue_field_history.story_point_estimate as {{ dbt.type_float() }}) as story_point_estimate,
+        cast(daily_issue_field_history.story_point_estimate as {{ dbt.type_numeric() }}) as story_point_estimate,
         {% endif %}
         sprints as sprint_id
     from daily_issue_field_history
