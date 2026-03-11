@@ -1,6 +1,17 @@
 {{ config(enabled=var('jira_using_sprints', True)) }}
 
 {% set using_teams = var('jira_using_teams', True) %}
+{% set issue_field_history_columns = var('issue_field_history_columns', []) | map('lower') | list %}
+{% set include_story_points = 'story points' in issue_field_history_columns %}
+{% set include_story_point_estimate = 'story point estimate' in issue_field_history_columns %}
+
+{# Base count of non-aggregated columns in final select (source_relation, sprint_id, sprint_name,
+   sprint_started_at, sprint_ended_at, sprint_completed_at, board_id, sprint_assignees, sprint_issues,
+   issues_committed, open_sprint_issues, resolved_sprint_issues = 12) #}
+{% set final_group_by_count = 12
+    + (1 if using_teams else 0)
+    + (3 if include_story_points else 0)
+    + (3 if include_story_point_estimate else 0) %}
 
 with daily_sprint_issue_history as (
 
@@ -47,8 +58,8 @@ sprint_start_metrics as (
         source_relation,
         sprint_id,
         {{ "team," if using_teams }}
-        sum(case when story_points is null then 0 else story_points end) as story_points_committed,
-        sum(case when story_point_estimate is null then 0 else story_point_estimate end) as story_point_estimate_committed,
+        {{ "sum(case when story_points is null then 0 else story_points end) as story_points_committed," if include_story_points }}
+        {{ "sum(case when story_point_estimate is null then 0 else story_point_estimate end) as story_point_estimate_committed," if include_story_point_estimate }}
         count(distinct issue_id) as issues_committed
     from daily_sprint_issue_history
     -- to capture both sprints that have started or will start in the future
@@ -64,14 +75,18 @@ sprint_end_metrics as (
         source_relation,
         sprint_id,
         {{ "team," if using_teams }}
+        {% if include_story_points %}
         sum(case when story_points is null then 0 else story_points end) as story_points_end,
+        sum(case when is_issue_resolved_in_sprint then story_points else 0 end) as story_points_completed{{ "," if include_story_point_estimate }}
+        {% endif %}
+        {% if include_story_point_estimate %}
         sum(case when story_point_estimate is null then 0 else story_point_estimate end) as story_point_estimate_end,
-        sum(case when is_issue_resolved_in_sprint then story_points else 0 end) as story_points_completed,
         sum(case when is_issue_resolved_in_sprint then story_point_estimate else 0 end) as story_point_estimate_completed
+        {% endif %}
     from daily_sprint_issue_history
     where date_day = cast(sprint_ended_at as date)
     {{ dbt_utils.group_by(3 if using_teams else 2) }}
-), 
+),
 
 final as (
 
@@ -84,12 +99,12 @@ final as (
         sprint_metrics_grouped.sprint_ended_at,
         sprint_metrics_grouped.sprint_completed_at,
         sprint_metrics_grouped.board_id,
-        sprint_start_metrics.story_points_committed,
-        sprint_start_metrics.story_point_estimate_committed,
-        sprint_end_metrics.story_points_end,
-        sprint_end_metrics.story_point_estimate_end,
-        sprint_end_metrics.story_points_completed,
-        sprint_end_metrics.story_point_estimate_completed,
+        {{ "sprint_start_metrics.story_points_committed," if include_story_points }}
+        {{ "sprint_start_metrics.story_point_estimate_committed," if include_story_point_estimate }}
+        {{ "sprint_end_metrics.story_points_end," if include_story_points }}
+        {{ "sprint_end_metrics.story_point_estimate_end," if include_story_point_estimate }}
+        {{ "sprint_end_metrics.story_points_completed," if include_story_points }}
+        {{ "sprint_end_metrics.story_point_estimate_completed," if include_story_point_estimate }}
         sprint_issue_metrics.sprint_assignees,
         sprint_issue_metrics.sprint_issues,
         sprint_start_metrics.issues_committed,
@@ -111,7 +126,7 @@ final as (
         on sprint_metrics_grouped.sprint_id = sprint_end_metrics.sprint_id
         and sprint_metrics_grouped.source_relation = sprint_end_metrics.source_relation
         {{ "and sprint_metrics_grouped.team = sprint_end_metrics.team" if using_teams }}
-    {{ dbt_utils.group_by(19 if using_teams else 18) }}
+    {{ dbt_utils.group_by(final_group_by_count) }}
 )
 
 select * 

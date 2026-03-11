@@ -10,9 +10,7 @@ with prod as (
         issue_id,
         sprint_id,
         sprint_name,
-        days_left_in_sprint,
-        story_point_estimate,
-        story_points
+        days_left_in_sprint
     from {{ target.schema }}_jira_prod.jira__daily_sprint_issue_history
 ),
 
@@ -22,9 +20,7 @@ dev as (
         issue_id,
         sprint_id,
         sprint_name,
-        days_left_in_sprint,
-        story_point_estimate,
-        story_points
+        days_left_in_sprint
     from {{ target.schema }}_jira_dev.jira__daily_sprint_issue_history
 ),
 
