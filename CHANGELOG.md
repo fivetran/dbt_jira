@@ -1,3 +1,23 @@
+# dbt_jira v1.7.0
+
+[PR #175](https://github.com/fivetran/dbt_jira/pull/175) includes the following updates:
+
+## Schema/Data Change (--full-refresh required after upgrading)
+**3 total changes • 3 possible breaking changes**
+
+| Data Model(s) | Change type | Old | New | Notes |
+| ---------- | ----------- | -------- | -------- | ----- |
+| `jira__daily_issue_field_history` <br> `jira__daily_sprint_issue_history` <br> `jira__issue_enhanced` | Removed default columns (**Breaking Change**) | `story_points` and `story_point_estimate` included by default | Columns only included when added to `var('issue_field_history_columns')` | These fields are Scrum-specific custom fields not universally used. Add the relevant fields to the `issue_field_history_columns` variable to retain them. |
+| `jira__sprint_enhanced` | Removed default columns (**Breaking Change**) | `story_points_committed`, `story_points_end`, `story_points_completed`, `story_point_estimate_committed`, `story_point_estimate_end`, and `story_point_estimate_completed` included by default | Columns only included when `story points` and/or `story point estimate` are added to `var('issue_field_history_columns')` | These metrics depend on `story_points`/`story_point_estimate` being tracked in field history. Add the relevant fields to the `issue_field_history_columns` variable to retain them. |
+| `jira__daily_sprint_issue_history` <br> `jira__sprint_enhanced` | Column type change | `story_points` and `story_point_estimate` cast as `float` | Cast as `numeric` | Improves precision for fractional story point values. |
+
+## Bug Fix
+- Updated `stg_jira__sprint` to filter out soft-deleted sprint records using the `_fivetran_deleted` flag.
+
+## Documentation
+- Updates model descriptions to remove static documentation for `story_points`, `story_point_estimate`, and `team` columns. Removes story point-related column documentation from `jira__sprint_enhanced` as these columns are dynamic and only present when added to `var('issue_field_history_columns')`.
+  - To retain story point data, add `story points` and/or `story point estimate` to the `issue_field_history_columns` variable in your `dbt_project.yml` ([See the README for details](https://github.com/fivetran/dbt_jira?tab=readme-ov-file#define-daily-issue-field-history-columns)). Quickstart users can add these fields in the Issue Field History Columns setting.
+ 
 # dbt_jira v1.6.0
 
 [PR #170](https://github.com/fivetran/dbt_jira/pull/170) includes the following update:

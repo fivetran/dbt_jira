@@ -2,8 +2,9 @@
 
 with base as (
 
-    select * 
+    select *
     from {{ ref('stg_jira__sprint_tmp') }}
+    where not coalesce(_fivetran_deleted, false)
 ),
 
 fields as (
