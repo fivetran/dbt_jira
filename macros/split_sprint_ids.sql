@@ -1,14 +1,11 @@
-{% macro split_sprint_ids(using_teams) %}
+{% macro split_sprint_ids(using_teams, include_story_points=false, include_story_point_estimate=false) %}
 
-{{ adapter.dispatch('split_sprint_ids', 'jira') (using_teams) }}
+{{ adapter.dispatch('split_sprint_ids', 'jira') (using_teams, include_story_points, include_story_point_estimate) }}
 
 {% endmacro %}
 
-{% macro default__split_sprint_ids(using_teams) %}
+{% macro default__split_sprint_ids(using_teams, include_story_points=false, include_story_point_estimate=false) %}
 {# bigquery  #}
-{% set issue_field_history_columns = var('issue_field_history_columns', []) | map('lower') | list %}
-{% set include_story_points = 'story points' in issue_field_history_columns %}
-{% set include_story_point_estimate = 'story point estimate' in issue_field_history_columns %}
     select
         daily_issue_field_history.issue_id,
         daily_issue_field_history.source_relation,
@@ -17,10 +14,10 @@
         daily_issue_field_history.status,
         {{ "daily_issue_field_history.team," if using_teams }}
         {% if include_story_points %}
-        cast(daily_issue_field_history.story_points as {{ dbt.type_numeric() }}) as story_points,
+        {{ jira.convert_string_to_numeric('daily_issue_field_history.story_points') }} as story_points,
         {% endif %}
         {% if include_story_point_estimate %}
-        cast(daily_issue_field_history.story_point_estimate as {{ dbt.type_numeric() }}) as story_point_estimate,
+        {{ jira.convert_string_to_numeric('daily_issue_field_history.story_point_estimate') }} as story_point_estimate,
         {% endif %}
         sprints as sprint_id
 
@@ -30,10 +27,7 @@
 
 {% endmacro %}
 
-{% macro snowflake__split_sprint_ids(using_teams) %}
-{% set issue_field_history_columns = var('issue_field_history_columns', []) | map('lower') | list %}
-{% set include_story_points = 'story points' in issue_field_history_columns %}
-{% set include_story_point_estimate = 'story point estimate' in issue_field_history_columns %}
+{% macro snowflake__split_sprint_ids(using_teams, include_story_points=false, include_story_point_estimate=false) %}
     select
         daily_issue_field_history.issue_id,
         daily_issue_field_history.source_relation,
@@ -42,10 +36,10 @@
         daily_issue_field_history.status,
         {{ "daily_issue_field_history.team," if using_teams }}
         {% if include_story_points %}
-        cast(daily_issue_field_history.story_points as {{ dbt.type_numeric() }}) as story_points,
+        {{ jira.convert_string_to_numeric('daily_issue_field_history.story_points') }} as story_points,
         {% endif %}
         {% if include_story_point_estimate %}
-        cast(daily_issue_field_history.story_point_estimate as {{ dbt.type_numeric() }}) as story_point_estimate,
+        {{ jira.convert_string_to_numeric('daily_issue_field_history.story_point_estimate') }} as story_point_estimate,
         {% endif %}
         sprints.value as sprint_id
 
@@ -55,10 +49,7 @@
 
 {% endmacro %}
 
-{% macro redshift__split_sprint_ids(using_teams) %}
-{% set issue_field_history_columns = var('issue_field_history_columns', []) | map('lower') | list %}
-{% set include_story_points = 'story points' in issue_field_history_columns %}
-{% set include_story_point_estimate = 'story point estimate' in issue_field_history_columns %}
+{% macro redshift__split_sprint_ids(using_teams, include_story_points=false, include_story_point_estimate=false) %}
 	select
         unnest_sprint_id_array.issue_id,
         unnest_sprint_id_array.source_relation,
@@ -67,10 +58,10 @@
         unnest_sprint_id_array.status,
         {{ "unnest_sprint_id_array.team," if using_teams }}
         {% if include_story_points %}
-        cast(unnest_sprint_id_array.story_points as {{ dbt.type_numeric() }}) as story_points,
+        {{ jira.convert_string_to_numeric('unnest_sprint_id_array.story_points') }} as story_points,
         {% endif %}
         {% if include_story_point_estimate %}
-        cast(unnest_sprint_id_array.story_point_estimate as {{ dbt.type_numeric() }}) as story_point_estimate,
+        {{ jira.convert_string_to_numeric('unnest_sprint_id_array.story_point_estimate') }} as story_point_estimate,
         {% endif %}
         cast(sprint_id as {{ dbt.type_string() }}) as sprint_id
     from (
@@ -82,10 +73,10 @@
             daily_issue_field_history.status,
             {{ "daily_issue_field_history.team," if using_teams }}
             {% if include_story_points %}
-            cast(daily_issue_field_history.story_points as {{ dbt.type_numeric() }}) as story_points,
+            daily_issue_field_history.story_points,
             {% endif %}
             {% if include_story_point_estimate %}
-            cast(daily_issue_field_history.story_point_estimate as {{ dbt.type_numeric() }}) as story_point_estimate,
+            daily_issue_field_history.story_point_estimate,
             {% endif %}
             split_to_array(sprint, ', ') as super_sprint_ids
 
@@ -94,10 +85,7 @@
 
 {% endmacro %}
 
-{% macro postgres__split_sprint_ids(using_teams) %}
-{% set issue_field_history_columns = var('issue_field_history_columns', []) | map('lower') | list %}
-{% set include_story_points = 'story points' in issue_field_history_columns %}
-{% set include_story_point_estimate = 'story point estimate' in issue_field_history_columns %}
+{% macro postgres__split_sprint_ids(using_teams, include_story_points=false, include_story_point_estimate=false) %}
     select
         daily_issue_field_history.issue_id,
         daily_issue_field_history.source_relation,
@@ -106,10 +94,10 @@
         daily_issue_field_history.status,
         {{ "daily_issue_field_history.team," if using_teams }}
         {% if include_story_points %}
-        cast(daily_issue_field_history.story_points as {{ dbt.type_numeric() }}) as story_points,
+        {{ jira.convert_string_to_numeric('daily_issue_field_history.story_points') }} as story_points,
         {% endif %}
         {% if include_story_point_estimate %}
-        cast(daily_issue_field_history.story_point_estimate as {{ dbt.type_numeric() }}) as story_point_estimate,
+        {{ jira.convert_string_to_numeric('daily_issue_field_history.story_point_estimate') }} as story_point_estimate,
         {% endif %}
         sprints as sprint_id
 
@@ -119,10 +107,7 @@
 
 {% endmacro %}
 
-{% macro spark__split_sprint_ids(using_teams) %}
-{% set issue_field_history_columns = var('issue_field_history_columns', []) | map('lower') | list %}
-{% set include_story_points = 'story points' in issue_field_history_columns %}
-{% set include_story_point_estimate = 'story point estimate' in issue_field_history_columns %}
+{% macro spark__split_sprint_ids(using_teams, include_story_points=false, include_story_point_estimate=false) %}
 {# databricks and spark #}
     select
         daily_issue_field_history.issue_id,
@@ -132,10 +117,10 @@
         daily_issue_field_history.status,
         {{ "daily_issue_field_history.team," if using_teams }}
         {% if include_story_points %}
-        cast(daily_issue_field_history.story_points as {{ dbt.type_numeric() }}) as story_points,
+        {{ jira.convert_string_to_numeric('daily_issue_field_history.story_points') }} as story_points,
         {% endif %}
         {% if include_story_point_estimate %}
-        cast(daily_issue_field_history.story_point_estimate as {{ dbt.type_numeric() }}) as story_point_estimate,
+        {{ jira.convert_string_to_numeric('daily_issue_field_history.story_point_estimate') }} as story_point_estimate,
         {% endif %}
         sprints as sprint_id
     from daily_issue_field_history

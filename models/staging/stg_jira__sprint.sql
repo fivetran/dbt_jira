@@ -4,7 +4,6 @@ with base as (
 
     select *
     from {{ ref('stg_jira__sprint_tmp') }}
-    where not coalesce(_fivetran_deleted, false)
 ),
 
 fields as (
@@ -32,6 +31,7 @@ final as (
         cast(start_date as {{ dbt.type_timestamp() }}) as started_at,
         _fivetran_synced
     from fields
+    where not coalesce(_fivetran_deleted, false)
 )
 
 select * 

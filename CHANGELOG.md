@@ -17,6 +17,12 @@
 ## Documentation
 - Updates model descriptions to remove static documentation for `story_points`, `story_point_estimate`, and `team` columns. Removes story point-related column documentation from `jira__sprint_enhanced` as these columns are dynamic and only present when added to `var('issue_field_history_columns')`.
   - To retain story point data, add `story points` and/or `story point estimate` to the `issue_field_history_columns` variable in your `dbt_project.yml` ([See the README for details](https://github.com/fivetran/dbt_jira?tab=readme-ov-file#define-daily-issue-field-history-columns)). Quickstart users can add these fields in the Issue Field History Columns setting.
+
+## Under the Hood
+- Adds a new `convert_string_to_numeric` macro with warehouse-specific dispatch implementations to safely cast story point string values to numeric, handling edge cases such as comma-formatted numbers.
+- Refactors the `split_sprint_ids` macro to accept `include_story_points` and `include_story_point_estimate` as explicit boolean parameters rather than re-evaluating `var('issue_field_history_columns')` inside each dispatch variant.
+- Removes hard-coded story point conditional blocks from `int_jira__timestamp_field_history_scd`. Story point columns now flow through the generic `custom_columns` loop alongside other user-defined field history columns.
+- Pre-computes `include_story_points` and `include_story_point_estimate` at the top of `jira__timestamp_issue_field_history` to avoid repeated `var()` evaluations throughout the model.
  
 # dbt_jira v1.6.0
 
