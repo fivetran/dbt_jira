@@ -2,7 +2,6 @@ with base as (
     
     select * 
     from {{ ref('stg_jira__issue_tmp') }}
-    where not coalesce(_fivetran_deleted, false)
 ),
 
 fields as (
@@ -47,6 +46,7 @@ final as (
         work_ratio,
         _fivetran_synced
     from fields
+    where not coalesce(_fivetran_deleted, false)
 )
 
 select * 

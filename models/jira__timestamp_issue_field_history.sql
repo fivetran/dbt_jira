@@ -1,4 +1,7 @@
 {%- set custom_columns = [] -%}
+{%- set _issue_field_history_columns = var('issue_field_history_columns', []) | map('lower') | list -%}
+{%- set include_story_points = 'story points' in _issue_field_history_columns -%}
+{%- set include_story_point_estimate = 'story point estimate' in _issue_field_history_columns -%}
 {%- for col in var('issue_field_history_columns', []) -%}
     {%- set clean_col = dbt_utils.slugify(col) | replace(' ', '_') | lower -%}
     {%- if clean_col not in ['sprint', 'sprint_name', 'story_points', 'story_point_estimate'] -%}
@@ -80,10 +83,10 @@ create_validity_periods as (
         author_id,
         sprint,
         sprint_name
-        {% if 'story points' in var('issue_field_history_columns', []) | map('lower') | list %}
+        {% if include_story_points %}
         , story_points
         {% endif %}
-        {% if 'story point estimate' in var('issue_field_history_columns', []) | map('lower') | list %}
+        {% if include_story_point_estimate %}
         , story_point_estimate
         {% endif %}
 
@@ -113,10 +116,10 @@ fix_null_values as (
         create_validity_periods.author_id,
         case when create_validity_periods.sprint = '-is_null' then null else create_validity_periods.sprint end as sprint,
         case when create_validity_periods.sprint_name = '-is_null' then null else create_validity_periods.sprint_name end as sprint_name
-        {% if 'story points' in var('issue_field_history_columns', []) | map('lower') | list %}
+        {% if include_story_points %}
         , case when create_validity_periods.story_points = '-is_null' then null else create_validity_periods.story_points end as story_points
         {% endif %}
-        {% if 'story point estimate' in var('issue_field_history_columns', []) | map('lower') | list %}
+        {% if include_story_point_estimate %}
         , case when create_validity_periods.story_point_estimate = '-is_null' then null else create_validity_periods.story_point_estimate end as story_point_estimate
         {% endif %}
 
@@ -169,10 +172,10 @@ final as (
         fix_null_values.author_id,
         fix_null_values.sprint,
         fix_null_values.sprint_name
-        {% if 'story points' in var('issue_field_history_columns', []) | map('lower') | list %}
+        {% if include_story_points %}
         , fix_null_values.story_points
         {% endif %}
-        {% if 'story point estimate' in var('issue_field_history_columns', []) | map('lower') | list %}
+        {% if include_story_point_estimate %}
         , fix_null_values.story_point_estimate
         {% endif %}
 

@@ -264,6 +264,8 @@ sources:
         columns:
           - name: id
             description: Unique ID of the sprint.
+          - name: _fivetran_deleted
+            description: Boolean indicating whether the record was soft-deleted by Fivetran.
           - name: board_id
             description: Foreign key referencing the ID of the `board` that the sprint lives in.
           - name: complete_date

@@ -16,7 +16,12 @@ with daily_issue_field_history as (
 
 split_issue_field_history_sprints as (
 
-    {{ jira.split_sprint_ids(using_teams=var('jira_using_teams', True)) }}
+    {%- set issue_field_history_columns = var('issue_field_history_columns', []) | map('lower') | list -%}
+    {{ jira.split_sprint_ids(
+        using_teams=var('jira_using_teams', True),
+        include_story_points='story points' in issue_field_history_columns,
+        include_story_point_estimate='story point estimate' in issue_field_history_columns
+    ) }}
 ),
 
 issue_sprint_history_join as (

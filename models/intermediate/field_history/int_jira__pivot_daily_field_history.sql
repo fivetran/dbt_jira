@@ -169,7 +169,7 @@ limit_to_relevant_fields as (
     from get_valid_dates
 
     where lower(field_id) = 'status'
-        or lower(field_name) in ('sprint', 'sprint_name', 'story points', 'story point estimate'
+        or lower(field_name) in ('sprint', 'sprint_name'
         {%- for col in issue_field_history_columns -%}
             ,'{{ (col|lower) }}'
         {%- endfor -%} )
@@ -217,7 +217,7 @@ int_jira__daily_field_history as (
 
 pivot_out as (
 
-    -- pivot out default columns (status and sprint) and others specified in the var(issue_field_history_columns)
+    -- pivot out default columns (status, sprint, sprint_name) and others specified in the var(issue_field_history_columns)
     -- only days on which a field value was actively changed will have a non-null value. the nulls will need to
     -- be backfilled in the final jira__daily_issue_field_history model
     select
@@ -227,12 +227,10 @@ pivot_out as (
         valid_starting_at_week,
         max(case when lower(field_id) = 'status' then field_value end) as status,
         max(case when lower(field_name) = 'sprint' then field_value end) as sprint,
-        max(case when lower(field_name) = 'sprint_name' then field_value end) as sprint_name,
-        max(case when lower(field_name) = 'story points' then field_value end) as story_points,
-        max(case when lower(field_name) = 'story point estimate' then field_value end) as story_point_estimate
+        max(case when lower(field_name) = 'sprint_name' then field_value end) as sprint_name
 
         {% for col in issue_field_history_columns -%}
-        {% if col|lower not in ['sprint', 'sprint_name', 'story points', 'story point estimate'] %}
+        {% if col|lower not in ['sprint', 'sprint_name'] %}
             , max(case when lower(field_name) = '{{ col|lower }}' then field_value end) as {{ dbt_utils.slugify(col) | replace(' ', '_') | lower }}
         {% endif %}
         {% endfor -%}
