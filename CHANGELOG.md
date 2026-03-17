@@ -14,6 +14,9 @@
 ## Bug Fix
 - Updated `stg_jira__sprint` to filter out soft-deleted sprint records using the `_fivetran_deleted` flag.
 
+## Under the Hood
+- Moved the `_fivetran_deleted` filter in `stg_jira__issue` to the `final` CTE so it runs after `fill_staging_columns` null-fills the column for sources that don't have `_fivetran_deleted` records.
+
 ## Documentation
 - Updates model descriptions to remove static documentation for `story_points`, `story_point_estimate`, and `team` columns. Removes story point-related column documentation from `jira__sprint_enhanced` as these columns are dynamic and only present when added to `var('issue_field_history_columns')`.
   - To retain story point data, add `story points` and/or `story point estimate` to the `issue_field_history_columns` variable in your `dbt_project.yml` ([See the README for details](https://github.com/fivetran/dbt_jira?tab=readme-ov-file#define-daily-issue-field-history-columns)). Quickstart users can add these fields in the Issue Field History Columns setting.
