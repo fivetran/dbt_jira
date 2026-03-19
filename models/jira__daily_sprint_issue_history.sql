@@ -14,15 +14,23 @@ with daily_issue_field_history as (
     where sprint is not null
 ),
 
-split_issue_field_history_sprints as (
-
-    {%- set issue_field_history_columns = var('issue_field_history_columns', []) | map('lower') | list -%}
-    {{ jira.split_sprint_ids(
-        using_teams=var('jira_using_teams', True),
-        include_story_points='story points' in issue_field_history_columns,
-        include_story_point_estimate='story point estimate' in issue_field_history_columns
-    ) }}
-),
+split_issue_field_history_sprints as (                                                                                                                                                           
+                                                                                                                                                                                                   
+      {%- set issue_field_history_columns = var('issue_field_history_columns', []) | map('lower') | list -%}                                                                                       
+  
+      {%- set using_teams = var('jira_using_teams', True) -%}                                                                                                                                      
+      {%- if using_teams -%}                                                                                                                                                                       
+          {%- set field_history_columns = adapter.get_columns_in_relation(ref('jira__daily_issue_field_history'))                                                                                  
+              | map(attribute='name') | map('lower') | list -%}                                                                                                                                  
+          {%- set using_teams = 'team' in field_history_columns -%}                                                                                                                                
+      {%- endif -%}
+                                                                                                                                                                                                   
+      {{ jira.split_sprint_ids(                                                                                                                                                                  
+          using_teams=using_teams,
+          include_story_points='story points' in issue_field_history_columns,                                                                                                                      
+          include_story_point_estimate='story point estimate' in issue_field_history_columns                                                                                                       
+      ) }}                                                                                                                                                                                         
+  ),    
 
 issue_sprint_history_join as (
 
