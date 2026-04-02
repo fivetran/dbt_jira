@@ -39,7 +39,7 @@ models:
     relation: true
     columns: "{{ false if target.type in ('databricks') else true }}"
   jira:
-    #+schema: "{{ 'jira_integrations_tests_sqlw' if target.name == 'databricks-sql' else 'jira' }}"
+   # +schema: "{{ 'jira_integrations_tests_sqlw' if target.name == 'databricks-sql' else 'jira' }}"
      +schema: "jira_{{ var('directed_schema','dev') }}"
 
 seeds:
