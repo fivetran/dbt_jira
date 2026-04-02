@@ -22,6 +22,22 @@ with daily_sprint_issue_history as (
 
 {% if using_teams %}
 
+ranked_issue_sprint_team as (
+
+    select
+        source_relation,
+        sprint_id,
+        issue_id,
+        team,
+        row_number() over (
+            partition by source_relation, sprint_id, issue_id
+            order by
+                case when team is not null then 0 else 1 end,
+                date_day desc
+        ) as row_num
+    from daily_sprint_issue_history
+),
+
 resolved_issue_sprint_team as (
 
     select
@@ -29,13 +45,8 @@ resolved_issue_sprint_team as (
         sprint_id,
         issue_id,
         team
-    from daily_sprint_issue_history
-    qualify row_number() over (
-        partition by source_relation, sprint_id, issue_id
-        order by
-            case when team is not null then 0 else 1 end,
-            date_day desc
-    ) = 1
+    from ranked_issue_sprint_team
+    where row_num = 1
 ),
 
 daily_sprint_issue_history_resolved as (
