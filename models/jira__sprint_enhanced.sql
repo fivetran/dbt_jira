@@ -17,7 +17,71 @@ with daily_sprint_issue_history as (
 
     select *
     from {{ ref('jira__daily_sprint_issue_history') }}
+
 ),
+
+{% if using_teams %}
+
+resolved_issue_sprint_team as (
+
+    select
+        source_relation,
+        sprint_id,
+        issue_id,
+        team
+    from daily_sprint_issue_history
+    qualify row_number() over (
+        partition by source_relation, sprint_id, issue_id
+        order by
+            case when team is not null then 0 else 1 end,
+            date_day desc
+    ) = 1
+),
+
+daily_sprint_issue_history_resolved as (
+
+    select
+        d.source_relation,
+        d.issue_id,
+        d.sprint_id,
+        r.team,
+        d.date_day,
+        d.sprint_name,
+        d.sprint_started_at,
+        d.sprint_ended_at,
+        d.sprint_completed_at,
+        d.board_id,
+        d.assignee_user_id,
+        d.original_estimate_seconds,
+        d.remaining_estimate_seconds,
+        d.time_spent_seconds,
+        d.is_sprint_active,
+        d.is_issue_open,
+        d.issue_resolved_at,
+        d.is_issue_resolved_in_sprint
+        {% if include_story_points %}
+        , d.story_points
+        {% endif %}
+        {% if include_story_point_estimate %}
+        , d.story_point_estimate
+        {% endif %}
+    from daily_sprint_issue_history d
+    left join resolved_issue_sprint_team r
+        on d.source_relation = r.source_relation
+        and d.sprint_id = r.sprint_id
+        and d.issue_id = r.issue_id
+),
+
+{% else %}
+
+daily_sprint_issue_history_resolved as (
+
+    select *
+    from daily_sprint_issue_history
+),
+
+{% endif %}
+
 sprint_metrics_grouped as (
 
     select
@@ -32,7 +96,7 @@ sprint_metrics_grouped as (
         original_estimate_seconds,
         remaining_estimate_seconds,
         time_spent_seconds
-    from daily_sprint_issue_history
+    from daily_sprint_issue_history_resolved
     {{ dbt_utils.group_by(11 if using_teams else 10) }}
 ),
 
@@ -48,7 +112,7 @@ sprint_issue_metrics as (
         count(distinct (case when date_day >= cast(issue_resolved_at as date)
             and issue_resolved_at <= sprint_ended_at
             then issue_id end)) as resolved_sprint_issues
-    from daily_sprint_issue_history
+    from daily_sprint_issue_history_resolved
     {{ dbt_utils.group_by(3 if using_teams else 2) }}
 ),
 
@@ -65,7 +129,7 @@ sprint_start_metrics as (
         sum(case when story_point_estimate is null then 0 else story_point_estimate end) as story_point_estimate_committed,
         {% endif %}
         count(distinct issue_id) as issues_committed
-    from daily_sprint_issue_history
+    from daily_sprint_issue_history_resolved
     -- to capture both sprints that have started or will start in the future
     where date_day = cast(sprint_started_at as date)
         or (date_day < cast(sprint_started_at as date)
@@ -87,7 +151,7 @@ sprint_end_metrics as (
         , sum(case when story_point_estimate is null then 0 else story_point_estimate end) as story_point_estimate_end
         , sum(case when is_issue_resolved_in_sprint then story_point_estimate else 0 end) as story_point_estimate_completed
         {% endif %}
-    from daily_sprint_issue_history
+    from daily_sprint_issue_history_resolved
     where date_day = cast(sprint_ended_at as date)
     {{ dbt_utils.group_by(3 if using_teams else 2) }}
 ),
