@@ -1,9 +1,14 @@
 {{ config(enabled=var('jira_using_sprints', True)) }}
 
-{% set using_teams = var('jira_using_teams', True) %}
-{% set issue_field_history_columns = var('issue_field_history_columns', []) | map('lower') | list %}
-{% set include_story_points = 'story points' in issue_field_history_columns %}
-{% set include_story_point_estimate = 'story point estimate' in issue_field_history_columns %}
+  {%- set using_teams = var('jira_using_teams', True) -%}                                                                                                                               
+  {%- if using_teams -%}                                                                                                                                                                
+      {%- set daily_sprint_columns = adapter.get_columns_in_relation(ref('jira__daily_sprint_issue_history'))                                                                           
+          | map(attribute='name') | map('lower') | list -%}                                                  
+      {%- set using_teams = 'team' in daily_sprint_columns -%}                                                                                                                          
+  {%- endif -%}                                                                                                                                                                         
+  {%- set issue_field_history_columns = var('issue_field_history_columns', []) | map('lower') | list -%}                                                                                
+  {%- set include_story_points = 'story points' in issue_field_history_columns -%}                                                                                                      
+  {%- set include_story_point_estimate = 'story point estimate' in issue_field_history_columns -%}  
 
 {# Base count of non-aggregated columns in final select (source_relation, sprint_id, sprint_name,
    sprint_started_at, sprint_ended_at, sprint_completed_at, board_id, sprint_assignees, sprint_issues,
