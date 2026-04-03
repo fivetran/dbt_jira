@@ -1,6 +1,5 @@
 # dbt_jira v1.8.0
-
-This release includes critical incremental logic fixes and runtime improvements for team-enabled configurations.
+[PR #176](https://github.com/fivetran/dbt_jira/pull/176) includes the following updates:
 
 ## Schema/Data Change (--full-refresh required after upgrading)
 **1 total change • 1 possible breaking change**
