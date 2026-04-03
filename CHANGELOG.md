@@ -1,3 +1,20 @@
+# dbt_jira v1.8.0
+
+This release includes critical incremental logic fixes and runtime improvements for team-enabled configurations.
+
+## Schema/Data Change (--full-refresh required after upgrading)
+**1 total change • 1 possible breaking change**
+
+| Data Model(s) | Change type | Old | New | Notes |
+| ---------- | ----------- | -------- | -------- | ----- |
+| `jira__daily_issue_field_history` | Incremental filter fix (**Breaking Change**) | Filtered by `date_day >= max_date_week` | Filtered by `date_week >= max_date_week` | Aligns the incremental filter with the model's weekly partition key. The previous filter could cause data loss during partition overwrites in BigQuery and Databricks destinations on incremental runs. A full refresh is recommended to backfill any records that may have been missed. |
+
+## Bug Fix
+- Fixed teams variable evaluation during incremental runs in `jira__daily_sprint_issue_history` and `jira__sprint_enhanced` models. The fix adds runtime column checking to prevent errors when `jira_using_teams=True` but the team column doesn't exist in the actual data model.
+
+## Under the Hood
+- Enhanced sprint integrity test logic to handle multiple sprint events per day correctly. The test now identifies the last sprint-related event per issue per day, mirroring how the data models forward-fill using end-of-day state.
+
 # dbt_jira v1.7.0
 
 [PR #175](https://github.com/fivetran/dbt_jira/pull/175) includes the following updates:
