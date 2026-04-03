@@ -36,6 +36,7 @@ ranked_issue_sprint_team as (
                 date_day desc
         ) as row_num
     from daily_sprint_issue_history
+
 ),
 
 resolved_issue_sprint_team as (
@@ -47,6 +48,7 @@ resolved_issue_sprint_team as (
         team
     from ranked_issue_sprint_team
     where row_num = 1
+
 ),
 
 daily_sprint_issue_history_resolved as (
@@ -76,11 +78,12 @@ daily_sprint_issue_history_resolved as (
         {% if include_story_point_estimate %}
         , daily_sprint_issue_history.story_point_estimate
         {% endif %}
-    from daily_sprint_issue_history 
-    left join resolved_issue_sprint_team 
-        on daily_sprint_issue_history.source_relation = r.source_relation
-        and daily_sprint_issue_history.sprint_id = r.sprint_id
-        and daily_sprint_issue_history.issue_id = r.issue_id
+    from daily_sprint_issue_history
+    left join resolved_issue_sprint_team
+        on daily_sprint_issue_history.source_relation = resolved_issue_sprint_team.source_relation
+        and daily_sprint_issue_history.sprint_id = resolved_issue_sprint_team.sprint_id
+        and daily_sprint_issue_history.issue_id = resolved_issue_sprint_team.issue_id
+
 ),
 
 {% else %}
@@ -89,6 +92,7 @@ daily_sprint_issue_history_resolved as (
 
     select *
     from daily_sprint_issue_history
+
 ),
 
 {% endif %}
