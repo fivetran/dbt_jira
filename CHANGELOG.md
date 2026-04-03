@@ -11,7 +11,7 @@
 
 # dbt_jira v1.8.0-a1
 
-[PR #177](https://github.com/fivetran/dbt_jira/pull/177) includes the following updates:
+[PR #178](https://github.com/fivetran/dbt_jira/pull/178) includes the following updates:
 
 ## Bug Fix
 - Updates `jira__sprint_enhanced` to resolve the team per issue per sprint when `jira_using_teams` is enabled. Previously, if an issue had no team assigned at any point during the sprint, the team would appear as null even if a team was later assigned. An additional row would also be created if an issue moved from one team to another within a sprint, causing potential double counting. Now, the model selects the most recent non-null team for each issue-sprint combination, ensuring team assignments are correctly reflected in sprint metrics. 
