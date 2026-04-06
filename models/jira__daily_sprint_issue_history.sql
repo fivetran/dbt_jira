@@ -22,7 +22,7 @@ split_issue_field_history_sprints as (
         include_story_points='story points' in issue_field_history_columns,
         include_story_point_estimate='story point estimate' in issue_field_history_columns
     ) }}
-),   
+),
 
 issue_sprint_history_join as (
 
