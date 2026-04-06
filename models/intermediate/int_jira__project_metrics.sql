@@ -5,35 +5,78 @@ with issue as (
     where project_id is not null
 ),
 
-calculate_medians as (
+-- Calculate median durations for CLOSED/RESOLVED issues only
+-- Filtering to only resolved issues with non-null durations prevents Redshift percentile errors when a project has no closed issues (which would create all-NULL partitions)
+calculate_closed_issue_medians as (
 
     select
         project_id,
         source_relation,
-        round(cast({{ fivetran_utils.percentile(percentile_field='case when resolved_at is not null then open_duration_seconds end',
-                    partition_field='project_id', percent='0.5') }} as {{ dbt.type_numeric() }} ), 0) as median_close_time_seconds,
-        round(cast({{ fivetran_utils.percentile(percentile_field='case when resolved_at is null then open_duration_seconds end',
-                    partition_field='project_id', percent='0.5') }} as {{ dbt.type_numeric() }} ), 0) as median_age_currently_open_seconds,
-        round(cast({{ fivetran_utils.percentile(percentile_field='case when resolved_at is not null then any_assignment_duration_seconds end',
-                    partition_field='project_id', percent='0.5') }} as {{ dbt.type_numeric() }} ), 0) as median_assigned_close_time_seconds,
-        round(cast({{ fivetran_utils.percentile(percentile_field='case when resolved_at is null then any_assignment_duration_seconds end',
-                    partition_field='project_id', percent='0.5') }} as {{ dbt.type_numeric() }} ), 0) as median_age_currently_open_assigned_seconds
+        -- Median time from creation to resolution for completed issues
+        round(cast({{ fivetran_utils.percentile(
+            percentile_field='cast(open_duration_seconds as ' ~ dbt.type_numeric() ~ ')',
+            partition_field='project_id',
+            percent='0.5'
+        ) }} as {{ dbt.type_numeric() }}), 0) as median_close_time_seconds,
+        -- Median assignment duration for completed issues
+        round(cast({{ fivetran_utils.percentile(
+            percentile_field='cast(any_assignment_duration_seconds as ' ~ dbt.type_numeric() ~ ')',
+            partition_field='project_id',
+            percent='0.5'
+        ) }} as {{ dbt.type_numeric() }}), 0) as median_assigned_close_time_seconds
     from issue
+    where resolved_at is not null
+        and open_duration_seconds is not null
 
     {% if target.type == 'postgres' %} group by project_id, source_relation {% endif %}
 ),
 
--- grouping because the medians were calculated using window functions (except in postgres)
-median_metrics as (
+-- Calculate median durations for OPEN/UNRESOLVED issues only
+-- Filtering to only open issues with non-null durations prevents Redshift percentile errors when a project has no open issues (which would create all-NULL partitions)
+calculate_open_issue_medians as (
 
     select
         project_id,
         source_relation,
-        median_close_time_seconds,
-        median_age_currently_open_seconds,
-        median_assigned_close_time_seconds,
-        median_age_currently_open_assigned_seconds
-    from calculate_medians
+        -- Median age of issues still open (time since creation)
+        round(cast({{ fivetran_utils.percentile(
+            percentile_field='cast(open_duration_seconds as ' ~ dbt.type_numeric() ~ ')',
+            partition_field='project_id',
+            percent='0.5'
+        ) }} as {{ dbt.type_numeric() }}), 0) as median_age_currently_open_seconds,
+        -- Median assignment duration for issues still open
+        round(cast({{ fivetran_utils.percentile(
+            percentile_field='cast(any_assignment_duration_seconds as ' ~ dbt.type_numeric() ~ ')',
+            partition_field='project_id',
+            percent='0.5'
+        ) }} as {{ dbt.type_numeric() }}), 0) as median_age_currently_open_assigned_seconds
+    from issue
+    where resolved_at is null
+        and open_duration_seconds is not null
+
+    {% if target.type == 'postgres' %} group by project_id, source_relation {% endif %}
+),
+
+-- Combine closed and open issue medians
+-- Using FULL OUTER JOIN ensures we get results for projects that have:
+-- - Only closed issues (no current open work)
+-- - Only open issues (no historical completions)
+-- - Both closed and open issues
+-- This prevents the Redshift "Invalid input" error that occurred when projects had no data for one of the median calculations
+median_metrics as (
+
+    select
+        coalesce(closed_medians.project_id, open_medians.project_id) as project_id,
+        coalesce(closed_medians.source_relation, open_medians.source_relation) as source_relation,
+        closed_medians.median_close_time_seconds,
+        open_medians.median_age_currently_open_seconds,
+        closed_medians.median_assigned_close_time_seconds,
+        open_medians.median_age_currently_open_assigned_seconds
+    from calculate_closed_issue_medians as closed_medians
+    full outer join calculate_open_issue_medians as open_medians
+        on closed_medians.project_id = open_medians.project_id
+        and closed_medians.source_relation = open_medians.source_relation
+
     {{ dbt_utils.group_by(6) }}
 ),
 
