@@ -25,20 +25,8 @@ with pivoted_daily_history as (
     from {{ ref('int_jira__field_history_scd') }}
 
     {% if is_incremental() %}
-    where valid_starting_on >= {{ max_date_week }}
-), 
-
--- If no issue fields have been updated since the last incremental run, the pivoted_daily_history CTE will return no record/rows.
--- When this is the case, we need to grab the most recent week's records from the previously built table so that we can persist 
--- those values into the future.
-
-most_recent_data as ( 
-    select 
-        *
-    from {{ this }}
-    where date_week >= {{ max_date_week }}
-{% endif %}
-), 
+    where cast({{ dbt.date_trunc('week', 'valid_starting_on') }} as date) >= {{ max_date_week }}
+),
 
 -- in intermediate/field_history/
 calendar as (
@@ -47,9 +35,39 @@ calendar as (
     from {{ ref('int_jira__issue_calendar_spine') }}
 
     {% if is_incremental() %}
-    where date_day >= {{ max_date_week }}
+    where cast({{ dbt.date_trunc('week', 'date_day') }} as date) >= {{ max_date_week }}
     {% endif %}
-), 
+),
+
+-- If no issue fields have been updated since the last incremental run, the pivoted_daily_history CTE will return no record/rows.
+-- When this is the case, we need to grab the most recent records from the previously built table so that we can persist
+-- those values into the future.
+--
+-- IMPORTANT: We only get historical data for issues that appear in the filtered calendar (issues with recent activity).
+-- This is correct for incremental processing - issues without recent activity don't need reprocessing in this run.
+-- For issues that DO need processing, we get their most recent record regardless of how old it is, ensuring
+-- field values set outside the lookback window (like reviewer assignments from months ago) are preserved.
+
+most_recent_data_ranked as (
+    select
+        *,
+        row_number() over (
+            partition by issue_id {{ jira.partition_by_source_relation() }}
+            order by date_day desc
+        ) as rn
+    from {{ this }}
+    where issue_id in (
+        select distinct issue_id
+        from calendar
+    )
+),
+
+most_recent_data as (
+    select *
+    from most_recent_data_ranked
+    where rn = 1
+{% endif %}
+),
 
 field_option as (
     
@@ -143,7 +161,6 @@ joined as (
     left join most_recent_data
         on calendar.issue_id = most_recent_data.issue_id
         and calendar.source_relation = most_recent_data.source_relation
-        and calendar.date_day = most_recent_data.date_day
     {% endif %}
 ),
 
