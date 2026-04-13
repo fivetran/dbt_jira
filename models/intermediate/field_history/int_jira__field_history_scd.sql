@@ -34,6 +34,7 @@ with change_data as (
 -- we need to backfill to persist values that have been previously updated and are still valid
     select
         valid_starting_on,
+        {{ dbt.date_trunc('week', 'valid_starting_on') }} as valid_starting_on_week,
         issue_id,
         source_relation,
         issue_day_id,
