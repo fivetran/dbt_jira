@@ -1,3 +1,14 @@
+# dbt_jira v1.8.0
+
+[PR #182](https://github.com/fivetran/dbt_jira/pull/180) includes the following updates:
+
+## Bug Fix
+- Adds `on_schema_change='append_new_columns'` configuration to `jira__daily_issue_field_history` and `int_jira__pivot_daily_field_history` models to automatically handle schema evolution when new columns are detected and prevent incremental run errors. 
+  - **Note:** For historical records to include appended columns, a `--full-refresh` is required.
+
+## Under the Hood
+- Updates integrity test for `jira__daily_sprint_issue_history` to track the last sprint-related event per day, ensuring that only sprint IDs recorded at the final event timestamp for each issue/day are included.
+
 # dbt_jira v1.7.0
 
 [PR #175](https://github.com/fivetran/dbt_jira/pull/175) includes the following updates:
