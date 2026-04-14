@@ -1,6 +1,6 @@
 {{ config(enabled=var('jira_using_sprints', True)) }}
 
-{% set using_teams = var('jira_using_teams', True) %}
+{% set using_teams = var('jira_using_teams', True) and var('jira_sprint_enhanced_include_teams', True) %}
 {% set issue_field_history_columns = var('issue_field_history_columns', []) | map('lower') | list %}
 {% set include_story_points = 'story points' in issue_field_history_columns %}
 {% set include_story_point_estimate = 'story point estimate' in issue_field_history_columns %}
@@ -97,6 +97,25 @@ daily_sprint_issue_history_resolved as (
 
 {% endif %}
 
+sprint_issue_estimates as (
+
+    select distinct
+        source_relation,
+        sprint_id,
+        issue_id,
+        {{ "team," if using_teams }}
+        sprint_name,
+        sprint_started_at,
+        sprint_ended_at,
+        sprint_completed_at,
+        board_id,
+        original_estimate_seconds,
+        remaining_estimate_seconds,
+        time_spent_seconds
+    from daily_sprint_issue_history_resolved
+
+),
+
 sprint_metrics_grouped as (
 
     select
@@ -108,11 +127,11 @@ sprint_metrics_grouped as (
         sprint_ended_at,
         sprint_completed_at,
         board_id,
-        original_estimate_seconds,
-        remaining_estimate_seconds,
-        time_spent_seconds
-    from daily_sprint_issue_history_resolved
-    {{ dbt_utils.group_by(11 if using_teams else 10) }}
+        sum(original_estimate_seconds) as original_estimate_seconds,
+        sum(remaining_estimate_seconds) as remaining_estimate_seconds,
+        sum(time_spent_seconds) as time_spent_seconds
+    from sprint_issue_estimates
+    {{ dbt_utils.group_by(8 if using_teams else 7) }}
 ),
 
 sprint_issue_metrics as (
@@ -204,15 +223,30 @@ final as (
     left join sprint_issue_metrics
         on sprint_metrics_grouped.sprint_id = sprint_issue_metrics.sprint_id
         and sprint_metrics_grouped.source_relation = sprint_issue_metrics.source_relation
-        {{ "and sprint_metrics_grouped.team = sprint_issue_metrics.team" if using_teams }}
+        {% if using_teams %}
+        and (
+            sprint_metrics_grouped.team = sprint_issue_metrics.team
+            or (sprint_metrics_grouped.team is null and sprint_issue_metrics.team is null)
+        )
+        {% endif %}
     left join sprint_start_metrics
         on sprint_metrics_grouped.sprint_id = sprint_start_metrics.sprint_id
         and sprint_metrics_grouped.source_relation = sprint_start_metrics.source_relation
-        {{ "and sprint_metrics_grouped.team = sprint_start_metrics.team" if using_teams }}
+        {% if using_teams %}
+        and (
+            sprint_metrics_grouped.team = sprint_start_metrics.team
+            or (sprint_metrics_grouped.team is null and sprint_start_metrics.team is null)
+        )
+        {% endif %}
     left join sprint_end_metrics
         on sprint_metrics_grouped.sprint_id = sprint_end_metrics.sprint_id
         and sprint_metrics_grouped.source_relation = sprint_end_metrics.source_relation
-        {{ "and sprint_metrics_grouped.team = sprint_end_metrics.team" if using_teams }}
+        {% if using_teams %}
+        and (
+            sprint_metrics_grouped.team = sprint_end_metrics.team
+            or (sprint_metrics_grouped.team is null and sprint_end_metrics.team is null)
+        )
+        {% endif %}
     {{ dbt_utils.group_by(final_group_by_count) }}
 )
 

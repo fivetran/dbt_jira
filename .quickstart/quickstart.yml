@@ -51,3 +51,9 @@ supported_vars:
     description: "Number of weeks into the past that the models will look back to capture late-arriving records on incremental runs"
     display_name: "Incremental Run Lookback Window (Weeks)"
 
+  jira_sprint_enhanced_include_teams:
+    type: boolean
+    value: true
+    description: "When false, rolls up jira__sprint_enhanced to one row per sprint by removing the team dimension. Only applies when jira_using_teams is also enabled."
+    display_name: "Include Team Dimension in Sprint Enhanced"
+
