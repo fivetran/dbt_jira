@@ -3,8 +3,7 @@
 [PR #182](https://github.com/fivetran/dbt_jira/pull/180) includes the following updates:
 
 ## Bug Fix
-- Adds `on_schema_change='append_new_columns'` configuration to `jira__daily_issue_field_history` and `int_jira__pivot_daily_field_history` models to automatically handle schema evolution when new columns are detected and prevent incremental run errors. 
-  - **Note:** For historical records to include appended columns, a `--full-refresh` is required.
+- Adds `on_schema_change='fail'` to the `jira__daily_issue_field_history` and `int_jira__pivot_daily_field_history` models to surface upstream schema changes (e.g., newly enabled fields) during incremental runs. When triggered, a `--full-refresh` is required to correctly rebuild the model and ensure a consistent schema.
 
 ## Under the Hood
 - Updates integrity test for `jira__daily_sprint_issue_history` to track the last sprint-related event per day, ensuring that only sprint IDs recorded at the final event timestamp for each issue/day are included.

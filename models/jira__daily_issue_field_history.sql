@@ -7,7 +7,7 @@
         unique_key='issue_day_id',
         incremental_strategy = 'insert_overwrite' if target.type in ('bigquery', 'databricks', 'spark') else 'delete+insert',
         file_format='delta',
-        on_schema_change='append_new_columns'
+        on_schema_change='fail'
     )
 }}
 
