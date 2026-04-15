@@ -26,7 +26,7 @@ with pivoted_daily_history as (
     from {{ ref('int_jira__field_history_scd') }}
 
     {% if is_incremental() %}
-    where valid_starting_on >= {{ max_date_week }}
+    where {{ dbt.date_trunc('week', 'valid_starting_on') }} >= {{ max_date_week }}
 ), 
 
 -- If no issue fields have been updated since the last incremental run, the pivoted_daily_history CTE will return no record/rows.
