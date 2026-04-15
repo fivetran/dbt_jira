@@ -4,6 +4,7 @@
 
 ## Bug Fix
 - For warehouses using the `insert_overwrite` strategy, updates the incremental filter in `jira__daily_issue_field_history` to align with the model’s partition grain. This helps prevent issues with incomplete partition coverage.
+  - You must run a `--full-refresh` after upgrading to apply this fix to existing data.
 
 ## Under the Hood
 - Updates integrity test for `jira__daily_sprint_issue_history` to track the last sprint-related event per day, ensuring that only sprint IDs recorded at the final event timestamp for each issue/day are included.
