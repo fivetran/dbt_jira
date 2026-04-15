@@ -66,7 +66,7 @@ Include the following jira package version in your `packages.yml` file:
 ```yaml
 packages:
   - package: fivetran/jira
-    version: [">=1.7.0", "<1.8.0"]
+    version: [">=1.8.0", "<1.9.0"]
 ```
 
 > All required sources and staging models are now bundled into this transformation package. Do not include `fivetran/jira_source` in your `packages.yml` since this package has been deprecated.
@@ -168,6 +168,8 @@ vars:
     jira_using_teams: false # Enabled by default. Disable if you are not using teams in Jira.
     jira_include_comments: false # Enabled by default. Disabling will remove the aggregation of comments via the `count_comments` and `conversations` columns in the `jira__issue_enhanced` table.
 ```
+
+> **Important**: After enabling or disabling any of these source variables, run a full refresh (`dbt run --full-refresh`) to prevent downstream data integrity issues.
 
 ### (Optional) Additional configurations
 

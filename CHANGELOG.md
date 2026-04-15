@@ -1,3 +1,14 @@
+# dbt_jira v1.8.0
+
+[PR #182](https://github.com/fivetran/dbt_jira/pull/180) includes the following updates:
+
+## Bug Fix
+- For warehouses using the `insert_overwrite` strategy, updates the incremental filter in `jira__daily_issue_field_history` to align with the model’s partition grain. This helps prevent issues with incomplete partition coverage.
+  - You must run a `--full-refresh` after upgrading to apply this fix to existing data.
+
+## Under the Hood
+- Updates integrity test for `jira__daily_sprint_issue_history` to track the last sprint-related event per day, ensuring that only sprint IDs recorded at the final event timestamp for each issue/day are included.
+
 # dbt_jira v1.7.0
 
 [PR #175](https://github.com/fivetran/dbt_jira/pull/175) includes the following updates:
