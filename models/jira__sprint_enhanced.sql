@@ -99,6 +99,7 @@ daily_sprint_issue_history_resolved as (
 
 sprint_issue_estimates as (
 
+    -- Deduplicate to one row per issue per sprint (and team, if enabled) so that issues with identical estimate values are not collapsed before aggregation.
     select distinct
         source_relation,
         sprint_id,
@@ -118,6 +119,7 @@ sprint_issue_estimates as (
 
 sprint_metrics_grouped as (
 
+    -- Sum estimate columns over the issue-deduplicated set to produce correct per-sprint totals.
     select
         source_relation,
         sprint_id,
@@ -224,6 +226,7 @@ final as (
         on sprint_metrics_grouped.sprint_id = sprint_issue_metrics.sprint_id
         and sprint_metrics_grouped.source_relation = sprint_issue_metrics.source_relation
         {% if using_teams %}
+        -- Explicit null handling ensures issues with no team assignment join correctly.
         and (
             sprint_metrics_grouped.team = sprint_issue_metrics.team
             or (sprint_metrics_grouped.team is null and sprint_issue_metrics.team is null)
