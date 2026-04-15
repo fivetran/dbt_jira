@@ -169,6 +169,8 @@ vars:
     jira_include_comments: false # Enabled by default. Disabling will remove the aggregation of comments via the `count_comments` and `conversations` columns in the `jira__issue_enhanced` table.
 ```
 
+> **Important**: After enabling or disabling any of these source variables, run a full refresh (`dbt run --full-refresh`) to prevent downstream data integrity issues.
+
 ### (Optional) Additional configurations
 
 #### Controlling conversation aggregations in `jira__issue_enhanced`
