@@ -3,7 +3,6 @@
 [PR #182](https://github.com/fivetran/dbt_jira/pull/180) includes the following updates:
 
 ## Bug Fix
-- Adds `on_schema_change='fail'` to the `jira__daily_issue_field_history` and `int_jira__pivot_daily_field_history` models to surface upstream schema changes (e.g., newly enabled fields) during incremental runs. When triggered, a `--full-refresh` is required to correctly rebuild the model and ensure a consistent schema.
 - For warehouses using the `insert_overwrite` strategy, updates the incremental filter in `jira__daily_issue_field_history` to align with the model’s partition grain. This helps prevent issues with incomplete partition coverage.
 
 ## Under the Hood
