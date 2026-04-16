@@ -166,7 +166,6 @@ vars:
     jira_using_versions: false   # Enabled by default. Disable if you do not have the versions table or do not want versions-related metrics reported.
     jira_using_priorities: false # Enabled by default. Disable if you are not using priorities in Jira.
     jira_using_teams: false # Enabled by default. Disable if you are not using teams in Jira.
-    jira_sprint_enhanced_include_teams: false # Enabled by default. Disable if you have the team table but want jira__sprint_enhanced at sprint-level granularity (one row per sprint instead of one row per team per sprint). Only applies when jira_using_teams is true.
     jira_include_comments: false # Enabled by default. Disabling will remove the aggregation of comments via the `count_comments` and `conversations` columns in the `jira__issue_enhanced` table.
 ```
 
@@ -187,6 +186,21 @@ In your `dbt_project.yml` file:
 ```yml
 vars:
   jira_include_conversations: false/true # Disabled by default for Redshift; enabled for other supported warehouses.
+```
+
+#### Controlling team-level granularity in `jira__sprint_enhanced`
+
+The `jira_sprint_enhanced_include_teams` variable controls whether the `team` column is included in `jira__sprint_enhanced` and whether metrics are broken out per team.
+
+- `jira_sprint_enhanced_include_teams`: Controls whether team-level granularity is applied in `jira__sprint_enhanced`. This variable only applies when `jira_using_teams` is also enabled.
+  - Default: `true` (one row per sprint per team).
+  - Setting this to `false` collapses all team rows into a single row per sprint, with all metrics aggregated at the sprint level. This is useful if you have the `TEAM` table synced but prefer sprint-level reporting without a team breakdown.
+
+In your `dbt_project.yml` file:
+
+```yml
+vars:
+  jira_sprint_enhanced_include_teams: false # true by default. Only applies when jira_using_teams is true.
 ```
 
 #### Define daily issue field history columns
