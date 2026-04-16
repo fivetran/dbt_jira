@@ -1,10 +1,21 @@
-# dbt_jira v1.8.0-a2
+# dbt_jira v1.9.0-a1
 
 ## Feature Update
 - Adds a new variable `jira_sprint_enhanced_include_teams` (default `true`) to control whether the team dimension is included in `jira__sprint_enhanced`. When set to `false`, the model rolls up to one row per sprint with all metrics aggregated at the sprint level. This variable only applies when `jira_using_teams` is also enabled. ([docs](https://github.com/fivetran/dbt_jira?tab=readme-ov-file#disable-models-for-non-existent-sources))
 
 ## Bug Fix
 - Fixes `jira__sprint_enhanced` where `original_estimate_seconds`, `remaining_estimate_seconds`, and `time_spent_seconds` were undercounted when multiple issues in the same sprint shared identical estimate values. The model now correctly sums estimates per issue before aggregating to the sprint level.
+
+# dbt_jira v1.8.0
+
+[PR #182](https://github.com/fivetran/dbt_jira/pull/180) includes the following updates:
+
+## Bug Fix
+- For warehouses using the `insert_overwrite` strategy, updates the incremental filter in `jira__daily_issue_field_history` to align with the model’s partition grain. This helps prevent issues with incomplete partition coverage.
+  - You must run a `--full-refresh` after upgrading to apply this fix to existing data.
+
+## Under the Hood
+- Updates integrity test for `jira__daily_sprint_issue_history` to track the last sprint-related event per day, ensuring that only sprint IDs recorded at the final event timestamp for each issue/day are included.
 
 # dbt_jira v1.8.0-a1
 
