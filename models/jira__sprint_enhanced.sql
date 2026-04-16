@@ -129,9 +129,9 @@ sprint_metrics_grouped as (
         sprint_ended_at,
         sprint_completed_at,
         board_id,
-        sum(original_estimate_seconds) as original_estimate_seconds,
-        sum(remaining_estimate_seconds) as remaining_estimate_seconds,
-        sum(time_spent_seconds) as time_spent_seconds
+        sum(coalesce(original_estimate_seconds, 0)) as original_estimate_seconds,
+        sum(coalesce(remaining_estimate_seconds, 0)) as remaining_estimate_seconds,
+        sum(coalesce(time_spent_seconds), 0) as time_spent_seconds
     from sprint_issue_estimates
     {{ dbt_utils.group_by(8 if using_teams else 7) }}
 ),

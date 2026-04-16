@@ -54,6 +54,6 @@ supported_vars:
   jira_sprint_enhanced_include_teams:
     type: boolean
     value: true
-    description: "When false, rolls up jira__sprint_enhanced to one row per sprint by removing the team dimension. Only applies when jira_using_teams is also enabled."
+    description: "When false, rolls up `jira__sprint_enhanced` to one row per sprint by removing the team dimension. Only applicable if team data is present"
     display_name: "Include Team Dimension in Sprint Enhanced"
 

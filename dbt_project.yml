@@ -24,7 +24,6 @@ vars:
     team: "{{ source('jira', 'team') }}"
     version: "{{ source('jira', 'version') }}"
     jira_issue_history_buffer: 1
-    jira_sprint_enhanced_include_teams: true
 
 analysis-paths: ["analysis"]
 
