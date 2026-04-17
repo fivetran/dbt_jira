@@ -1,5 +1,7 @@
 # dbt_jira v1.9.0-a1
 
+[PR #184](https://github.com/fivetran/dbt_jira/pull/184) includes the following updates:
+
 ## Feature Update
 - Adds a new variable `jira_sprint_enhanced_include_teams` (default `true`) to control whether the team dimension is included in `jira__sprint_enhanced`. When set to `false`, the model rolls up to one row per sprint with all metrics aggregated at the sprint level. This variable only applies when `jira_using_teams` is also enabled. ([docs](https://github.com/fivetran/dbt_jira?tab=readme-ov-file#disable-models-for-non-existent-sources))
 
@@ -8,7 +10,7 @@
 
 # dbt_jira v1.8.0
 
-[PR #182](https://github.com/fivetran/dbt_jira/pull/180) includes the following updates:
+[PR #182](https://github.com/fivetran/dbt_jira/pull/182) includes the following updates:
 
 ## Bug Fix
 - For warehouses using the `insert_overwrite` strategy, updates the incremental filter in `jira__daily_issue_field_history` to align with the model’s partition grain. This helps prevent issues with incomplete partition coverage.
