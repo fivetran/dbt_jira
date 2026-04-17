@@ -66,7 +66,7 @@ Include the following jira package version in your `packages.yml` file:
 ```yaml
 packages:
   - package: fivetran/jira
-    version: 1.8.0-a1
+    version: 1.9.0-a1
 ```
 
 > All required sources and staging models are now bundled into this transformation package. Do not include `fivetran/jira_source` in your `packages.yml` since this package has been deprecated.
@@ -169,6 +169,8 @@ vars:
     jira_include_comments: false # Enabled by default. Disabling will remove the aggregation of comments via the `count_comments` and `conversations` columns in the `jira__issue_enhanced` table.
 ```
 
+> **Important**: After enabling or disabling any of these source variables, run a full refresh (`dbt run --full-refresh`) to prevent downstream data integrity issues.
+
 ### (Optional) Additional configurations
 
 #### Controlling conversation aggregations in `jira__issue_enhanced`
@@ -184,6 +186,21 @@ In your `dbt_project.yml` file:
 ```yml
 vars:
   jira_include_conversations: false/true # Disabled by default for Redshift; enabled for other supported warehouses.
+```
+
+#### Controlling team-level granularity in `jira__sprint_enhanced`
+
+The `jira_sprint_enhanced_include_teams` variable controls whether the `team` column is included in `jira__sprint_enhanced` and whether metrics are broken out per team.
+
+- `jira_sprint_enhanced_include_teams`: Controls whether team-level granularity is applied in `jira__sprint_enhanced`. This variable only applies when `jira_using_teams` is also enabled.
+  - Default: `true` (one row per sprint per team).
+  - Setting this to `false` collapses all team rows into a single row per sprint, with all metrics aggregated at the sprint level. This is useful if you have the `TEAM` table synced but prefer sprint-level reporting without a team breakdown.
+
+In your `dbt_project.yml` file:
+
+```yml
+vars:
+  jira_sprint_enhanced_include_teams: false # true by default. Only applies when jira_using_teams is true.
 ```
 
 #### Define daily issue field history columns
