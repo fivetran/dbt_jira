@@ -1,3 +1,8 @@
+# dbt_jira v1.8.1
+
+## Bug Fix
+- Adds DuckDB support for median issue metrics by using the aggregate percentile path already used by Postgres. This prevents DuckDB from receiving the unsupported `percentile_cont(...) within group (...) over (...)` window form.
+
 # dbt_jira v1.8.0
 
 [PR #182](https://github.com/fivetran/dbt_jira/pull/180) includes the following updates:

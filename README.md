@@ -264,7 +264,7 @@ This dbt package is dependent on the following dbt packages. These dependencies 
 ```yml
 packages:
     - package: fivetran/fivetran_utils
-      version: [">=0.4.0", "<0.5.0"]
+      version: [">=0.4.12", "<0.5.0"]
 
     - package: dbt-labs/dbt_utils
       version: [">=1.0.0", "<2.0.0"]
