@@ -15,10 +15,10 @@ calculate_medians as (
         round(cast({{ fivetran_utils.percentile(percentile_field='case when resolved_at is null then last_assignment_duration_seconds end',
                     partition_field='assignee_user_id', percent='0.5') }} as {{ dbt.type_numeric() }}), 0) as median_age_currently_open_seconds
     from issue
-    {% if target.type == 'postgres' %} group by 1, 2 {% endif %}
+    {% if target.type in ('postgres', 'duckdb') %} group by 1, 2 {% endif %}
 ),
 
--- grouping because the medians were calculated using window functions (except postgres)
+-- grouping because the medians were calculated using window functions (except postgres and duckdb)
 median_metrics as (
 
     select
