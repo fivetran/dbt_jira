@@ -1,3 +1,16 @@
+# dbt_jira v1.9.0
+
+[PR #186](https://github.com/fivetran/dbt_jira/pull/186) includes the following updates:
+
+## Feature Update
+- Adds configurable table variable `Include Team Dimension in Sprint Enhanced` to control whether the `team` column is included in `jira__sprint_enhanced`. Variable is set to `true` by default. When set to `false`, the table rolls up to one row per sprint with all metrics aggregated at the sprint level. Only applicable if the `team` table is synced in your connector. 
+
+- **For dbt Core users**: Introduces `jira_sprint_enhanced_include_teams` variable to control whether the team dimension is included in `jira__sprint_enhanced`. Set to `true` by default. When set to `false`, the model rolls up to one row per sprint with all metrics aggregated at the sprint level. This variable only applies when `jira_using_teams` is also enabled. [See the README on how to configure this variable](https://github.com/fivetran/dbt_jira?tab=readme-ov-file#disable-models-for-non-existent-sources).
+
+
+## Bug Fix
+- Fixes an issue in `jira__sprint_enhanced` where `original_estimate_seconds`, `remaining_estimate_seconds`, and `time_spent_seconds` were undercounted when multiple issues in the same sprint shared identical estimate values. The model now correctly sums estimates per issue before aggregating to the sprint level.
+
 # dbt_jira v1.9.0-a1
 
 [PR #184](https://github.com/fivetran/dbt_jira/pull/184) includes the following updates:
