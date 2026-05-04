@@ -39,7 +39,7 @@ By default, this package materializes the following final tables:
 | [jira__issue_enhanced](https://fivetran.github.io/dbt_jira/#!/model/model.jira.jira__issue_enhanced) | One row per Jira issue with enriched details about assignee, reporter, sprint, project, and current status, plus metrics on assignments and re-openings. <br><br>**Example Analytics Questions:**<br><ul><li>How many issues are currently blocked and who owns them?</li><li>What's the average time to resolution for high-priority bugs by assignee?</li></ul> |
 | [jira__project_enhanced](https://fivetran.github.io/dbt_jira/#!/model/model.jira.jira__project_enhanced) | One row per project with team member details, issue counts, work velocity metrics, and project scope information. <br><br>**Example Analytics Questions:**<br><ul><li>Which projects have the highest velocity in terms of issues closed per sprint?</li><li>What is the ratio of unassigned open tickets to assigned open tickets by project?</li></ul> |
 | [jira__user_enhanced](https://fivetran.github.io/dbt_jira/#!/model/model.jira.jira__user_enhanced) | One row per user with metrics on open and completed issues, and individual work velocity. <br><br>**Example Analytics Questions:**<br><ul><li>Who are the top performers in terms of issues resolved per month?</li><li>Which team members have the highest workload based on open issue count and how long, on average, have those issues been open?</li></ul> |
-| [jira__sprint_enhanced](https://fivetran.github.io/dbt_jira/#!/model/model.jira.jira__sprint_enhanced) | One row per sprint with metrics on issues created, resolved, and carried over, plus story point estimates. <br><br>**Example Analytics Questions:**<br><ul><li>Which sprints had the highest velocity and what made them successful?</li><li>How many story points were planned vs. completed across recent sprints?</li><li>What percentage of issues are typically carried over from sprint to sprint?</li></ul> |
+| [jira__sprint_enhanced](https://fivetran.github.io/dbt_jira/#!/model/model.jira.jira__sprint_enhanced) | One row per sprint with metrics on issues created, resolved, and carried over, plus story point estimates. If teams are enabled, granularity is one row per team per sprint. <br><br>**Example Analytics Questions:**<br><ul><li>Which sprints had the highest velocity and what made them successful?</li><li>How many story points were planned vs. completed across recent sprints?</li><li>What percentage of issues are typically carried over from sprint to sprint?</li></ul> |
 | [jira__daily_sprint_issue_history](https://fivetran.github.io/dbt_jira/#!/model/model.jira.jira__daily_sprint_issue_history) | Daily snapshot of each sprint showing all associated issues from sprint start to end, useful for tracking progress over time. <br><br>**Example Analytics Questions:**<br><ul><li>How many issues were active in each sprint on any given day?</li><li>What's the daily count of open vs. completed issues per sprint?</li><li>Which sprints had issues added or removed mid-sprint?</li></ul> |
 
 ¹ Each Quickstart transformation job run materializes these models if all components of this data model are enabled. This count includes all staging, intermediate, and final models materialized as `view`, `table`, or `incremental`.
@@ -66,7 +66,7 @@ Include the following jira package version in your `packages.yml` file:
 ```yaml
 packages:
   - package: fivetran/jira
-    version: [">=1.8.0", "<1.9.0"]
+    version: [">=1.9.0", "<1.10.0"]
 ```
 
 > All required sources and staging models are now bundled into this transformation package. Do not include `fivetran/jira_source` in your `packages.yml` since this package has been deprecated.
@@ -186,6 +186,21 @@ In your `dbt_project.yml` file:
 ```yml
 vars:
   jira_include_conversations: false/true # Disabled by default for Redshift; enabled for other supported warehouses.
+```
+
+#### Controlling team-level granularity in `jira__sprint_enhanced`
+
+The `jira_sprint_enhanced_include_teams` variable controls whether the `team` column is included in `jira__sprint_enhanced` and whether metrics are broken out per team.
+
+- `jira_sprint_enhanced_include_teams`: Controls whether team-level granularity is applied in `jira__sprint_enhanced`. This variable only applies when `jira_using_teams` is also enabled.
+  - Default: `true` (one row per sprint per team).
+  - Setting this to `false` collapses all team rows into a single row per sprint, with all metrics aggregated at the sprint level. This is useful if you have the `TEAM` table synced but prefer sprint-level reporting without a team breakdown.
+
+In your `dbt_project.yml` file:
+
+```yml
+vars:
+  jira_sprint_enhanced_include_teams: false # true by default. Only applies when jira_using_teams is true.
 ```
 
 #### Define daily issue field history columns
