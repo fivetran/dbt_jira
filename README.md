@@ -194,7 +194,7 @@ The `jira_sprint_enhanced_include_teams` variable controls whether the `team` co
 
 - `jira_sprint_enhanced_include_teams`: Controls whether team-level granularity is applied in `jira__sprint_enhanced`. This variable only applies when `jira_using_teams` is also enabled.
   - Default: `true` (one row per sprint per team).
-  - Setting this to `false` collapses all team rows into a single row per sprint, with all metrics aggregated at the sprint level. This is useful if youi prefer sprint-level reporting without a team breakdown.
+  - Setting this to `false` collapses all team rows into a single row per sprint, with all metrics aggregated at the sprint level. This is useful if you prefer sprint-level reporting without a team breakdown.
 
 In your `dbt_project.yml` file:
 
