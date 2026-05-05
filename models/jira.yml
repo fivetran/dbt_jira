@@ -340,8 +340,7 @@ models:
 
   - name: jira__sprint_enhanced
     description: >
-      This model provides enhanced sprint-level metrics in Jira, incorporating data from sprints,
-      sprint-related issue history, and sprint-based story points tracking. If teams are enabled, granularity is one row per team per sprint.
+      One row per sprint per team with metrics on issues created, resolved, and carried over, plus story point estimates. If teams are disabled, granularity is one row per sprint.
     columns:
       - name: source_relation
         description: "{{ doc('source_relation') }}"
@@ -375,6 +374,8 @@ models:
         description: The remaining estimate of how long working on the issues in this sprint would take, in seconds.
       - name: time_spent_seconds
         description: The time that was spent working on the issues in the sprint in seconds.
+      - name: team
+        description: Name of the team with the associated issue metrics for the sprint. Can be null for issues not assigned to a team.
 
   - name: jira__user_enhanced
     description: >
