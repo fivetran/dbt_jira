@@ -15,7 +15,7 @@ include_dbt_compile: true
 test_scenarios:
   - name: "Default"
     vars: {}
-    include_incremental: false
+    include_incremental: true
 
   - name: "features disabled field grain"
     vars:
@@ -25,4 +25,4 @@ test_scenarios:
       jira_using_components: false
       jira_using_versions: false
       jira_field_grain: 'field_name'
-    include_incremental: false
+    include_incremental: true
