@@ -18,15 +18,7 @@ This dbt package transforms data from Fivetran's Jira connector into analytics-r
   - `>=1.3.0, <3.0.0`
 
 ## What does this dbt package do?
-This package enables you to better understand the workload, performance, and velocity of your team's work using Jira issues. It creates enriched models with metrics focused on daily issue history, workflow analysis, and team performance.
-
-### Automatic field label resolution
-Jira's raw synced data stores field values as IDs. For example, the `ISSUE` table contains a `status` value of `10005` rather than the human-readable label `In Progress`. To build reports from raw data, you would need to manually join across dimension tables like `STATUS`, `PRIORITY`, `RESOLUTION`, `SPRINT`, and `FIELD_OPTION` to retrieve the display names your team actually recognizes.
-
-This package handles all of those joins for you. The enhanced models resolve both standard and custom field IDs to their label values automatically, so you can query results like `status = 'In Progress'` or `priority = 'High'` directly without writing any join logic yourself. This applies to:
-- **Standard fields**: status, priority, resolution, issue type, project, sprint name, assignee, and reporter names
-- **Custom fields**: select lists, multi-select fields, radio buttons, cascading selects, and other fields tracked through the `FIELD_OPTION` table
-- **Historical values**: the daily and timestamp field history models also resolve labels, so you can analyze how fields changed over time using readable names rather than IDs
+This package enables you to better understand the workload, performance, and velocity of your team's work using Jira issues. It creates enriched models with metrics focused on daily issue history, workflow analysis, and team performance. The package also resolves IDs to their human-readable labels across standard fields, custom fields, and historical values, so you can query `status = 'In Progress'` instead of `status = 10005` without writing any join logic yourself.
 
 ### Output schema
 Final output tables are generated in the following target schema:
