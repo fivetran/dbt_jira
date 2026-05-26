@@ -18,7 +18,7 @@ This dbt package transforms data from Fivetran's Jira connector into analytics-r
   - `>=1.3.0, <3.0.0`
 
 ## What does this dbt package do?
-This package enables you to better understand the workload, performance, and velocity of your team's work using Jira issues. It creates enriched models with metrics focused on daily issue history, workflow analysis, and team performance.
+This package enables you to better understand the workload, performance, and velocity of your team's work using Jira issues. It creates enriched models with metrics focused on daily issue history, workflow analysis, and team performance. The package also resolves IDs to their human-readable labels across standard fields, custom fields, and historical values, so you can query `status = 'In Progress'` instead of `status = 10005` without writing any join logic yourself.
 
 ### Output schema
 Final output tables are generated in the following target schema:
