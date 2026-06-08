@@ -20,7 +20,7 @@ order_versions as (
         *,
         -- using rank so batches stick together
         rank() over (
-            partition by field_id, issue_id {{ jira.partition_by_source_relation() }}
+            partition by field_id, issue_id {{ fivetran_utils.partition_by_source_relation(package_name='jira') }}
             order by updated_at desc
             ) as row_num
     from version_history

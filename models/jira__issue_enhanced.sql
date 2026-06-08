@@ -17,7 +17,7 @@ daily_issue_field_history as (
 
     select
         *,
-        row_number() over (partition by issue_id {{ jira.partition_by_source_relation() }} order by date_day desc) = 1 as latest_record
+        row_number() over (partition by issue_id {{ fivetran_utils.partition_by_source_relation(package_name='jira') }} order by date_day desc) = 1 as latest_record
     from {{ ref('jira__daily_issue_field_history')}}
 
 ),
