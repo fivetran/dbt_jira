@@ -20,7 +20,7 @@ calculate_medians as (
                     partition_field='project_id', percent='0.5') }} as {{ dbt.type_numeric() }} ), 0) as median_age_currently_open_assigned_seconds
     from issue
 
-    {% if target.type == 'postgres' %} group by project_id {{ fivetran_utils.partition_by_source_relation(package_name='jira') }} {% endif %}
+    {% if target.type == 'postgres' %} group by project_id, source_relation {% endif %}
 ),
 
 -- grouping because the medians were calculated using window functions (except in postgres)
