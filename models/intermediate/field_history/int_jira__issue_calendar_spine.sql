@@ -1,20 +1,3 @@
-Looking at the SQL file, I can see it contains references to `source_relation` but none of them match the patterns you specified for updating partition by clauses. Let me examine each occurrence:
-
-1. Line 32: `issue_history_scd.source_relation,` - This is a SELECT clause column
-2. Line 47: `and issue_history_scd.source_relation = issue.source_relation` - This is a JOIN condition
-3. Line 54: `issue_dates.source_relation,` - This is a SELECT clause column
-4. Line 67: `source_relation,` - This is a GROUP BY clause column
-5. Line 73: `source_relation,` - This is a SELECT clause column
-6. Line 74: `{{ dbt_utils.generate_surrogate_key(['date_day','issue_id','source_relation']) }} as issue_day_id,` - This is inside a surrogate key generation function
-
-None of these are partition by clauses that need to be updated according to your patterns. The file does not contain any:
-- `partition by` statements with `source_relation`
-- Macro calls to `jira.partition_by_source_relation()` or `partition_by_source_relation()`
-- Inline Jinja conditionals for source_relation partitioning
-
-Since there are no partition by clauses with source_relation to update, the file remains unchanged:
-
-```sql
 with spine as (
 
     -- depends_on: {{ ref('stg_jira__issue_tmp') }}
