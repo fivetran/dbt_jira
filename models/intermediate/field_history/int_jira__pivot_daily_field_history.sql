@@ -99,6 +99,32 @@ combined_multiselect_history as (
     {% endif %}
 ),
 
+order_multiselect_history as (
+    -- keep one record per value per timestamp so duplicate syncs don't get double-counted by the string_agg below
+    select
+        *,
+        row_number() over (
+            partition by issue_id, field_id, field_name, field_value, updated_at {{ jira.partition_by_source_relation() }}
+            order by updated_at
+        ) as row_num
+    from combined_multiselect_history
+),
+
+deduped_multiselect_history as (
+
+    select
+        field_id,
+        field_name,
+        issue_id,
+        source_relation,
+        updated_at,
+        updated_at_week,
+        date_day,
+        field_value
+    from order_multiselect_history
+    where row_num = 1
+),
+
 issue_multiselect_batch_history as (
 
     select
@@ -111,7 +137,7 @@ issue_multiselect_batch_history as (
         date_day,
         {{ fivetran_utils.string_agg('field_value', "', '") }} as field_values
 
-    from combined_multiselect_history
+    from deduped_multiselect_history
 
     {{ dbt_utils.group_by(7) }}
 ),
