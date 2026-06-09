@@ -3,7 +3,7 @@
 [PR #190](https://github.com/fivetran/dbt_jira/pull/190) includes the following update:
 
 ## Bug Fix
-- Fixes duplicate `issue_multiselect_history` records (same field, issue, and timestamp) being double-counted, which fanned out sprint rows in `jira__daily_sprint_issue_history`.
+- Removes duplicate `issue_multiselect_history` records to avoid fanout in `jira__daily_sprint_issue_history`. 
   - You must run a `--full-refresh` after upgrading to apply this fix to existing data.
 
 # dbt_jira v1.9.0
