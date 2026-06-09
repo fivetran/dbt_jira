@@ -63,7 +63,7 @@ with change_data as (
             order by updated_at asc rows between unbounded preceding and current row) as {{ col }}
         {% endfor %}
 
-    from fill_values
+    from set_values
 
 )
 
