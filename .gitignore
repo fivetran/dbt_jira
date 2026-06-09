@@ -1,4 +1,5 @@
 # dbt
+worktrees/
 **/package-lock.yml
 package-lock.yml
 .dbt/

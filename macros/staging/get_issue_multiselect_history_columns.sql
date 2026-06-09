@@ -12,7 +12,7 @@
 
 {% if target.type == 'redshift' %}
  {{ columns.append( {"name": "time", "datatype": dbt.type_timestamp(), "quote": True } ) }}
-{% elif target.type == 'snowflake' %}
+{% elif target.type == 'snowflake' and not var('fivetran_using_source_casing', false) %}
  {{ columns.append( {"name": "TIME", "datatype": dbt.type_timestamp(), "quote": True } ) }}
 {% else %}
  {{ columns.append( {"name": "time", "datatype": dbt.type_timestamp()} ) }}
