@@ -1,6 +1,6 @@
 {{ config(enabled=var('jira_include_comments', True)) }}
 
-{% set comment_render = "comment.created_at || '  -  ' || jira_user.user_display_name || ':  ' || comment.body" %}
+{% set comment_render = "cast(comment.created_at as " ~ dbt.type_string() ~ ") || '  -  ' || jira_user.user_display_name || ':  ' || comment.body" %}
 {% set default_char_limit = 65535 if target.type == 'redshift' else 16777216 %}
 {% set conversation_char_limit = var('jira_conversation_char_limit', default_char_limit) %}
 {% set guard_conversation = target.type in ['snowflake', 'bigquery', 'redshift'] %}
