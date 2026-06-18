@@ -178,14 +178,19 @@ vars:
 The `dbt_jira` package offers variables to enable or disable conversation aggregations in the `jira__issue_enhanced` table. These settings allow you to manage the amount of data processed and avoid potential performance or limit issues with large datasets.
 
 - `jira_include_conversations`: Controls only the `conversation` [column](https://github.com/fivetran/dbt_jira/blob/main/models/jira.yml#L125-L127) in the `jira__issue_enhanced` table. 
-  - Default: Disabled for Redshift due to string size constraints; enabled for other supported warehouses.
+  - Default: Disabled for Redshift due to string size constraints; enabled for all other supported warehouses.
   - Setting this to `false` removes the `conversation` column but retains the `count_comments` field if `jira_include_comments` is still enabled. This is useful if you want a comment count without the full conversation details.
+  - On Snowflake and BigQuery, the package automatically guards against string length limit errors. Issues having aggregated comment text that exceed the warehouse limit return `'conversation too long to render'` instead of failing. The `count_comments` field is unaffected. Redshift users who explicitly enable conversations via this variable receive the same protection.
+
+- `jira_conversation_char_limit`: Sets the character threshold used on Snowflake, BigQuery, and Redshift to detect conversations that would exceed the warehouse string length limit. Conversations whose total character count exceeds this value return `'conversation too long to render'` for the `conversation` field.
+  - Default: `65535` on Redshift (VARCHAR max); `16777216` on Snowflake and BigQuery (Snowflake's documented LISTAGG hard limit)
 
 In your `dbt_project.yml` file:
 
 ```yml
 vars:
   jira_include_conversations: false/true # Disabled by default for Redshift; enabled for other supported warehouses.
+  jira_conversation_char_limit: 16777216 # Override the default character limit for conversation aggregation.
 ```
 
 #### Controlling team-level granularity in `jira__sprint_enhanced`
