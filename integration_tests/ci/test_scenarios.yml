@@ -33,3 +33,4 @@ test_scenarios:
       jira_include_conversations: false
     include_incremental: false
     warehouses: ["snowflake", "bigquery", "postgres", "databricks"]
+
