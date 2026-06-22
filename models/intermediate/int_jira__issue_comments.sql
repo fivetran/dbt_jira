@@ -1,9 +1,9 @@
 {{ config(enabled=var('jira_include_comments', True)) }}
 
 {% set comment_render = "cast(comment.created_at as " ~ dbt.type_string() ~ ") || '  -  ' || jira_user.user_display_name || ':  ' || comment.body" %}
-{% set default_char_limit = 65535 if target.type == 'redshift' else 16777216 %}
-{% set conversation_char_limit = var('jira_conversation_char_limit', default_char_limit) %}
-{% set guard_conversation = target.type in ['snowflake', 'bigquery', 'redshift'] %}
+
+-- Character limit of 16MB for Snowflake and BigQuery, which error when the conversation exceeds the char limit for a string. Redshift is excluded (see DECISIONLOG for details).
+{% set conversation_char_limit = var('jira_conversation_char_limit', 16777216) %}
 
 with comment as (
 
@@ -27,14 +27,14 @@ agg_comments as (
     count(comment.comment_id) as count_comments
 
     {%- if var('jira_include_conversations', target.type != 'redshift') %}
-        {% if guard_conversation -%}
-        , case when sum(length({{ comment_render }} || '\n')) <= {{ conversation_char_limit }}
-            then {{ fivetran_utils.string_agg(comment_render, "'\\n'") }}
-            else 'conversation too long to render'
-        end as conversation
-        {%- else %}
-        , {{ fivetran_utils.string_agg(comment_render, "'\\n'") }} as conversation
-        {%- endif %} 
+    {%- if target.type in ['snowflake', 'bigquery'] %}
+    , case when sum(length({{ comment_render }} || '\n')) <= {{ conversation_char_limit }}
+        then {{ fivetran_utils.string_agg(comment_render, "'\\n'") }}
+        else 'conversation too long to render'
+    end as conversation
+    {%- else %}
+    , {{ fivetran_utils.string_agg(comment_render, "'\\n'") }} as conversation
+    {%- endif %}
     {% endif %}
 
     from comment

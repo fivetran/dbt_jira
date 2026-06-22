@@ -2,16 +2,16 @@
 In creating this package, which is meant for a wide range of use cases, we had to take opinionated stances on a few different questions we came across during development. We've consolidated significant choices we made here, and will continue to update as the package evolves.
 
 ## Conversation Aggregation Guard Against String Length Limits
-Jira issues with a large volume of comments can cause `string_agg` to exceed a warehouse's string length limit, producing a runtime error (`String '...' is too long and would be truncated`). Rather than disabling the `conversation` field entirely or letting runs fail, the package uses a single-pass `CASE WHEN` that sums the exact rendered character length of each comment row (`length(rendered_comment || '\n')`) before aggregating. If the total would exceed the warehouse limit, `conversation` returns `'conversation too long to render'` instead. The `count_comments` field is always populated regardless.
+Jira issues with a large volume of comments can cause the `conversation` field to exceed the warehouse string size limit, resulting in a runtime error. To prevent this, the package now checks the total conversation length for each issue before aggregation on Snowflake and BigQuery.
 
-The threshold is warehouse-specific and exposed as `jira_conversation_char_limit` for users who need to lower it. See the [README](https://github.com/fivetran/dbt_jira#controlling-conversation-aggregations-in-jira__issue_enhanced) for configuration details.
+If an issue exceeds the configured limit, `conversation` returns `'conversation too long to render'` instead of failing the model. The `count_comments` field is still populated, so users can identify issues with large comment volumes even when the full conversation cannot be rendered.
+
+The default threshold is `16,777,216` characters for Snowflake and BigQuery. You can override this value with `jira_conversation_char_limit` if you need a lower threshold. See the [README](https://github.com/fivetran/dbt_jira#controlling-conversation-aggregations-in-jira__issue_enhanced) for configuration details.
 
 Per-warehouse behavior:
-- **Snowflake**: guard active, default limit 16,777,216 chars (documented LISTAGG hard limit)
-- **BigQuery**: guard active, default limit 16,777,216 chars
-- **Redshift**: guard active, default limit 65,535 chars (VARCHAR max); conversations remain disabled by default via `jira_include_conversations` to avoid a schema change for existing users, but enabling them is now safe
-- **Postgres**: no guard — TEXT supports ~1 GB, overflow is not a practical concern
-- **Databricks**: no guard — Spark STRING supports ~2 GB and `collect_set` deduplicates rows before aggregating, making overflow extremely unlikely
+- **Snowflake and BigQuery**: Overflow protection is enabled by default. If an issue has enough comments for `conversation` to exceed the warehouse string size limit, `conversation` returns `'conversation too long to render'` instead of failing. The default limit is `16,777,216` characters.
+- **Redshift**: Overflow protection is not currently applied. Redshift has a much lower string size limit, but it does not support the SQL pattern used by this guard, so adding the same protection would require a more significant model change. Conversations are disabled on Redshift by default with `jira_include_conversations`, so overflow is only a risk for users who explicitly enable conversations and have issues with very large comment volumes. If you need Redshift overflow protection, [open a GitHub issue](https://github.com/fivetran/dbt_jira/issues/new/choose).
+- **Postgres and Databricks**: Overflow protection is not applied because their string/text limits make this issue unlikely in practice.
 
 ## Enhancing Jira Sprint Reporting with Flexible Metrics
 To improve sprint reporting in the Jira dbt package, we introduced two new models, `jira__daily_sprint_issue_history` and `jira__sprint_enhanced`, designed to capture key sprint metrics such as velocity, time tracking, and story point completion.

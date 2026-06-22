@@ -27,14 +27,7 @@ test_scenarios:
       jira_field_grain: 'field_name'
     include_incremental: true
 
-  # Redshift defaults conversations to false; enabling to test the overflow guard.
-  - name: "conversations enabled"
-    vars:
-      jira_include_conversations: true
-    include_incremental: false
-    warehouses: ["redshift"]
-
-  # All other warehouses default conversations to true; test the disabled path.
+  # Redshift is false by default
   - name: "conversations disabled"
     vars:
       jira_include_conversations: false
