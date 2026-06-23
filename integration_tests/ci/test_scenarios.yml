@@ -34,3 +34,8 @@ test_scenarios:
     include_incremental: false
     warehouses: ["snowflake", "bigquery", "postgres", "databricks"]
 
+  - name: "MDLS"
+    vars:
+      fivetran_using_source_casing: true
+    include_incremental: false
+    include_dbt_seed: true

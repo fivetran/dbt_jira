@@ -1,15 +1,15 @@
 with spine as (
 
-    -- depends_on: {{ ref('stg_jira__issue_tmp') }}
+    -- depends_on: {{ ref('stg_jira__issue') }}
     {% if execute and flags.WHICH in ('run', 'build') %}
     {% set first_date_query %}
     -- start at the first created issue
         select
             coalesce(
-                min(cast(created as date)),
+                min(cast(created_at as date)),
                 cast({{ dbt.dateadd("month", -1, "current_date") }} as date)
             ) as min_date
-        from {{ ref('stg_jira__issue_tmp') }}
+        from {{ ref('stg_jira__issue') }}
     {% endset %}
 
     {%- set first_date = dbt_utils.get_single_value(first_date_query) %}

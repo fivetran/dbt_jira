@@ -73,7 +73,7 @@ create_validity_periods as (
         updated_at as valid_from,
         -- Next update becomes valid_until for this record
         lead(updated_at) over (
-            partition by issue_id {{ jira.partition_by_source_relation() }}
+            partition by issue_id {{ fivetran_utils.partition_by_source_relation(package_name='jira') }}
             order by updated_at
         ) as valid_until,
         updated_at_week,

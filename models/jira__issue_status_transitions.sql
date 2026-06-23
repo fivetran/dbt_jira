@@ -8,7 +8,7 @@ with status_changes_only as (
     valid_from,
     valid_until,
     -- Track previous status to identify actual changes
-    lag(status) over (partition by issue_id {{ jira.partition_by_source_relation() }} order by valid_from) as previous_status
+    lag(status) over (partition by issue_id {{ fivetran_utils.partition_by_source_relation(package_name='jira') }} order by valid_from) as previous_status
 
   from {{ ref('jira__timestamp_issue_field_history') }}
 ),
@@ -23,16 +23,16 @@ issue_status_history as (
     valid_from,
     -- Recalculate valid_until based on next actual status change
     coalesce(
-      lead(valid_from) over (partition by issue_id {{ jira.partition_by_source_relation() }} order by valid_from),
+      lead(valid_from) over (partition by issue_id {{ fivetran_utils.partition_by_source_relation(package_name='jira') }} order by valid_from),
       {{ dbt.current_timestamp() }}
     ) as valid_until,
     previous_status,
 
     -- Current status indicator: if no next status change, this is current
-    case when lead(valid_from) over (partition by issue_id {{ jira.partition_by_source_relation() }} order by valid_from) is null then true else false end as is_current_status,
+    case when lead(valid_from) over (partition by issue_id {{ fivetran_utils.partition_by_source_relation(package_name='jira') }} order by valid_from) is null then true else false end as is_current_status,
 
     -- Calculate seconds in each status period using recalculated valid_until
-    {{ dbt.datediff('valid_from', 'coalesce(lead(valid_from) over (partition by issue_id ' ~ jira.partition_by_source_relation() ~ ' order by valid_from), ' ~ dbt.current_timestamp() ~ ')', 'second') }} as seconds_in_status
+    {{ dbt.datediff('valid_from', 'coalesce(lead(valid_from) over (partition by issue_id ' ~ fivetran_utils.partition_by_source_relation(package_name='jira') ~ ' order by valid_from), ' ~ dbt.current_timestamp() ~ ')', 'second') }} as seconds_in_status
 
   from status_changes_only
   -- Keep first record (no previous status) OR actual status changes
@@ -53,15 +53,15 @@ status_transitions as (
     seconds_in_status,
 
     -- Sequence tracking
-    row_number() over (partition by issue_id {{ jira.partition_by_source_relation() }} order by valid_from) as status_sequence,
+    row_number() over (partition by issue_id {{ fivetran_utils.partition_by_source_relation(package_name='jira') }} order by valid_from) as status_sequence,
 
     -- Previous status tracking
     previous_status,
-    lag(status_category_name) over (partition by issue_id {{ jira.partition_by_source_relation() }} order by valid_from) as previous_status_category_name,
-    lag(valid_from) over (partition by issue_id {{ jira.partition_by_source_relation() }} order by valid_from) as previous_transition_at,
+    lag(status_category_name) over (partition by issue_id {{ fivetran_utils.partition_by_source_relation(package_name='jira') }} order by valid_from) as previous_status_category_name,
+    lag(valid_from) over (partition by issue_id {{ fivetran_utils.partition_by_source_relation(package_name='jira') }} order by valid_from) as previous_transition_at,
 
     -- Time in previous status
-    lag(seconds_in_status) over (partition by issue_id {{ jira.partition_by_source_relation() }} order by valid_from) as seconds_in_previous_status
+    lag(seconds_in_status) over (partition by issue_id {{ fivetran_utils.partition_by_source_relation(package_name='jira') }} order by valid_from) as seconds_in_previous_status
 
   from issue_status_history
 ),

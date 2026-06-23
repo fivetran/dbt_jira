@@ -1,9 +1,17 @@
-# dbt_jira v1.9.1
+# dbt_jira v1.10.1
 
 [PR #193](https://github.com/fivetran/dbt_jira/pull/193) includes the following updates:
 
 ## Bug Fix
 - Fixes a runtime error on Snowflake and BigQuery that occurred when an issue's concatenated comments exceeded the warehouse's string length limit. The `conversation` field in `jira__issue_enhanced` now returns `'conversation too long to render'` for those issues instead of failing the entire run. `count_comments` is unaffected. The character threshold defaults to 16,777,216 (Snowflake's documented LISTAGG hard limit) but can be lowered using the `jira_conversation_char_limit` variable. [See the README for configuration details](https://github.com/fivetran/dbt_jira#controlling-conversation-aggregations-in-jira__issue_enhanced) and the [DECISIONLOG](https://github.com/fivetran/dbt_jira/blob/main/DECISIONLOG.md#conversation-aggregation-guard-against-string-length-limits) for per-warehouse details.
+
+# dbt_jira v1.10.0
+
+[PR #191](https://github.com/fivetran/dbt_jira/pull/191) includes the following updates:
+
+## Under the Hood
+- Migrates the `union_connections`, `apply_source_relation`, and `partition_by_source_relation` macros to the `dbt_fivetran_utils` package.
+- Adds the `fivetran_using_source_casing` variable for case-sensitive destination support. When enabled, downstream transformations respect source casing to ensure consistent results. See the [Additional Configurations](https://github.com/fivetran/dbt_jira/#source-casing-for-case-sensitive-destinations) section of the README for details.
 
 # dbt_jira v1.9.0
 
@@ -32,7 +40,7 @@
 [PR #182](https://github.com/fivetran/dbt_jira/pull/182) includes the following updates:
 
 ## Bug Fix
-- For warehouses using the `insert_overwrite` strategy, updates the incremental filter in `jira__daily_issue_field_history` to align with the model’s partition grain. This helps prevent issues with incomplete partition coverage.
+- For warehouses using the `insert_overwrite` strategy, updates the incremental filter in `jira__daily_issue_field_history` to align with the model's partition grain. This helps prevent issues with incomplete partition coverage.
   - You must run a `--full-refresh` after upgrading to apply this fix to existing data.
 
 ## Under the Hood
@@ -608,7 +616,7 @@ This release includes the following updates.
   - Please note, if you are installing a version of `dbt_utils` in your `packages.yml` that is not in the range above then you will encounter a package dependency error.
 
 # dbt_jira v0.6.0
-## 🚨 Breaking Changes 🚨
+## 🚨 Breaking Changes
 - This release of the `dbt_jira` packages implements changes to the incremental logic within various models highlighted in the Bug Fixes section below. As such, a `dbt run --full-refresh` will be required after upgrading this dependency for this package in your `packages.yml`.
 ## Bug Fixes
 - Corrected CTE references within `int_jira__issue_assignee_resolution`. The final cte referenced was previously selecting from `issue_field_history` when it should have been selecting from `filtered`. ([#45](https://github.com/fivetran/dbt_jira/pull/45))

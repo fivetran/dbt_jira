@@ -14,7 +14,7 @@ fields as (
                 staging_columns=get_issue_link_columns()
             )
         }}
-        {{ jira.apply_source_relation() }}
+        {{ fivetran_utils.apply_source_relation(package_name='jira') }}
     from base
 ),
 
