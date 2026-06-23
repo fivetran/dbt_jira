@@ -153,7 +153,7 @@ set_values as (
         joined.issue_id,
         joined.source_relation,
         joined.status_id,
-        sum( case when joined.status_id is null then 0 else 1 end) over ( partition by issue_id {{ jira.partition_by_source_relation(alias='joined') }}
+        sum( case when joined.status_id is null then 0 else 1 end) over ( partition by issue_id {{ fivetran_utils.partition_by_source_relation(package_name='jira', alias='joined') }}
             order by date_day rows unbounded preceding) as status_id_field_partition
 
         -- list of exception columns
@@ -162,29 +162,29 @@ set_values as (
         {% for col in pivot_data_columns %}
             {% if col.name|lower == 'components' and var('jira_using_components', True) %}
             , coalesce(components.component_name, joined.components) as components
-            , sum(case when joined.components is null then 0 else 1 end) over (partition by issue_id {{ jira.partition_by_source_relation(alias='joined') }} order by date_day rows unbounded preceding) as component_field_partition
+            , sum(case when joined.components is null then 0 else 1 end) over (partition by issue_id {{ fivetran_utils.partition_by_source_relation(package_name='jira', alias='joined') }} order by date_day rows unbounded preceding) as component_field_partition
 
             {% elif col.name|lower == 'issue_type' %}
             , coalesce(issue_types.issue_type_name, joined.issue_type) as issue_type
-            , sum(case when joined.issue_type is null then 0 else 1 end) over (partition by issue_id {{ jira.partition_by_source_relation(alias='joined') }} order by date_day rows unbounded preceding) as issue_type_field_partition
+            , sum(case when joined.issue_type is null then 0 else 1 end) over (partition by issue_id {{ fivetran_utils.partition_by_source_relation(package_name='jira', alias='joined') }} order by date_day rows unbounded preceding) as issue_type_field_partition
 
             {% elif col.name|lower == 'team' and var('jira_using_teams', True) %}
             , coalesce(teams.team_name, joined.team) as team
-            , sum(case when joined.team is null then 0 else 1 end) over ( partition by issue_id {{ jira.partition_by_source_relation(alias='joined') }}
+            , sum(case when joined.team is null then 0 else 1 end) over ( partition by issue_id {{ fivetran_utils.partition_by_source_relation(package_name='jira', alias='joined') }}
                 order by date_day rows unbounded preceding) as team_field_partition
 
             {% elif col.name|lower == 'project' %}
             , coalesce(projects.project_name, joined.project) as project
-            , sum(case when joined.project is null then 0 else 1 end) over (partition by issue_id {{ jira.partition_by_source_relation(alias='joined') }} order by date_day rows unbounded preceding) as project_field_partition
+            , sum(case when joined.project is null then 0 else 1 end) over (partition by issue_id {{ fivetran_utils.partition_by_source_relation(package_name='jira', alias='joined') }} order by date_day rows unbounded preceding) as project_field_partition
 
             {% elif col.name|lower == 'assignee' %}
             , coalesce(users.user_display_name, joined.assignee) as assignee
-            , sum(case when joined.assignee is null then 0 else 1 end) over (partition by issue_id {{ jira.partition_by_source_relation(alias='joined') }} order by date_day rows unbounded preceding) as assignee_field_partition
+            , sum(case when joined.assignee is null then 0 else 1 end) over (partition by issue_id {{ fivetran_utils.partition_by_source_relation(package_name='jira', alias='joined') }} order by date_day rows unbounded preceding) as assignee_field_partition
 
             {% elif col.name|lower not in exception_cols %}
             , coalesce(field_option_{{ col.name }}.field_option_name, joined.{{ col.name }}) as {{ col.name }}
             -- create a batch/partition once a new value is provided
-            , sum( case when joined.{{ col.name }} is null then 0 else 1 end) over ( partition by issue_id {{ jira.partition_by_source_relation(alias='joined') }}
+            , sum( case when joined.{{ col.name }} is null then 0 else 1 end) over ( partition by issue_id {{ fivetran_utils.partition_by_source_relation(package_name='jira', alias='joined') }}
                 order by date_day rows unbounded preceding) as {{ col.name }}_field_partition
 
             {% endif %}
@@ -234,35 +234,35 @@ fill_values as (
         issue_id,
         source_relation,
         first_value( status_id ) over (
-            partition by issue_id, status_id_field_partition {{ jira.partition_by_source_relation() }}
+            partition by issue_id, status_id_field_partition {{ fivetran_utils.partition_by_source_relation(package_name='jira') }}
             order by date_day asc rows between unbounded preceding and current row) as status_id
 
         {% for col in pivot_data_columns %}
             {% if col.name|lower == 'components' and var('jira_using_components', True) %}
             , first_value(components) over (
-                partition by issue_id, component_field_partition {{ jira.partition_by_source_relation() }}
+                partition by issue_id, component_field_partition {{ fivetran_utils.partition_by_source_relation(package_name='jira') }}
                 order by date_day asc rows between unbounded preceding and current row) as components
 
             {% elif col.name|lower == 'project' %}
             , first_value(project) over (
-                partition by issue_id, project_field_partition {{ jira.partition_by_source_relation() }}
+                partition by issue_id, project_field_partition {{ fivetran_utils.partition_by_source_relation(package_name='jira') }}
                 order by date_day asc rows between unbounded preceding and current row) as project
 
             {% elif col.name|lower == 'assignee' %}
             , first_value(assignee) over (
-                partition by issue_id, assignee_field_partition {{ jira.partition_by_source_relation() }}
+                partition by issue_id, assignee_field_partition {{ fivetran_utils.partition_by_source_relation(package_name='jira') }}
                 order by date_day asc rows between unbounded preceding and current row) as assignee
 
             {% elif col.name|lower == 'team' and var('jira_using_teams', True) %}
             , first_value(team) over (
-                partition by issue_id, team_field_partition {{ jira.partition_by_source_relation() }}
+                partition by issue_id, team_field_partition {{ fivetran_utils.partition_by_source_relation(package_name='jira') }}
                 order by date_day asc rows between unbounded preceding and current row) as team
 
             {% elif col.name|lower not in ['issue_id', 'issue_day_id', 'valid_starting_on', 'valid_starting_at_week', 'status', 'status_id', 'components', 'project', 'assignee', 'team', 'source_relation'] %}
 
             -- grab the value that started this batch/partition
             , first_value( {{ col.name }} ) over (
-                partition by issue_id, {{ col.name }}_field_partition {{ jira.partition_by_source_relation() }}
+                partition by issue_id, {{ col.name }}_field_partition {{ fivetran_utils.partition_by_source_relation(package_name='jira') }}
                 order by date_day asc rows between unbounded preceding and current row) as {{ col.name }}
 
             {% endif %}

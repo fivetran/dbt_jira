@@ -30,7 +30,7 @@ ranked_issue_sprint_team as (
         issue_id,
         team,
         row_number() over (
-            partition by source_relation, sprint_id, issue_id
+            partition by sprint_id, issue_id {{ fivetran_utils.partition_by_source_relation(package_name='jira') }}
             order by
                 case when team is not null then 0 else 1 end,
                 date_day desc

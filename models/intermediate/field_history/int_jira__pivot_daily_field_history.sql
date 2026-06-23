@@ -155,7 +155,7 @@ get_valid_dates as (
         updated_at_week as valid_starting_at_week,
 
         -- this value is valid until the next value is updated
-        lead(updated_at, 1) over(partition by issue_id, {{ var('jira_field_grain', 'field_id') }} {{ jira.partition_by_source_relation() }} order by updated_at asc) as valid_ending_at,
+        lead(updated_at, 1) over(partition by issue_id, {{ var('jira_field_grain', 'field_id') }} {{ fivetran_utils.partition_by_source_relation(package_name='jira') }} order by updated_at asc) as valid_ending_at,
         cast( {{ dbt.date_trunc('day', 'updated_at') }} as date) as valid_starting_on
 
     from combine_field_history
@@ -181,7 +181,7 @@ order_daily_values as (
         *,
         -- want to grab last value for an issue's field for each day
         row_number() over (
-            partition by valid_starting_on, issue_id, {{ var('jira_field_grain', 'field_id') }} {{ jira.partition_by_source_relation() }}
+            partition by valid_starting_on, issue_id, {{ var('jira_field_grain', 'field_id') }} {{ fivetran_utils.partition_by_source_relation(package_name='jira') }}
             order by valid_starting_at desc
             ) as row_num
 
@@ -249,4 +249,4 @@ final as (
 )
 
 select *
-from final 
+from final

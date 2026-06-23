@@ -25,7 +25,7 @@ sprint_field_history as (
         sprint.started_at,
         sprint._fivetran_synced,
         row_number() over (
-                    partition by field_history.issue_id {{ jira.partition_by_source_relation(alias='field_history') }}
+                    partition by field_history.issue_id {{ fivetran_utils.partition_by_source_relation(package_name='jira', alias='field_history') }}
                     order by field_history.updated_at desc, sprint.started_at desc
                     ) as row_num
     from field_history

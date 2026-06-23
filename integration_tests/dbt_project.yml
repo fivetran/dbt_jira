@@ -1,5 +1,5 @@
 name: 'jira_integration_tests'
-version: '1.9.0'
+version: '1.10.0'
 config-version: 2
 profile: 'integration_tests'
 
@@ -39,12 +39,12 @@ models:
     relation: true
     columns: "{{ false if target.type in ('databricks') else true }}"
   jira:
-    +schema: "{{ 'jira_integrations_tests_sqlw' if target.name == 'databricks-sql' else 'jira' }}"
-    # +schema: "jira_{{ var('directed_schema','dev') }}"
+    +schema: "jira_{{ var('directed_schema','dev') }}"
 
 seeds:
   +docs:
     show: False
+  +quote_columns: "{{ target.type == 'redshift' or var('fivetran_using_source_casing', false) }}"
   jira_integration_tests:
     +column_types:
       _fivetran_synced: timestamp
