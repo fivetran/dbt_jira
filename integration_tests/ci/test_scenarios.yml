@@ -27,6 +27,13 @@ test_scenarios:
       jira_field_grain: 'field_name'
     include_incremental: true
 
+  # Redshift is false by default
+  - name: "conversations disabled"
+    vars:
+      jira_include_conversations: false
+    include_incremental: false
+    warehouses: ["snowflake", "bigquery", "postgres", "databricks"]
+
   - name: "MDLS"
     vars:
       fivetran_using_source_casing: true

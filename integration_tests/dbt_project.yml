@@ -1,5 +1,5 @@
 name: 'jira_integration_tests'
-version: '1.10.0'
+version: '1.10.1'
 config-version: 2
 profile: 'integration_tests'
 
@@ -49,6 +49,15 @@ seeds:
     +column_types:
       _fivetran_synced: timestamp
     comment:
+      +enabled: "{{ target.type != 'redshift' }}"
+      +column_types:
+        id: "{{ 'int64' if target.type == 'bigquery' else 'bigint' }}"
+        created: timestamp
+        issue_id: "{{ 'int64' if target.type == 'bigquery' else 'bigint' }}"
+        updated: timestamp
+    comment_redshift:
+      +enabled: "{{ target.type == 'redshift' }}"
+      +alias: comment
       +column_types:
         id: "{{ 'int64' if target.type == 'bigquery' else 'bigint' }}"
         created: timestamp

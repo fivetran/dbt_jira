@@ -1,3 +1,10 @@
+# dbt_jira v1.10.1
+
+[PR #193](https://github.com/fivetran/dbt_jira/pull/193) includes the following updates:
+
+## Bug Fix
+- Fixes a runtime error on Snowflake and BigQuery that occurred when an issue's concatenated comments exceeded the warehouse's string length limit. The `conversation` field in `jira__issue_enhanced` now returns `'conversation too long to render'` for those issues instead of failing the entire run. `count_comments` is unaffected. The character threshold defaults to 16,777,216 (16MB) but can be lowered using the `jira_conversation_char_limit` variable. [See the README for configuration details](https://github.com/fivetran/dbt_jira#controlling-conversation-aggregations-in-jira__issue_enhanced) and the [DECISIONLOG](https://github.com/fivetran/dbt_jira/blob/main/DECISIONLOG.md#conversation-aggregation-guard-against-string-length-limits) for per-warehouse details.
+
 # dbt_jira v1.10.0
 
 [PR #191](https://github.com/fivetran/dbt_jira/pull/191) includes the following updates:
