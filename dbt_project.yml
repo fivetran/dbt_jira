@@ -25,6 +25,10 @@ vars:
     version: "{{ source('jira', 'version') }}"
     jira_issue_history_buffer: 1
 
+dispatch:
+  - macro_namespace: fivetran_utils
+    search_order: ['jira', 'fivetran_utils']
+
 analysis-paths: ["analysis"]
 
 models:
