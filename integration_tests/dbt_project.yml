@@ -104,8 +104,6 @@ seeds:
 dispatch:
   - macro_namespace: dbt_utils
     search_order: ['spark_utils', 'dbt_utils']
-  - macro_namespace: fivetran_utils
-    search_order: ['jira', 'fivetran_utils']
 
 flags:
   send_anonymous_usage_stats: False

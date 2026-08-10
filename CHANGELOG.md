@@ -5,7 +5,6 @@
 ## Feature Updates
 - Adds DuckDB as a supported destination.
 
-
 # dbt_jira v1.10.1
 
 [PR #193](https://github.com/fivetran/dbt_jira/pull/193) includes the following updates:
