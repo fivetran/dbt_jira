@@ -127,3 +127,23 @@
     lateral view explode(split(sprint, ', ')) sprints_view as sprints
 
 {% endmacro %}
+
+{% macro duckdb__split_sprint_ids(using_teams, include_story_points=false, include_story_point_estimate=false) %}
+    select
+        daily_issue_field_history.issue_id,
+        daily_issue_field_history.source_relation,
+        daily_issue_field_history.date_day,
+        daily_issue_field_history.date_week,
+        daily_issue_field_history.status,
+        {{ "daily_issue_field_history.team," if using_teams }}
+        {% if include_story_points %}
+        {{ jira.convert_string_to_numeric('daily_issue_field_history.story_points') }} as story_points,
+        {% endif %}
+        {% if include_story_point_estimate %}
+        {{ jira.convert_string_to_numeric('daily_issue_field_history.story_point_estimate') }} as story_point_estimate,
+        {% endif %}
+        unnest(string_split(sprint, ', ')) as sprint_id
+
+    from daily_issue_field_history
+
+{% endmacro %}

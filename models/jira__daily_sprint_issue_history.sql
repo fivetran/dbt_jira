@@ -3,7 +3,7 @@
         enabled=var('jira_using_sprints', True),
         materialized='table',
         partition_by={'field': 'date_week', 'data_type': 'date'}
-            if target.type not in ['spark', 'databricks'] else ['date_week']
+            if target.type not in ('spark', 'databricks', 'duckdb') else ['date_week']
     )
 }}
 

@@ -2,7 +2,7 @@
     config(
         materialized='incremental' if jira_is_incremental_compatible() else 'table',
         partition_by = {'field': 'date_week', 'data_type': 'date'}
-            if target.type not in ['spark', 'databricks'] else ['date_week'],
+            if target.type not in ('spark', 'databricks', 'duckdb') else ['date_week'],
         cluster_by = ['date_week'],
         unique_key='issue_day_id',
         incremental_strategy = 'insert_overwrite' if target.type in ('bigquery', 'databricks', 'spark') else 'delete+insert',
