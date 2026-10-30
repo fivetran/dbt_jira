@@ -1,5 +1,5 @@
-{{ config(materialized='view') }}
--- needs to be a view to use the dbt_utils.star macro in int_jira__issue_users
+-- must stay materialized as a view or table (not ephemeral) since int_jira__issue_users
+-- introspects its columns via the dbt_utils.star macro, which requires a database relation
 
 with issue as (
 
