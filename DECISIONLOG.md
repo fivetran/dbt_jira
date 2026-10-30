@@ -13,11 +13,6 @@ Per-warehouse behavior:
 - **Redshift**: Overflow protection is not currently applied. Redshift has a much lower string size limit, but it does not support the SQL pattern used by this guard, so adding the same protection would require a more significant model change. Conversations are disabled on Redshift by default with `jira_include_conversations`, so overflow is only a risk for users who explicitly enable conversations and have issues with very large comment volumes. If you need Redshift overflow protection, [open a GitHub issue](https://github.com/fivetran/dbt_jira/issues/new/choose).
 - **Postgres and Databricks**: Overflow protection is not applied because their string/text limits make this issue unlikely in practice.
 
-## int_jira__issue_type_parents Must Stay a View or Table
-`int_jira__issue_type_parents` is materialized as a `view` by default, but you can override this in your `dbt_project.yml`, for example to a `table` on destinations that don't support views.
-
-Downstream, `int_jira__issue_users` introspects `int_jira__issue_type_parents`'s columns using the `dbt_utils.star` macro, which requires the referenced model to already exist as a database relation. If `int_jira__issue_type_parents` is overridden to `ephemeral`, that introspection fails. Only `view` and `table` are supported overrides for this model.
-
 ## Enhancing Jira Sprint Reporting with Flexible Metrics
 To improve sprint reporting in the Jira dbt package, we introduced two new models, `jira__daily_sprint_issue_history` and `jira__sprint_enhanced`, designed to capture key sprint metrics such as velocity, time tracking, and story point completion.
   
