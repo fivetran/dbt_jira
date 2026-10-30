@@ -1,0 +1,4 @@
+version: 1.10.3
+pr_number: 201
+under_the_hood:
+  - description: Moves the `view` materialization for `int_jira__issue_type_parents` from the model file to `dbt_project.yml`. The model still builds as a view, and you can override its materialization from your root `dbt_project.yml`, for example to a table on destinations that don't support views.

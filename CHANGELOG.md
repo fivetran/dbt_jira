@@ -1,10 +1,3 @@
-# dbt_jira v1.10.3
-
-[PR #201](https://github.com/fivetran/dbt_jira/pull/201) includes the following updates:
-
-## Under the Hood
-- Moves the `view` materialization for `int_jira__issue_type_parents` from the model file to `dbt_project.yml`. The model still builds as a view, and you can override its materialization from your root `dbt_project.yml`, for example to a table on destinations that don't support views.
-
 # dbt_jira v1.10.2
 
 [PR #195](https://github.com/fivetran/dbt_jira/pull/195) includes the following updates:
