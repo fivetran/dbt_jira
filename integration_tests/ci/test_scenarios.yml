@@ -16,6 +16,11 @@ include_sqlserver: false
 include_duckdb: true
 include_dbt_compile: true
 
+# dbt v2 runs only on these warehouses until upstream dbt bugs are fixed:
+# - databricks: duplicate partition column breaks int_jira__field_history_scd's full refresh (GA-1044229, dbt-labs/dbt#14264)
+# - redshift: view rebuilds fail on the second run (GA-1044262, dbt-labs/dbt#14082)
+dbt_v2_warehouses: ["snowflake", "bigquery", "duckdb"]
+
 test_scenarios:
   - name: "Default"
     vars: {}
