@@ -1,5 +1,5 @@
 -- must stay materialized as a view or table (not ephemeral) since int_jira__issue_users
--- introspects its columns via the dbt_utils.star macro, which requires a database relation
+-- introspects its columns via the `dbt_utils.star` macro, which requires a database relation
 
 with issue as (
 
