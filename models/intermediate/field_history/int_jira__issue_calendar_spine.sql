@@ -34,6 +34,10 @@ issue_history_scd as (
     
     select *
     from {{ ref('int_jira__field_history_scd') }}
+    {% if is_incremental() %}
+    -- Only get records for issues that were updated in the past 3 days
+    where int_jira__field_history_scd.issue_id in (select issue.issue_id from {{ var('issue') }} as issue where issue.updated_at >= dateadd(day, -3, current_date) )
+    {% endif %}
 ),
 
 issue_dates as (
