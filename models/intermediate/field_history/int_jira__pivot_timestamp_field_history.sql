@@ -74,7 +74,7 @@ issue_multiselect_batch_history as (
         source_relation,
         updated_at,
         author_id,
-        {{ fivetran_utils.string_agg('field_value', "', '") }} as field_values
+        {{ dbt.listagg('field_value', "', '") }} as field_values
 
     from combined_multiselect_history
     {{ dbt_utils.group_by(6) }}

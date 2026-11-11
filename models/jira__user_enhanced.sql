@@ -31,7 +31,7 @@ agg_user_projects as (
     select
         assignee_user_id,
         source_relation,
-        {{ fivetran_utils.string_agg( "project_name", "', '" ) }} as projects
+        {{ dbt.listagg( "project_name", "', '" ) }} as projects
     from user_project
     group by 1, 2
 ),

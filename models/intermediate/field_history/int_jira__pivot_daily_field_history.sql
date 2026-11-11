@@ -109,7 +109,7 @@ issue_multiselect_batch_history as (
         updated_at,
         updated_at_week,
         date_day,
-        {{ fivetran_utils.string_agg('field_value', "', '") }} as field_values
+        {{ dbt.listagg('field_value', "', '") }} as field_values
 
     from combined_multiselect_history
 
