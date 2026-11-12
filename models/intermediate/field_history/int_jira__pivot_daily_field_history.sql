@@ -25,7 +25,7 @@ with issue_field_history as (
     from {{ ref('int_jira__issue_field_history') }}
 
     {% if is_incremental() %}
-    {% set max_valid_starting_at_week = jira.jira_lookback(from_date='max(valid_starting_on)', datepart='week', interval=var('lookback_window', 1)) %}
+    {% set max_valid_starting_at_week = fivetran_utils.lookback(from_date='max(valid_starting_on)', datepart='week', interval=var('lookback_window', 1)) %}
     where updated_at_week >= {{ max_valid_starting_at_week }}
     {% endif %}
 ),
