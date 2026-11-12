@@ -24,6 +24,8 @@ models:
         description: Foreign key referencing the id of the `user` who last updated this comment.
       - name: last_updated_at 
         description: Timestamp of when the comment was last updated.
+      - name: _fivetran_synced
+        description: "{{ doc('fivetran_synced') }}"
 
   - name: stg_jira__component
     description: Table of project components (subsections to group issues).
@@ -40,6 +42,8 @@ models:
         description: UI-facing name of the component.
       - name: project_id
         description: Foreign key referencing the id of the component's `project`.
+      - name: _fivetran_synced
+        description: "{{ doc('fivetran_synced') }}"
 
   - name: stg_jira__field
     description: Table of all issue fields.
@@ -60,6 +64,8 @@ models:
           it is default to Jira.
       - name: field_name
         description: Name of the field as it appears on issue cards.
+      - name: _fivetran_synced
+        description: "{{ doc('fivetran_synced') }}"
 
   - name: stg_jira__field_option
     description: Table of all options related to custom fields.
@@ -87,6 +93,8 @@ models:
         description: Foreign key referencing the ID of the `issue` that is the object of this relationship (the linkee).
       - name: relationship
         description: The nature of the link between the two issues ("blocks", "is duplicated by", "relates to", etc.)
+      - name: _fivetran_synced
+        description: "{{ doc('fivetran_synced') }}"
 
   - name: stg_jira__issue
     description: Table of all issues in your organization's Jira (captures soft deletes).
@@ -151,6 +159,8 @@ models:
         description: >
           The percentage of work that has been logged against the issue (time_spent) vs the original estimate of worktime.
           Equals -1.0 when the fields required for calculation are not provided.
+      - name: _fivetran_synced
+        description: "{{ doc('fivetran_synced') }}"
 
   - name: stg_jira__issue_field_history
     description: Table of every value that each **custom non-array** (not multiselect) field has been set to.
@@ -169,6 +179,8 @@ models:
         description: Boolean showing whether this issue field is currently active.
       - name: author_id
         description: Foreign key referencing the ID of the `user` who made this field change.
+      - name: _fivetran_synced
+        description: "{{ doc('fivetran_synced') }}"
 
   - name: stg_jira__issue_multiselect_history
     description: >
@@ -190,6 +202,8 @@ models:
         description: Boolean showing whether this issue field is currently active.
       - name: author_id
         description: Foreign key referencing the ID of the `user` who made this field change.
+      - name: _fivetran_synced
+        description: "{{ doc('fivetran_synced') }}"
 
   - name: stg_jira__issue_type
     description: >
@@ -208,6 +222,8 @@ models:
         description: Name of the issue type (ie Epic, Task, Subtask, any custom types)
       - name: is_subtask
         description: Boolean that is true if this type of issue is a subtask.
+      - name: _fivetran_synced
+        description: "{{ doc('fivetran_synced') }}"
 
   - name: stg_jira__priority
     description: Table of issue priority levels (global).
@@ -222,6 +238,8 @@ models:
         description: Description of the priority level.
       - name: priority_name
         description: Name of the priority as it appears in the UI.
+      - name: _fivetran_synced
+        description: "{{ doc('fivetran_synced') }}"
 
   - name: stg_jira__project
     description: Table of all projects in your organization.
@@ -244,6 +262,8 @@ models:
         description: Foreign key referencing the ID of the `permission_scheme` that the project ascribes to. 
       - name: project_category_id
         description: Foreign key referencing the ID of the `project_category` that the project is associated with, if any.
+      - name: _fivetran_synced
+        description: "{{ doc('fivetran_synced') }}"
 
   - name: stg_jira__resolution
     description: Table storing the types of resolutions used by your organization.
@@ -258,6 +278,8 @@ models:
         description: Description given to the resolution.
       - name: resolution_name 
         description: Display name of the resolution.
+      - name: _fivetran_synced
+        description: "{{ doc('fivetran_synced') }}"
 
   - name: stg_jira__sprint
     description: Table of all sprints.
@@ -278,6 +300,8 @@ models:
         description: Title of the sprint.
       - name: started_at
         description: Timestamp of when the sprint began. 
+      - name: _fivetran_synced
+        description: "{{ doc('fivetran_synced') }}"
 
   - name: stg_jira__status
     description: Table of project-level statuses (which may have the same umbrella `status_category`).
@@ -296,6 +320,8 @@ models:
         description: Title of the status.
       - name: status_category_id
         description: Foreign key referencing the ID of the `status_category` that this project status falls under.
+      - name: _fivetran_synced
+        description: "{{ doc('fivetran_synced') }}"
 
   - name: stg_jira__status_category
     description: Table of umbrella status categories.
@@ -326,6 +352,8 @@ models:
         description: Name of the team.
       - name: team_title
         description: Longer, more descriptive name of the team.
+      - name: _fivetran_synced
+        description: "{{ doc('fivetran_synced') }}"
 
   - name: stg_jira__user
     description: Table of users associated with your organization.
@@ -348,6 +376,8 @@ models:
         description: Account username.
       - name: is_active
         description: Boolean showing whether this issue field is currently active.
+      - name: _fivetran_synced
+        description: "{{ doc('fivetran_synced') }}"
 
   - name: stg_jira__version
     description: Table of project versions in your organization.
