@@ -44,7 +44,7 @@ version_info as (
         latest_versions.field_id,
         latest_versions.issue_id,
         latest_versions.source_relation,
-        {{ fivetran_utils.string_agg('version.version_name', "', '") }} as versions
+        {{ dbt.listagg('version.version_name', "', '") }} as versions
 
     from latest_versions
     join version on latest_versions.version_id = version.version_id

@@ -29,11 +29,11 @@ agg_comments as (
     {%- if var('jira_include_conversations', target.type != 'redshift') %}
     {%- if target.type in ['snowflake', 'bigquery'] %}
     , case when sum(length({{ comment_render }} || '\n')) <= {{ conversation_char_limit }}
-        then {{ fivetran_utils.string_agg(comment_render, "'\\n'") }}
+        then {{ dbt.listagg(comment_render, "'\\n'") }}
         else 'conversation too long to render'
     end as conversation
     {%- else %}
-    , {{ fivetran_utils.string_agg(comment_render, "'\\n'") }} as conversation
+    , {{ dbt.listagg(comment_render, "'\\n'") }} as conversation
     {%- endif %}
     {% endif %}
 

@@ -15,7 +15,7 @@
 
 {% if is_incremental() %}
 -- set max date_day with lookback as a variable for multiple uses
-{% set max_date_week = jira.jira_lookback(from_date='max(date_week)', datepart='week', interval=var('lookback_window', 1)) %}
+{% set max_date_week = fivetran_utils.lookback(from_date='max(date_week)', datepart='week', interval=var('lookback_window', 1)) %}
 {% endif %}
 
 -- in intermediate/field_history/

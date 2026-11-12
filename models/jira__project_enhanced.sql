@@ -22,7 +22,7 @@ agg_epics as (
     select
         project_id,
         source_relation,
-        {{ fivetran_utils.string_agg( "issue_name", "', '" ) }} as epics
+        {{ dbt.listagg( "issue_name", "', '" ) }} as epics
 
     from {{ ref('jira__issue_enhanced') }}
     where lower(issue_type) = 'epic'
@@ -38,7 +38,7 @@ agg_components as (
     select
         project_id,
         source_relation,
-        {{ fivetran_utils.string_agg( "component_name", "', '" ) }} as components
+        {{ dbt.listagg( "component_name", "', '" ) }} as components
     from {{ ref('stg_jira__component') }}
     group by 1, 2
 ),

@@ -10,9 +10,9 @@ calculate_medians as (
     select
         assignee_user_id as user_id,
         source_relation,
-        round(cast({{ fivetran_utils.percentile(percentile_field='case when resolved_at is not null then last_assignment_duration_seconds end',
+        round(cast({{ dbt.percentile(percentile_field='case when resolved_at is not null then last_assignment_duration_seconds end',
                     partition_field='assignee_user_id', percent='0.5') }} as {{ dbt.type_numeric() }}), 0) as median_close_time_seconds,
-        round(cast({{ fivetran_utils.percentile(percentile_field='case when resolved_at is null then last_assignment_duration_seconds end',
+        round(cast({{ dbt.percentile(percentile_field='case when resolved_at is null then last_assignment_duration_seconds end',
                     partition_field='assignee_user_id', percent='0.5') }} as {{ dbt.type_numeric() }}), 0) as median_age_currently_open_seconds
     from issue
     {% if target.type == 'postgres' %} group by 1, 2 {% endif %}

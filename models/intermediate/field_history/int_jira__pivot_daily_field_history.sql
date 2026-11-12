@@ -25,7 +25,7 @@ with issue_field_history as (
     from {{ ref('int_jira__issue_field_history') }}
 
     {% if is_incremental() %}
-    {% set max_valid_starting_at_week = jira.jira_lookback(from_date='max(valid_starting_on)', datepart='week', interval=var('lookback_window', 1)) %}
+    {% set max_valid_starting_at_week = fivetran_utils.lookback(from_date='max(valid_starting_on)', datepart='week', interval=var('lookback_window', 1)) %}
     where updated_at_week >= {{ max_valid_starting_at_week }}
     {% endif %}
 ),
@@ -109,7 +109,7 @@ issue_multiselect_batch_history as (
         updated_at,
         updated_at_week,
         date_day,
-        {{ fivetran_utils.string_agg('field_value', "', '") }} as field_values
+        {{ dbt.listagg('field_value', "', '") }} as field_values
 
     from combined_multiselect_history
 
