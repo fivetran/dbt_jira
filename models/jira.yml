@@ -32,6 +32,8 @@ models:
         description: The ID of the status that an issue has on a given day.
       - name: status
         description: The name of the status that an issue has on a given day.
+      - name: team
+        description: The team associated with an issue on a given day (when `jira_using_teams` is enabled).
 
   - name: jira__timestamp_issue_field_history
     description: >
@@ -59,6 +61,8 @@ models:
         description: The ID of the sprint that an issue is slotted into during this period.
       - name: sprint_name
         description: The name of the sprint that an issue is slotted into during this period. (Returns no data when `jira_using_sprints` is disabled.)
+      - name: team
+        description: The team associated with an issue during this validity period (when `jira_using_teams` is enabled).
       - name: author_id
         description: Foreign key referencing the ID of the `user` who made the field changes.
       - name: is_current_record
@@ -126,6 +130,8 @@ models:
         description: Boolean indicating if the issue was resolved during this sprint.
       - name: days_left_in_sprint
         description: Number of days remaining in the sprint from the given date (null if sprint is completed or date is after sprint end).
+      - name: team
+        description: The team associated with an issue on a given day (when `jira_using_teams` is enabled).
 
   - name: jira__issue_enhanced
     description: >
@@ -135,7 +141,7 @@ models:
       - name: source_relation
         description: "{{ doc('source_relation') }}"
       - name: _fivetran_synced
-        description: Timestamp of when Fivetran last synced this record.
+        description: "{{ doc('fivetran_synced') }}"
       - name: issue_id
         description: Unique ID of the issue.
         tests:
@@ -266,6 +272,8 @@ models:
         description: Comma-separated list of the names of project versions that this issue fixes.
       - name: current_status_category
         description: Title of the umbrella status category that the issue is currently in. 
+      - name: team
+        description: The team currently associated with the issue (when `jira_using_teams` is enabled).
 
   - name: jira__project_enhanced
     description: >
@@ -274,7 +282,7 @@ models:
       - name: source_relation
         description: "{{ doc('source_relation') }}"
       - name: _fivetran_synced
-        description: Timestamp of when Fivetran last synced this record.
+        description: "{{ doc('fivetran_synced') }}"
       - name: project_id
         description: Unique ID of the project.
         tests:
@@ -384,7 +392,7 @@ models:
       - name: source_relation
         description: "{{ doc('source_relation') }}"
       - name: _fivetran_synced
-        description: Timestamp of when Fivetran last synced this record.
+        description: "{{ doc('fivetran_synced') }}"
       - name: user_id
         description: Unique ID of the user.
         tests:

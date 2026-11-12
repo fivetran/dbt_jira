@@ -1,3 +1,13 @@
+# dbt_jira v1.10.4
+
+## Under the Hood
+- **Column documentation coverage**: Documents 21 columns that the models already output but the yml files did not describe. This change is documentation-only and does not alter any schema or data output.
+
+  - Adds `_fivetran_synced` to the 15 staging models that output it.
+  - Adds `team` to `jira__daily_issue_field_history`, `jira__daily_sprint_issue_history`, `jira__issue_enhanced`, and `jira__timestamp_issue_field_history`.
+  - Adds `sprint_name` to `int_jira__field_history_scd` and `int_jira__pivot_daily_field_history`.
+  - Adds a `fivetran_synced` docs block so every `_fivetran_synced` column shares one description.
+
 # dbt_jira v1.10.3
 
 [PR #201](https://github.com/fivetran/dbt_jira/pull/201) includes the following updates:
