@@ -3,6 +3,12 @@ version: 2
 models:
   - name: stg_jira__comment
     description: Table of comments made on issues.
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - source_relation
+              - comment_id
     columns:
       - name: source_relation
         description: "{{ doc('source_relation') }}"
@@ -27,6 +33,12 @@ models:
 
   - name: stg_jira__component
     description: Table of project components (subsections to group issues).
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - source_relation
+              - component_id
     columns:
       - name: source_relation
         description: "{{ doc('source_relation') }}"
@@ -43,6 +55,12 @@ models:
 
   - name: stg_jira__field
     description: Table of all issue fields.
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - source_relation
+              - field_id
     columns:
       - name: source_relation
         description: "{{ doc('source_relation') }}"
@@ -63,6 +81,12 @@ models:
 
   - name: stg_jira__field_option
     description: Table of all options related to custom fields.
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - source_relation
+              - field_id
     columns:
       - name: source_relation
         description: "{{ doc('source_relation') }}"
@@ -78,6 +102,14 @@ models:
   - name: stg_jira__issue_link
     description: >
       Table of relationships (links) created between issues. Issue links can include blockers, clones/duplicates, and general relationships.
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - source_relation
+              - issue_id
+              - related_issue_id
+              - relationship
     columns:
       - name: source_relation
         description: "{{ doc('source_relation') }}"
@@ -90,6 +122,12 @@ models:
 
   - name: stg_jira__issue
     description: Table of all issues in your organization's Jira (captures soft deletes).
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - source_relation
+              - issue_id
     columns:
       - name: source_relation
         description: "{{ doc('source_relation') }}"
@@ -154,6 +192,14 @@ models:
 
   - name: stg_jira__issue_field_history
     description: Table of every value that each **custom non-array** (not multiselect) field has been set to.
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - source_relation
+              - field_id
+              - issue_id
+              - updated_at
     columns:
       - name: source_relation
         description: "{{ doc('source_relation') }}"
@@ -173,6 +219,13 @@ models:
   - name: stg_jira__issue_multiselect_history
     description: >
       Table of every value that each array-type (multiselect) field has been set to. Each row will pertain to **one** value.
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - source_relation
+              - _fivetran_id
+              - updated_at
     columns:
       - name: source_relation
         description: "{{ doc('source_relation') }}"
@@ -195,6 +248,12 @@ models:
     description: >
       Table containing information about issue types. Issue types can have identical names in different projects, but they may have
       differing descriptions.
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - source_relation
+              - issue_type_id
     columns:
       - name: source_relation
         description: "{{ doc('source_relation') }}"
@@ -211,6 +270,12 @@ models:
 
   - name: stg_jira__priority
     description: Table of issue priority levels (global).
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - source_relation
+              - priority_id
     columns:
       - name: source_relation
         description: "{{ doc('source_relation') }}"
@@ -225,6 +290,12 @@ models:
 
   - name: stg_jira__project
     description: Table of all projects in your organization.
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - source_relation
+              - project_id
     columns:
       - name: source_relation
         description: "{{ doc('source_relation') }}"
@@ -247,6 +318,12 @@ models:
 
   - name: stg_jira__resolution
     description: Table storing the types of resolutions used by your organization.
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - source_relation
+              - resolution_id
     columns:
       - name: source_relation
         description: "{{ doc('source_relation') }}"
@@ -261,6 +338,12 @@ models:
 
   - name: stg_jira__sprint
     description: Table of all sprints.
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - source_relation
+              - sprint_id
     columns:
       - name: source_relation
         description: "{{ doc('source_relation') }}"
@@ -281,6 +364,12 @@ models:
 
   - name: stg_jira__status
     description: Table of project-level statuses (which may have the same umbrella `status_category`).
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - source_relation
+              - status_id
     columns:
       - name: source_relation
         description: "{{ doc('source_relation') }}"
@@ -299,6 +388,12 @@ models:
 
   - name: stg_jira__status_category
     description: Table of umbrella status categories.
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - source_relation
+              - status_category_id
     columns:
       - name: source_relation
         description: "{{ doc('source_relation') }}"
@@ -311,6 +406,12 @@ models:
   
   - name: stg_jira__team
     description: Table of teams associated with your organization.
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - source_relation
+              - team_id
     columns:
       - name: source_relation
         description: "{{ doc('source_relation') }}"
@@ -329,6 +430,12 @@ models:
 
   - name: stg_jira__user
     description: Table of users associated with your organization.
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - source_relation
+              - user_id
     columns:
       - name: source_relation
         description: "{{ doc('source_relation') }}"
@@ -351,6 +458,12 @@ models:
 
   - name: stg_jira__version
     description: Table of project versions in your organization.
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - source_relation
+              - version_id
     columns:
       - name: source_relation
         description: "{{ doc('source_relation') }}"

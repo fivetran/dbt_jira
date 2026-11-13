@@ -131,6 +131,12 @@ models:
     description: >
       The core issue table, enhanced with current-status attributes from foreign-key-related tables,
       and metrics regarding resolutions and assignments.
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - source_relation
+              - issue_id
     columns:
       - name: source_relation
         description: "{{ doc('source_relation') }}"
@@ -270,6 +276,12 @@ models:
   - name: jira__project_enhanced
     description: >
       Table of projects enriched with data about its lead, epics, components, and volume and velocity of worktime.
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - source_relation
+              - project_id
     columns:
       - name: source_relation
         description: "{{ doc('source_relation') }}"
@@ -341,6 +353,12 @@ models:
   - name: jira__sprint_enhanced
     description: >
       One row per sprint per team with metrics on issues created, resolved, and carried over, plus story point estimates. If teams are disabled, granularity is one row per sprint.
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - source_relation
+              - sprint_id
     columns:
       - name: source_relation
         description: "{{ doc('source_relation') }}"
@@ -380,6 +398,12 @@ models:
   - name: jira__user_enhanced
     description: >
       Table of users enriched with their projects, and the volume and velocity of their issues.
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - source_relation
+              - user_id
     columns:
       - name: source_relation
         description: "{{ doc('source_relation') }}"
@@ -429,6 +453,13 @@ models:
       Each record represents a status transition for an issue, tracking the complete workflow journey
       with timing metrics and transition analysis. The grain is issue_id + status_sequence, providing
       a chronological view of how issues move through different statuses over time.
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - source_relation
+              - issue_id
+              - status_sequence
     columns:
       - name: source_relation
         description: "{{ doc('source_relation') }}"
