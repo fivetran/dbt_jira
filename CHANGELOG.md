@@ -1,3 +1,10 @@
+# dbt_jira v1.10.4
+
+[PR #205](https://github.com/fivetran/dbt_jira/pull/205) includes the following updates:
+
+## Bug Fixes
+- Casts the `dateadd` result to `date` in the `int_jira__issue_calendar_spine` join so both sides of the comparison are dates. This resolves a date vs. timestamp mismatch flagged by dbt Fusion strict static analysis (`dbt0407`). Results are unchanged.
+
 # dbt_jira v1.10.3
 
 [PR #201](https://github.com/fivetran/dbt_jira/pull/201) includes the following updates:
