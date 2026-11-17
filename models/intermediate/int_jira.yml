@@ -9,7 +9,7 @@ models:
       - name: source_relation
         description: "{{ doc('source_relation') }}"
       - name: _fivetran_synced
-        description: Timestamp of when Fivetran last synced this record.
+        description: "{{ doc('fivetran_synced') }}"
       - name: issue_id
         description: Unique ID of the issue.
         tests:
@@ -265,7 +265,7 @@ models:
       - name: source_relation
         description: "{{ doc('source_relation') }}"
       - name: _fivetran_synced
-        description: Timestamp of when Fivetran last synced this record.
+        description: "{{ doc('fivetran_synced') }}"
       - name: issue_id
         description: Unique ID of the issue.
         tests:
@@ -457,6 +457,8 @@ models:
         description: Foreign key referencing the ID of the `issue` whose field was updated.
       - name: sprint
         description: The ID of the sprint that an issue is slotted into on a given day.
+      - name: sprint_name
+        description: The name of the sprint that an issue is slotted into on a given day. Returns null when `jira_using_sprints` is disabled.
       - name: status
         description: The ID of the status that an issue has on a given day.
       - name: story_points
@@ -601,6 +603,8 @@ models:
         description: Foreign key referencing the ID of the `issue` whose field was updated.
       - name: sprint
         description: The ID of the sprint that an issue is slotted into on a given day.
+      - name: sprint_name
+        description: The name of the sprint that an issue is slotted into on a given day. Returns null when `jira_using_sprints` is disabled.
       - name: status
         description: The ID of the status that an issue has on a given day.
       - name: status_id
