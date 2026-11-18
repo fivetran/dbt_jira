@@ -1,19 +1,13 @@
 version: 1.11.0
 pr_number: 204
 new_features:
-- description: Raises the minimum supported dbt version from v1.3.0 to v1.10.0.
+- description: Raises the minimum dbt version to 1.10.0.
+- description: Adds `dbt_utils.unique_combination_of_columns` tests to staging and end models. If a test fails, please [open an issue](https://github.com/fivetran/dbt_jira/issues/new/choose).
 under_the_hood:
-- description: Adds `dbt_utils.unique_combination_of_columns` tests to the staging and end models. The tests use the `arguments` syntax introduced in dbt v1.10.0, the new minimum supported version.
 - title: Column documentation coverage
-  description: 'Documents 21 columns that the models already output but the yml files
-    did not describe. This change is documentation-only and does not alter any schema
-    or data output.
-
-    '
+  description: Documents 21 columns that the models already output but the yml files did not describe. This change is documentation-only and does not alter any schema or data output.
   details:
   - Adds `_fivetran_synced` to the 15 staging models that output it.
-  - Adds `team` to `jira__daily_issue_field_history`, `jira__daily_sprint_issue_history`,
-    `jira__issue_enhanced`, and `jira__timestamp_issue_field_history`.
+  - Adds `team` to `jira__daily_issue_field_history`, `jira__daily_sprint_issue_history`, `jira__issue_enhanced`, and `jira__timestamp_issue_field_history`.
   - Adds `sprint_name` to `int_jira__field_history_scd` and `int_jira__pivot_daily_field_history`.
-  - Adds a `fivetran_synced` docs block so every `_fivetran_synced` column shares
-    one description.
+  - Adds a `fivetran_synced` docs block so every `_fivetran_synced` column shares one description.
