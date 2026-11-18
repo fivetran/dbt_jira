@@ -5,10 +5,6 @@ new_features:
 - description: Adds `dbt_utils.unique_combination_of_columns` tests to staging and
     end models. If a test fails, please [open an issue](https://github.com/fivetran/dbt_jira/issues/new/choose).
 under_the_hood:
-- title: Column documentation coverage
-  description: Documents 21 columns that the models already output but the yml files
-    did not describe. This change is documentation-only and does not alter any schema
-    or data output.
   details:
   - Adds `_fivetran_synced` to the 15 staging models that output it.
   - Adds `team` to `jira__daily_issue_field_history`, `jira__daily_sprint_issue_history`,
