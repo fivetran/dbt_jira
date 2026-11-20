@@ -3,12 +3,18 @@ version: 2
 models:
   - name: stg_jira__comment
     description: Table of comments made on issues.
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - source_relation
+              - comment_id
     columns:
       - name: source_relation
         description: "{{ doc('source_relation') }}"
       - name: comment_id 
         description: Unique ID of the comment.
-        tests:
+        data_tests:
           - not_null
       - name: author_user_id
         description: Foreign key referencing the `user` id of the comment's author.
@@ -24,15 +30,23 @@ models:
         description: Foreign key referencing the id of the `user` who last updated this comment.
       - name: last_updated_at 
         description: Timestamp of when the comment was last updated.
+      - name: _fivetran_synced
+        description: "{{ doc('fivetran_synced') }}"
 
   - name: stg_jira__component
     description: Table of project components (subsections to group issues).
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - source_relation
+              - component_id
     columns:
       - name: source_relation
         description: "{{ doc('source_relation') }}"
       - name: component_id
         description: ID of the component.
-        tests:
+        data_tests:
           - not_null
       - name: component_description
         description: Description given to the component.
@@ -40,9 +54,17 @@ models:
         description: UI-facing name of the component.
       - name: project_id
         description: Foreign key referencing the id of the component's `project`.
+      - name: _fivetran_synced
+        description: "{{ doc('fivetran_synced') }}"
 
   - name: stg_jira__field
     description: Table of all issue fields.
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - source_relation
+              - field_id
     columns:
       - name: source_relation
         description: "{{ doc('source_relation') }}"
@@ -50,7 +72,7 @@ models:
         description: >
           Unique ID of the field. Default fields will have descriptive IDs, whereas custom
           field IDs will be `'customfield_#####'`.
-        tests:
+        data_tests:
           - not_null
       - name: is_array
         description: Boolean that is true if a field can have multiple values (is multiselect).
@@ -60,15 +82,23 @@ models:
           it is default to Jira.
       - name: field_name
         description: Name of the field as it appears on issue cards.
+      - name: _fivetran_synced
+        description: "{{ doc('fivetran_synced') }}"
 
   - name: stg_jira__field_option
     description: Table of all options related to custom fields.
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - source_relation
+              - field_id
     columns:
       - name: source_relation
         description: "{{ doc('source_relation') }}"
       - name: field_id
         description: The ID of the custom field.
-        tests:
+        data_tests:
           - not_null
       - name: parent_field_id
         description: The ID of the parent custom field.
@@ -78,6 +108,14 @@ models:
   - name: stg_jira__issue_link
     description: >
       Table of relationships (links) created between issues. Issue links can include blockers, clones/duplicates, and general relationships.
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - source_relation
+              - issue_id
+              - related_issue_id
+              - relationship
     columns:
       - name: source_relation
         description: "{{ doc('source_relation') }}"
@@ -87,15 +125,23 @@ models:
         description: Foreign key referencing the ID of the `issue` that is the object of this relationship (the linkee).
       - name: relationship
         description: The nature of the link between the two issues ("blocks", "is duplicated by", "relates to", etc.)
+      - name: _fivetran_synced
+        description: "{{ doc('fivetran_synced') }}"
 
   - name: stg_jira__issue
     description: Table of all issues in your organization's Jira (captures soft deletes).
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - source_relation
+              - issue_id
     columns:
       - name: source_relation
         description: "{{ doc('source_relation') }}"
       - name: issue_id
         description: Unique ID of the issue. 
-        tests:
+        data_tests:
           - not_null
       - name: assignee_user_id
         description: Foreign key referencing the ID of the `user` currently assigned to this task.
@@ -151,9 +197,19 @@ models:
         description: >
           The percentage of work that has been logged against the issue (time_spent) vs the original estimate of worktime.
           Equals -1.0 when the fields required for calculation are not provided.
+      - name: _fivetran_synced
+        description: "{{ doc('fivetran_synced') }}"
 
   - name: stg_jira__issue_field_history
     description: Table of every value that each **custom non-array** (not multiselect) field has been set to.
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - source_relation
+              - field_id
+              - issue_id
+              - updated_at
     columns:
       - name: source_relation
         description: "{{ doc('source_relation') }}"
@@ -169,10 +225,19 @@ models:
         description: Boolean showing whether this issue field is currently active.
       - name: author_id
         description: Foreign key referencing the ID of the `user` who made this field change.
+      - name: _fivetran_synced
+        description: "{{ doc('fivetran_synced') }}"
 
   - name: stg_jira__issue_multiselect_history
     description: >
       Table of every value that each array-type (multiselect) field has been set to. Each row will pertain to **one** value.
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - source_relation
+              - _fivetran_id
+              - updated_at
     columns:
       - name: source_relation
         description: "{{ doc('source_relation') }}"
@@ -190,17 +255,25 @@ models:
         description: Boolean showing whether this issue field is currently active.
       - name: author_id
         description: Foreign key referencing the ID of the `user` who made this field change.
+      - name: _fivetran_synced
+        description: "{{ doc('fivetran_synced') }}"
 
   - name: stg_jira__issue_type
     description: >
       Table containing information about issue types. Issue types can have identical names in different projects, but they may have
       differing descriptions.
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - source_relation
+              - issue_type_id
     columns:
       - name: source_relation
         description: "{{ doc('source_relation') }}"
       - name: issue_type_id 
         description: Unique ID of the issue type. 
-        tests:
+        data_tests:
           - not_null
       - name: description
         description: Project-level description given to the issue type.
@@ -208,29 +281,45 @@ models:
         description: Name of the issue type (ie Epic, Task, Subtask, any custom types)
       - name: is_subtask
         description: Boolean that is true if this type of issue is a subtask.
+      - name: _fivetran_synced
+        description: "{{ doc('fivetran_synced') }}"
 
   - name: stg_jira__priority
     description: Table of issue priority levels (global).
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - source_relation
+              - priority_id
     columns:
       - name: source_relation
         description: "{{ doc('source_relation') }}"
       - name: priority_id
         description: Unique ID of the priority level.
-        tests:
+        data_tests:
           - not_null
       - name: priority_description
         description: Description of the priority level.
       - name: priority_name
         description: Name of the priority as it appears in the UI.
+      - name: _fivetran_synced
+        description: "{{ doc('fivetran_synced') }}"
 
   - name: stg_jira__project
     description: Table of all projects in your organization.
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - source_relation
+              - project_id
     columns:
       - name: source_relation
         description: "{{ doc('source_relation') }}"
       - name: project_id
         description: Unique ID of the project.
-        tests:
+        data_tests:
           - not_null
       - name: project_description
         description: Description of the project, if given.
@@ -244,29 +333,45 @@ models:
         description: Foreign key referencing the ID of the `permission_scheme` that the project ascribes to. 
       - name: project_category_id
         description: Foreign key referencing the ID of the `project_category` that the project is associated with, if any.
+      - name: _fivetran_synced
+        description: "{{ doc('fivetran_synced') }}"
 
   - name: stg_jira__resolution
     description: Table storing the types of resolutions used by your organization.
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - source_relation
+              - resolution_id
     columns:
       - name: source_relation
         description: "{{ doc('source_relation') }}"
       - name: resolution_id
         description: Unique ID of the resolution type.
-        tests:
+        data_tests:
           - not_null
       - name: resolution_description
         description: Description given to the resolution.
       - name: resolution_name 
         description: Display name of the resolution.
+      - name: _fivetran_synced
+        description: "{{ doc('fivetran_synced') }}"
 
   - name: stg_jira__sprint
     description: Table of all sprints.
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - source_relation
+              - sprint_id
     columns:
       - name: source_relation
         description: "{{ doc('source_relation') }}"
       - name: sprint_id
         description: Unique ID of the sprint.
-        tests:
+        data_tests:
           - not_null
       - name: board_id
         description: Foreign key referencing the ID of the `board` that the sprint lives in.
@@ -278,15 +383,23 @@ models:
         description: Title of the sprint.
       - name: started_at
         description: Timestamp of when the sprint began. 
+      - name: _fivetran_synced
+        description: "{{ doc('fivetran_synced') }}"
 
   - name: stg_jira__status
     description: Table of project-level statuses (which may have the same umbrella `status_category`).
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - source_relation
+              - status_id
     columns:
       - name: source_relation
         description: "{{ doc('source_relation') }}"
       - name: status_id
         description: Unique ID of the project status.
-        tests:
+        data_tests:
           - not_null
       - name: status_description
         description: >
@@ -296,27 +409,41 @@ models:
         description: Title of the status.
       - name: status_category_id
         description: Foreign key referencing the ID of the `status_category` that this project status falls under.
+      - name: _fivetran_synced
+        description: "{{ doc('fivetran_synced') }}"
 
   - name: stg_jira__status_category
     description: Table of umbrella status categories.
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - source_relation
+              - status_category_id
     columns:
       - name: source_relation
         description: "{{ doc('source_relation') }}"
       - name: status_category_id
         description: Unique ID of the status category.
-        tests:
+        data_tests:
           - not_null
       - name: status_category_name
         description: Title of the status category.
   
   - name: stg_jira__team
     description: Table of teams associated with your organization.
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - source_relation
+              - team_id
     columns:
       - name: source_relation
         description: "{{ doc('source_relation') }}"
       - name: team_id
         description: Unique ID of the team.
-        tests:
+        data_tests:
           - not_null
       - name: is_shared_team
         description: Boolean that is true if the team is shared with other teams in your organization.
@@ -326,15 +453,23 @@ models:
         description: Name of the team.
       - name: team_title
         description: Longer, more descriptive name of the team.
+      - name: _fivetran_synced
+        description: "{{ doc('fivetran_synced') }}"
 
   - name: stg_jira__user
     description: Table of users associated with your organization.
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - source_relation
+              - user_id
     columns:
       - name: source_relation
         description: "{{ doc('source_relation') }}"
       - name: user_id  
         description: Unique ID of the user. 
-        tests:
+        data_tests:
           - not_null
       - name: email
         description: Email associated with the user account.
@@ -348,9 +483,17 @@ models:
         description: Account username.
       - name: is_active
         description: Boolean showing whether this issue field is currently active.
+      - name: _fivetran_synced
+        description: "{{ doc('fivetran_synced') }}"
 
   - name: stg_jira__version
     description: Table of project versions in your organization.
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - source_relation
+              - version_id
     columns:
       - name: source_relation
         description: "{{ doc('source_relation') }}"
@@ -360,7 +503,7 @@ models:
         description: The optional description given to the version.
       - name: version_id
         description: Unique ID of the version.
-        tests:
+        data_tests:
           - not_null
       - name: version_name
         description: Unique name of the version.
