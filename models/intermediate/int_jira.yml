@@ -12,7 +12,7 @@ models:
         description: "{{ doc('fivetran_synced') }}"
       - name: issue_id
         description: Unique ID of the issue.
-        tests:
+        data_tests:
           - not_null
       - name: issue_name
         description: Title of the issue.
@@ -135,7 +135,7 @@ models:
         description: "{{ doc('source_relation') }}"
       - name: project_id
         description: Unique ID of the project.
-        tests:
+        data_tests:
           - not_null
       - name: count_closed_issues
         description: The number of issues closed in this project.
@@ -183,7 +183,7 @@ models:
         description: "{{ doc('source_relation') }}"
       - name: user_id  
         description: Unique ID of the user. 
-        tests:
+        data_tests:
           - not_null
       - name: count_closed_issues
         description: The number of issues that the user has closed (while being assigned to).
@@ -213,7 +213,7 @@ models:
         description: "{{ doc('source_relation') }}"
       - name: issue_id
         description: Unique ID of the issue.
-        tests:
+        data_tests:
           - not_null
       - name: conversation
         description: >
@@ -268,7 +268,7 @@ models:
         description: "{{ doc('fivetran_synced') }}"
       - name: issue_id
         description: Unique ID of the issue.
-        tests:
+        data_tests:
           - not_null
       - name: parent_issue_id
         description: Unique ID of the parent issue.
@@ -346,7 +346,7 @@ models:
         description: "{{ doc('source_relation') }}"
       - name: issue_id
         description: Unique ID of the issue.
-        tests:
+        data_tests:
           - not_null
       - name: assignee_name
         description: User display name of the person currently assigned this issue.
@@ -436,7 +436,7 @@ models:
         description: Foreign key referencing the unique ID of the `issue` whose field was updated.
       - name: issue_day_id
         description: Unique ID hashed on `date_day`, `issue_id`, and `source_relation`. 
-        tests:
+        data_tests:
           - unique
           - not_null
       - name: earliest_open_until_date
@@ -470,7 +470,7 @@ models:
       # plus any fields specified by `var('issue_field_history_columns')`
       - name: issue_day_id
         description: Unique ID hashed on `valid_starting_on`, `issue_id` and `source_relation`.
-        tests:
+        data_tests:
           - unique
           - not_null
 
@@ -585,7 +585,7 @@ models:
         description: Timestamp of when the issue was first resolved.  
       - name: issue_id
         description: Foreign key referencing the ID of the `issue` that was assigned or resolved.
-        tests:
+        data_tests:
           - not_null
   
   - name: int_jira__field_history_scd
@@ -620,7 +620,7 @@ models:
       # plus any fields specified by `var('issue_field_history_columns')`
       - name: issue_day_id
         description: Unique ID hashed on `valid_starting_on`, `issue_id`, and `source_relation`.
-        tests:
+        data_tests:
           - unique
           - not_null
 
@@ -632,7 +632,7 @@ models:
         description: "{{ doc('source_relation') }}"
       - name: issue_id
         description: Foreign key referencing the `issue` tagged with these versions. 
-        tests:
+        data_tests:
           - not_null
       - name: affects_versions
         description: Comma-separated list of the names of project versions that this issue affects.

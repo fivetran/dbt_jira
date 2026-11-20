@@ -14,7 +14,7 @@ models:
         description: "{{ doc('source_relation') }}"
       - name: comment_id 
         description: Unique ID of the comment.
-        tests:
+        data_tests:
           - not_null
       - name: author_user_id
         description: Foreign key referencing the `user` id of the comment's author.
@@ -46,7 +46,7 @@ models:
         description: "{{ doc('source_relation') }}"
       - name: component_id
         description: ID of the component.
-        tests:
+        data_tests:
           - not_null
       - name: component_description
         description: Description given to the component.
@@ -72,7 +72,7 @@ models:
         description: >
           Unique ID of the field. Default fields will have descriptive IDs, whereas custom
           field IDs will be `'customfield_#####'`.
-        tests:
+        data_tests:
           - not_null
       - name: is_array
         description: Boolean that is true if a field can have multiple values (is multiselect).
@@ -98,7 +98,7 @@ models:
         description: "{{ doc('source_relation') }}"
       - name: field_id
         description: The ID of the custom field.
-        tests:
+        data_tests:
           - not_null
       - name: parent_field_id
         description: The ID of the parent custom field.
@@ -141,7 +141,7 @@ models:
         description: "{{ doc('source_relation') }}"
       - name: issue_id
         description: Unique ID of the issue. 
-        tests:
+        data_tests:
           - not_null
       - name: assignee_user_id
         description: Foreign key referencing the ID of the `user` currently assigned to this task.
@@ -273,7 +273,7 @@ models:
         description: "{{ doc('source_relation') }}"
       - name: issue_type_id 
         description: Unique ID of the issue type. 
-        tests:
+        data_tests:
           - not_null
       - name: description
         description: Project-level description given to the issue type.
@@ -297,7 +297,7 @@ models:
         description: "{{ doc('source_relation') }}"
       - name: priority_id
         description: Unique ID of the priority level.
-        tests:
+        data_tests:
           - not_null
       - name: priority_description
         description: Description of the priority level.
@@ -319,7 +319,7 @@ models:
         description: "{{ doc('source_relation') }}"
       - name: project_id
         description: Unique ID of the project.
-        tests:
+        data_tests:
           - not_null
       - name: project_description
         description: Description of the project, if given.
@@ -349,7 +349,7 @@ models:
         description: "{{ doc('source_relation') }}"
       - name: resolution_id
         description: Unique ID of the resolution type.
-        tests:
+        data_tests:
           - not_null
       - name: resolution_description
         description: Description given to the resolution.
@@ -371,7 +371,7 @@ models:
         description: "{{ doc('source_relation') }}"
       - name: sprint_id
         description: Unique ID of the sprint.
-        tests:
+        data_tests:
           - not_null
       - name: board_id
         description: Foreign key referencing the ID of the `board` that the sprint lives in.
@@ -399,7 +399,7 @@ models:
         description: "{{ doc('source_relation') }}"
       - name: status_id
         description: Unique ID of the project status.
-        tests:
+        data_tests:
           - not_null
       - name: status_description
         description: >
@@ -425,7 +425,7 @@ models:
         description: "{{ doc('source_relation') }}"
       - name: status_category_id
         description: Unique ID of the status category.
-        tests:
+        data_tests:
           - not_null
       - name: status_category_name
         description: Title of the status category.
@@ -443,7 +443,7 @@ models:
         description: "{{ doc('source_relation') }}"
       - name: team_id
         description: Unique ID of the team.
-        tests:
+        data_tests:
           - not_null
       - name: is_shared_team
         description: Boolean that is true if the team is shared with other teams in your organization.
@@ -469,7 +469,7 @@ models:
         description: "{{ doc('source_relation') }}"
       - name: user_id  
         description: Unique ID of the user. 
-        tests:
+        data_tests:
           - not_null
       - name: email
         description: Email associated with the user account.
@@ -503,7 +503,7 @@ models:
         description: The optional description given to the version.
       - name: version_id
         description: Unique ID of the version.
-        tests:
+        data_tests:
           - not_null
       - name: version_name
         description: Unique name of the version.
