@@ -6,7 +6,7 @@
 - **Breaking change**: Raises the minimum dbt version to 1.10.0.
 - Adds `dbt_utils.unique_combination_of_columns` tests to staging and end models. If a test fails, please [open an issue](https://github.com/fivetran/dbt_jira/issues/new/choose).
 
-## Bug Fixes
+## Bug Fix
 - Casts the `dateadd` result to `date` in the `int_jira__issue_calendar_spine` join so both sides of the comparison are dates. This resolves a date vs. timestamp mismatch flagged by dbt Fusion strict static analysis (`dbt0407`). Results are unchanged.
 
 ## Under the Hood
