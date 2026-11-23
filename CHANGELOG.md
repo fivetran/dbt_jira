@@ -1,3 +1,17 @@
+# dbt_jira v1.11.0
+
+[PR #204](https://github.com/fivetran/dbt_jira/pull/204) and [PR #205](https://github.com/fivetran/dbt_jira/pull/205) include the following updates:
+
+## Feature Update
+- **Breaking change**: Raises the minimum dbt version to 1.10.0.
+- Adds `dbt_utils.unique_combination_of_columns` tests to staging and end models. If a test fails, please [open an issue](https://github.com/fivetran/dbt_jira/issues/new/choose).
+
+## Bug Fix
+- Casts the `dateadd` result to `date` in the `int_jira__issue_calendar_spine` join so both sides of the comparison are dates. This resolves a date vs. timestamp mismatch flagged by dbt Fusion strict static analysis (`dbt0407`). Results are unchanged.
+
+## Under the Hood
+- Updates yml column documentation to match model output.
+
 # dbt_jira v1.10.3
 
 [PR #201](https://github.com/fivetran/dbt_jira/pull/201) includes the following updates:
