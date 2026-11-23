@@ -15,7 +15,7 @@ This dbt package transforms data from Fivetran's Jira connector into analytics-r
   - [DAG](https://fivetran.github.io/dbt_jira/#!/overview?g_v=1)
   - [Changelog](https://github.com/fivetran/dbt_jira/blob/main/CHANGELOG.md)
 - dbt Core™ supported versions
-  - `>=1.3.0, <3.0.0`
+  - `>=1.10.0, <3.0.0`
 
 ## What does this dbt package do?
 This package enables you to better understand the workload, performance, and velocity of your team's work using Jira issues. It creates enriched models with metrics focused on daily issue history, workflow analysis, and team performance. The package also resolves IDs to their human-readable labels across standard fields, custom fields, and historical values, so you can query `status = 'In Progress'` instead of `status = 10005` without writing any join logic yourself.
@@ -66,7 +66,7 @@ Include the following jira package version in your `packages.yml` file:
 ```yaml
 packages:
   - package: fivetran/jira
-    version: [">=1.10.0", "<1.11.0"]
+    version: [">=1.11.0", "<1.12.0"]
 ```
 
 > All required sources and staging models are now bundled into this transformation package. Do not include `fivetran/jira_source` in your `packages.yml` since this package has been deprecated.
@@ -275,7 +275,7 @@ The Fivetran team maintaining this package only maintains the [latest version](h
 ### Contributions
 A small team of analytics engineers at Fivetran develops these dbt packages. However, the packages are made better by community contributions.
 
-We highly encourage and welcome contributions to this package. Learn how to contribute to a package in dbt's [Contributing to an external dbt package article](https://discourse.getdbt.com/t/contributing-to-a-dbt-package/657).
+We highly encourage and welcome contributions to this package. Learn how to contribute to a package by reading the guidelines in our [CONTRIBUTING.md](https://github.com/fivetran/dbt_jira/blob/main/CONTRIBUTING.md) document.
 
 <!--section-end-->
 
