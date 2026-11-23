@@ -11,13 +11,13 @@ calculate_medians as (
         project_id,
         source_relation,
         round(cast({{ fivetran_utils.percentile(percentile_field='case when resolved_at is not null then open_duration_seconds end',
-                    partition_field='project_id', percent='0.5') }} as {{ dbt.type_numeric() }} ), 0) as median_close_time_seconds,
+                    partition_field='project_id, source_relation', percent='0.5') }} as {{ dbt.type_numeric() }} ), 0) as median_close_time_seconds,
         round(cast({{ fivetran_utils.percentile(percentile_field='case when resolved_at is null then open_duration_seconds end',
-                    partition_field='project_id', percent='0.5') }} as {{ dbt.type_numeric() }} ), 0) as median_age_currently_open_seconds,
+                    partition_field='project_id, source_relation', percent='0.5') }} as {{ dbt.type_numeric() }} ), 0) as median_age_currently_open_seconds,
         round(cast({{ fivetran_utils.percentile(percentile_field='case when resolved_at is not null then any_assignment_duration_seconds end',
-                    partition_field='project_id', percent='0.5') }} as {{ dbt.type_numeric() }} ), 0) as median_assigned_close_time_seconds,
+                    partition_field='project_id, source_relation', percent='0.5') }} as {{ dbt.type_numeric() }} ), 0) as median_assigned_close_time_seconds,
         round(cast({{ fivetran_utils.percentile(percentile_field='case when resolved_at is null then any_assignment_duration_seconds end',
-                    partition_field='project_id', percent='0.5') }} as {{ dbt.type_numeric() }} ), 0) as median_age_currently_open_assigned_seconds
+                    partition_field='project_id, source_relation', percent='0.5') }} as {{ dbt.type_numeric() }} ), 0) as median_age_currently_open_assigned_seconds
     from issue
 
     {% if target.type == 'postgres' %} group by project_id, source_relation {% endif %}
