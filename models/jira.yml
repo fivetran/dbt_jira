@@ -367,6 +367,16 @@ models:
             combination_of_columns:
               - source_relation
               - sprint_id
+              - team
+          config:
+            enabled: "{{ var('jira_using_teams', true) and var('jira_sprint_enhanced_include_teams', true) }}"
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - source_relation
+              - sprint_id
+          config:
+            enabled: "{{ not (var('jira_using_teams', true) and var('jira_sprint_enhanced_include_teams', true)) }}"
     columns:
       - name: source_relation
         description: "{{ doc('source_relation') }}"
