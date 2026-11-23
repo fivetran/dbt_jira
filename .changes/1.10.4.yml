@@ -1,8 +1,0 @@
-version: 1.10.4
-pr_number: 205
-bug_fixes:
-- description: Casts the `dateadd` result to `date` in the `int_jira__issue_calendar_spine`
-    join so both sides of the comparison are dates. This resolves a date vs. timestamp
-    mismatch flagged by dbt Fusion strict static analysis (`dbt0407`). Results are
-    unchanged.
-date: '2026-11-16'
